@@ -40,7 +40,7 @@ export default function RewardOverlay({
     if (!reward) return;
     pop.setValue(0);
     coins.setValue(0);
-    Animated.sequence([
+    Animated.parallel([
       Animated.spring(pop, {
         toValue: 1,
         friction: 5,
@@ -49,7 +49,8 @@ export default function RewardOverlay({
       }),
       Animated.timing(coins, {
         toValue: 1,
-        duration: 700,
+        duration: 620,
+        delay: 160,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
@@ -116,6 +117,9 @@ export default function RewardOverlay({
             </LinearGradient>
 
             {/* les gains, en très gros */}
+            {/* l'animation ne porte que sur la position : un chiffre de gain
+                ne doit jamais rester invisible si une séquence s'interrompt */}
+            {(reward.gold > 0 || reward.xp > 0 || reward.piments) && (
             <Animated.View
               style={[
                 styles.gains,
@@ -124,11 +128,10 @@ export default function RewardOverlay({
                     {
                       translateY: coins.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [18, 0],
+                        outputRange: [16, 0],
                       }),
                     },
                   ],
-                  opacity: coins,
                 },
               ]}
             >
@@ -158,6 +161,7 @@ export default function RewardOverlay({
                 </View>
               ) : null}
             </Animated.View>
+            )}
 
             {reward.itemName && (
               <View
@@ -250,11 +254,22 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.35)',
   },
-  bannerText: { fontFamily: F.black, fontSize: 21, lineHeight: 27 },
+  bannerText: {
+    fontFamily: F.black,
+    fontSize: 21,
+    lineHeight: 26,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
   gains: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 18 },
   gain: { flexDirection: 'row', alignItems: 'baseline', gap: 5 },
   gainIcon: { fontSize: 26 },
-  gainValue: { fontFamily: F.black, fontSize: 40, lineHeight: 50 },
+  gainValue: {
+    fontFamily: F.black,
+    fontSize: 40,
+    lineHeight: 46,
+    includeFontPadding: false,
+  },
   gainUnit: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.textDim },
   item: {
     flexDirection: 'row',

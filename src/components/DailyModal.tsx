@@ -4,11 +4,12 @@ import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 
 import { STREAK_REWARDS } from '../game/progress';
 import { useGame } from '../store/gameStore';
+import { localDay } from '../game/day';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button } from './ui';
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDay();
 }
 
 /** Rendez-vous quotidien : la série de connexions, récompense croissante. */

@@ -15,6 +15,7 @@ import {
   T,
   Well,
 } from '../components/ui';
+import { formatUntil, nextDailyReset } from '../game/day';
 import { fmt } from '../game/formulas';
 import { MAX_DODOS_PER_DAY, MAX_MOTIVATION } from '../game/quests';
 import { TRANSPORTS } from '../game/transport';
@@ -69,11 +70,28 @@ export default function QuestScreen() {
           </Text>
         </View>
         <Bar value={motivation} max={MAX_MOTIVATION} variant="lagoon" height={16} />
+
+        {motivation < 20 && (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>
+              {motivation === 0 ? '😮‍💨 Pu d’énerzi' : '⚠️ Énerzi ba'}
+            </Text>
+            <Text style={styles.emptyText}>
+              Rechargé o komplé dan {formatUntil(nextDailyReset() - now)} (minui).
+              An atandan : in Dodo, in plin, ou in pub.
+            </Text>
+          </View>
+        )}
+
         <View style={styles.actions}>
           <Button
             size="sm"
             icon="🍺"
-            label={`Dodo fraîche 🌶️1 · ${dodosToday}/${MAX_DODOS_PER_DAY}`}
+            label={
+              dodosToday >= MAX_DODOS_PER_DAY
+                ? 'Dodo — pu ryink ojourdi'
+                : `Dodo fraîche 🌶️1 · ${MAX_DODOS_PER_DAY - dodosToday} rèstan`
+            }
             onPress={drinkDodo}
             disabled={dodosToday >= MAX_DODOS_PER_DAY || player.piments < 1}
           />
@@ -252,6 +270,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   motivMax: { fontFamily: F.semi, fontSize: 13, color: C.textDim },
+  empty: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,90,31,0.35)',
+    backgroundColor: 'rgba(255,90,31,0.10)',
+    gap: 4,
+  },
+  emptyTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ember },
+  emptyText: {
+    fontFamily: F.regular,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: C.textDim,
+  },
   actions: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' },
   transportRow: { flexDirection: 'row', marginTop: 12 },
   questHead: { gap: 8, alignItems: 'flex-start' },

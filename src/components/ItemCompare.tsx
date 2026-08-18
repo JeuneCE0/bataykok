@@ -61,13 +61,22 @@ export function CompareLines({ cmp }: { cmp: ItemComparison }) {
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2.5,
+    paddingHorizontal: 9,
+    minHeight: 24,
     borderRadius: R.pill,
     borderWidth: 1,
     alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  badgeText: { fontFamily: F.black, fontSize: 11.5, lineHeight: 15, letterSpacing: 0.2 },
+  badgeText: {
+    fontFamily: F.black,
+    fontSize: 11.5,
+    lineHeight: 14,
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
   lines: { gap: 3, marginTop: 6 },
   line: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   lineLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.textDim },

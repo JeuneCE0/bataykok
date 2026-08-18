@@ -295,7 +295,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.hairline,
   },
-  floorText: { fontFamily: F.black, fontSize: 11, lineHeight: 15, color: C.mystic },
+  floorText: {
+    fontFamily: F.black,
+    fontSize: 11,
+    lineHeight: 14,
+    color: C.mystic,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
   bossName: { fontFamily: F.black, fontSize: 17.5, lineHeight: 23, color: C.text },
   place: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
   flavor: {

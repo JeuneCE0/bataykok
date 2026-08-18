@@ -253,12 +253,31 @@ interface GameState {
   claimSeason: () => { grains: number; piments: number } | null;
 }
 
+/**
+ * Jour **local** du joueur. `toISOString()` renvoie de l'UTC : à La Réunion
+ * (UTC+4) la journée de jeu basculait à 4 h du matin, en plein milieu d'une
+ * soirée de jeu.
+ */
+function dayKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return dayKey(new Date());
 }
 
 function yesterday(): string {
-  return new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+  return dayKey(new Date(Date.now() - 86_400_000));
+}
+
+/** Minuit local prochain : l'heure à laquelle tout se recharge. */
+export function nextDailyReset(): number {
+  const d = new Date();
+  d.setHours(24, 0, 0, 0);
+  return d.getTime();
 }
 
 function defaultAttrs() {

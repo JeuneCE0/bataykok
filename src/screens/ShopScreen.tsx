@@ -25,6 +25,7 @@ import { SET_BY_ID } from '../game/sets';
 import { TRANSPORTS } from '../game/transport';
 import { AttrId, Item } from '../game/types';
 import { useGame } from '../store/gameStore';
+import { localDay } from '../game/day';
 import { C, F, G, R } from '../theme';
 
 const PIMENT_PACKS = [
@@ -49,7 +50,7 @@ export default function ShopScreen() {
   const buyPass = useGame((s) => s.buyPass);
   const claimPassPiments = useGame((s) => s.claimPassPiments);
   const passClaimedDay = useGame((s) => s.passClaimedDay);
-  const dayEvent = eventOfDay(new Date().toISOString().slice(0, 10));
+  const dayEvent = eventOfDay(localDay());
   const priceOf = (base: number) =>
     Math.round(base * (dayEvent.kind === 'shop' ? dayEvent.mult : 1));
 
@@ -247,11 +248,11 @@ export default function ShopScreen() {
               full
               variant="cane"
               label={
-                passClaimedDay === new Date().toISOString().slice(0, 10)
+                passClaimedDay === localDay()
                   ? 'Piments du jour déjà pris'
                   : 'Récupérer 🌶️20 du jour'
               }
-              disabled={passClaimedDay === new Date().toISOString().slice(0, 10)}
+              disabled={passClaimedDay === localDay()}
               onPress={claimPassPiments}
             />
           </>

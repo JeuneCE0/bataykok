@@ -97,8 +97,10 @@ export function Button({
         ? { paddingVertical: 8, paddingHorizontal: 12 }
         : { paddingVertical: 11, paddingHorizontal: 16 };
   const font = size === 'lg' ? 18 : size === 'sm' ? 13 : 15;
-  const grad = G[variant];
-  const light = variant === 'gold' || variant === 'cane';
+  // un bouton éteint doit rester lisible : on change de couleur plutôt que
+  // de baisser l'opacité, qui délavait le texte sur les fonds clairs
+  const grad = disabled ? G.slate : G[variant];
+  const light = !disabled && (variant === 'gold' || variant === 'cane');
 
   return (
     <Pressable
@@ -108,7 +110,7 @@ export function Button({
         styles.btnBase,
         { backgroundColor: grad[2] },
         full ? { alignSelf: 'stretch' } : { alignSelf: 'flex-start' },
-        disabled ? styles.btnDisabled : null,
+        disabled ? { opacity: 0.75 } : null,
         pressed && !disabled ? styles.btnPressed : null,
         style,
       ]}
@@ -129,8 +131,8 @@ export function Button({
               styles.btnText,
               {
                 fontSize: font,
-                lineHeight: font * 1.35,
-                color: light ? C.ink : '#FFF8F0',
+                lineHeight: font * 1.25,
+                color: disabled ? C.textDim : light ? C.ink : '#FFF8F0',
               },
             ]}
             numberOfLines={1}
@@ -240,7 +242,11 @@ export function ScreenTitle({
   return (
     <View style={styles.screenTitle}>
       <Text style={[TYPO.display, { color: accent }]}>{title}</Text>
-      {sub ? <Text style={styles.screenSub}>{sub}</Text> : null}
+      {sub ? (
+        <Text style={styles.screenSub} numberOfLines={2}>
+          {sub}
+        </Text>
+      ) : null}
       <View style={styles.titleRule}>
         <LinearGradient
           colors={['transparent', accent, 'transparent']}
@@ -398,17 +404,19 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.35)',
   },
   btnPressed: { transform: [{ translateY: 2 }] },
-  btnDisabled: { opacity: 0.35 },
   btnText: {
     fontFamily: F.black,
     letterSpacing: 0.4,
+    textAlign: 'center',
+    includeFontPadding: false,
     textShadowColor: 'rgba(0,0,0,0.18)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
   } as TextStyle,
   ghost: {
     alignSelf: 'flex-start',
-    paddingVertical: 8,
+    minHeight: 34,
+    justifyContent: 'center',
     paddingHorizontal: 14,
     borderRadius: R.pill,
     borderWidth: 1,
@@ -418,8 +426,10 @@ const styles = StyleSheet.create({
   ghostText: {
     fontFamily: F.bold,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 16,
     color: C.textDim,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   barOuter: {
     backgroundColor: 'rgba(6,3,12,0.6)',
@@ -438,6 +448,7 @@ const styles = StyleSheet.create({
     fontFamily: F.black,
     color: '#fff',
     textAlign: 'center',
+    includeFontPadding: false,
     textShadowColor: 'rgba(0,0,0,0.85)',
     textShadowRadius: 3,
     textShadowOffset: { width: 0, height: 1 },
@@ -460,16 +471,23 @@ const styles = StyleSheet.create({
   },
   chip: {
     paddingHorizontal: 11,
-    paddingVertical: 4,
+    // Baloo 2 assoit sa ligne de base très bas : avec un lineHeight généreux
+    // le glyphe remonte et le texte paraît collé au bord haut. On centre donc
+    // dans une hauteur fixe plutôt que de jouer sur le padding.
+    minHeight: 26,
     borderRadius: R.pill,
     borderWidth: 1,
     backgroundColor: 'rgba(6,3,12,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   chipText: {
     fontFamily: F.bold,
     fontSize: 12.5,
-    lineHeight: 17,
+    lineHeight: 15,
     letterSpacing: 0.2,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   statRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
@@ -487,11 +505,19 @@ const styles = StyleSheet.create({
   },
   segBtn: {
     flex: 1,
-    paddingVertical: 8,
+    minHeight: 36,
     borderRadius: R.pill,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   segBtnOn: { backgroundColor: 'rgba(255,201,60,0.18)' },
-  segText: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 18, color: C.textDim },
+  segText: {
+    fontFamily: F.bold,
+    fontSize: 13.5,
+    lineHeight: 17,
+    color: C.textDim,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
   segTextOn: { fontFamily: F.black, color: C.gold },
 });

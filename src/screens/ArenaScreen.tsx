@@ -247,7 +247,9 @@ export default function ArenaScreen() {
             <Text style={styles.ticketSub}>
               {arenaTickets >= maxTickets
                 ? 'Jetons o max — anon !'
-                : `Prochain jeton dans ${formatSec(refill)}`}
+                : arenaTickets === 0
+                  ? `Prochain jeton dan ${formatSec(refill)} · ou in pub / 🌶️1`
+                  : `Prochain jeton dan ${formatSec(refill)}`}
             </Text>
           </View>
         </View>
@@ -383,7 +385,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 1,
   },
-  rankBadgeText: { fontFamily: F.black, fontSize: 10, color: C.gold },
+  rankBadgeText: {
+    fontFamily: F.black,
+    fontSize: 10.5,
+    lineHeight: 13,
+    color: C.gold,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
   opName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
   gainRow: { flexDirection: 'row', gap: 16, flexWrap: 'wrap', marginBottom: 8 },
   gain: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },

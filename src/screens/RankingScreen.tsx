@@ -210,7 +210,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rank: { fontFamily: F.black, fontSize: 13.5, lineHeight: 18, color: C.textDim },
+  rank: {
+    fontFamily: F.black,
+    fontSize: 13.5,
+    lineHeight: 17,
+    color: C.textDim,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
   name: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text, flex: 1 },
   cls: { fontSize: 16 },
   level: {

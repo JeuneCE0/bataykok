@@ -79,7 +79,7 @@ export default function AdButton({
         style={({ pressed }) => [
           styles.wrap,
           full ? { alignSelf: 'stretch' } : { alignSelf: 'flex-start' },
-          disabled ? { opacity: 0.4 } : null,
+          disabled ? { opacity: 0.9 } : null,
           pressed && !disabled ? { transform: [{ translateY: 2 }] } : null,
         ]}
       >
@@ -91,24 +91,32 @@ export default function AdButton({
           }}
         >
           <LinearGradient
-            colors={['#3EE3B3', '#12B886', '#0A8A66']}
+            colors={
+              disabled
+                ? ['#4A4056', '#332C3E', '#241F2C']
+                : ['#3EE3B3', '#12B886', '#0A8A66']
+            }
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={[styles.btn, SHADOW.card]}
           >
-            <Text style={styles.play}>▶</Text>
+            <Text style={[styles.play, disabled && { color: C.textDim }]}>
+              {disabled ? '⏳' : '▶'}
+            </Text>
             <View style={{ flex: full ? 1 : 0 }}>
-              <Text style={styles.title}>{label ?? offer.title}</Text>
-              <Text style={styles.sub}>
+              <Text style={[styles.title, disabled && { color: C.text }]}>
+                {label ?? offer.title}
+              </Text>
+              <Text style={[styles.sub, disabled && { color: C.textDim }]}>
                 {outOfAds
-                  ? 'Revient demain'
+                  ? 'Pu de pub pou ojourdi — revien demin'
                   : waiting > 0
-                    ? `Disponible dans ${waiting}s`
-                    : `${offer.icon} ${offer.reward} · gratuit`}
+                    ? `Disponib dan ${waiting} s`
+                    : `${offer.icon} ${offer.reward} · gratui`}
               </Text>
             </View>
-            <View style={styles.counter}>
-              <Text style={styles.counterText}>
+            <View style={[styles.counter, disabled && styles.counterOff]}>
+              <Text style={[styles.counterText, disabled && { color: C.textDim }]}>
                 {Math.max(0, MAX_ADS_PER_DAY - adsToday)}
               </Text>
             </View>
@@ -141,29 +149,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     borderRadius: R.md,
-    paddingVertical: 9,
+    minHeight: 52,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.35)',
   },
   play: { fontFamily: F.black, fontSize: 15, color: '#06301F' },
-  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: '#06301F' },
+  title: {
+    fontFamily: F.black,
+    fontSize: 15,
+    lineHeight: 19,
+    color: '#06301F',
+    includeFontPadding: false,
+  },
   sub: {
     fontFamily: F.bold,
     fontSize: 12,
-    lineHeight: 16,
-    color: 'rgba(6,48,31,0.8)',
+    lineHeight: 15,
+    color: 'rgba(6,48,31,0.82)',
+    includeFontPadding: false,
   },
   counter: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: 'rgba(6,48,31,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 5,
   },
-  counterText: { fontFamily: F.black, fontSize: 11, color: '#06301F' },
+  counterOff: { backgroundColor: 'rgba(6,3,12,0.45)' },
+  counterText: {
+    fontFamily: F.black,
+    fontSize: 12,
+    lineHeight: 15,
+    color: '#06301F',
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
   adRoot: {
     flex: 1,
     backgroundColor: 'rgba(4,2,8,0.92)',
