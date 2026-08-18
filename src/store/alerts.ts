@@ -15,12 +15,14 @@ export function useAlerts(now: number): Record<TabId, boolean> {
   const stats = useGame((s) => s.stats);
   const foundMitik = useGame((s) => s.foundMitik);
   const claimedSteps = useGame((s) => s.claimedSteps);
+  const keys = useGame((s) => s.keys);
+  const dungeonFloor = useGame((s) => s.dungeonFloor);
 
   const none: Record<TabId, boolean> = {
     kok: false,
     quetes: false,
     rond: false,
-    palmares: false,
+    donjon: false,
     ecurie: false,
     bazar: false,
   };
@@ -39,7 +41,7 @@ export function useAlerts(now: number): Record<TabId, boolean> {
     kok: upgradeInBag || missionReady || !!step?.ready,
     quetes: !!activeQuest && now >= activeQuest.endsAt,
     rond: arenaTickets > 0,
-    palmares: false,
+    donjon: keys > 0 && dungeonFloor < 13,
     ecurie: !player.guildId,
     bazar: dealInShop,
   };

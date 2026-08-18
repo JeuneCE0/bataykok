@@ -13,6 +13,8 @@ export interface DayEvent {
   desc: string;
   icon: string;
   color: string;
+  /** libellé de la pastille du HUD */
+  short: string;
   /** multiplicateur (ou remise pour `shop`) */
   mult: number;
 }
@@ -20,6 +22,7 @@ export interface DayEvent {
 const EVENTS: DayEvent[] = [
   {
     kind: 'grains',
+    short: 'Grains ×1,5',
     title: 'Jour de marsé',
     desc: 'Toute les récompenses en grains ×1,5',
     icon: '🌽',
@@ -28,6 +31,7 @@ const EVENTS: DayEvent[] = [
   },
   {
     kind: 'xp',
+    short: 'XP ×1,5',
     title: 'Lékol dann rond',
     desc: "Toute l'XP gagnée ×1,5",
     icon: '✨',
@@ -36,6 +40,7 @@ const EVENTS: DayEvent[] = [
   },
   {
     kind: 'loot',
+    short: 'Loot ×2',
     title: 'Chans du gramoune',
     desc: 'Deux fois plus de chances de trouver un objè en quête',
     icon: '🎁',
@@ -44,6 +49,7 @@ const EVENTS: DayEvent[] = [
   },
   {
     kind: 'shop',
+    short: 'Bazar −30 %',
     title: 'Brad o Bazar',
     desc: '−30 % su tout lékipman du Bazar',
     icon: '🏷️',
@@ -52,6 +58,7 @@ const EVENTS: DayEvent[] = [
   },
   {
     kind: 'batay',
+    short: '+2 batay',
     title: 'Gran kabar dann rond',
     desc: '+2 jetons de batay toute la journée',
     icon: '⚔️',

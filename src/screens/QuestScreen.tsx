@@ -195,18 +195,12 @@ export default function QuestScreen() {
                   { icon: '✨', value: `${fmt(q.xp)} XP`, color: C.mystic },
                 ]}
               />
-              <View style={styles.yieldRow}>
-                <Chip
-                  label={`${Math.round(q.gold / (q.motivationCost || 1))} 🌽 par ⚡`}
-                  color={C.gold}
-                />
-                <Chip
-                  label={`${Math.round(
-                    (q.gold / Math.max(1, q.durationSec * (1 - transport.reduction))) * 60
-                  )} 🌽 / min`}
-                  color={C.cane}
-                />
-              </View>
+              <Text style={styles.yield}>
+                {Math.round(
+                  (q.gold / Math.max(1, q.durationSec * (1 - transport.reduction))) * 60
+                )}{' '}
+                🌽 par minute
+              </Text>
               <Button
                 full
                 label="Partir en quête"
@@ -274,5 +268,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   levelUp: { ...T.body, fontFamily: F.black, color: C.gold, marginTop: 8 },
-  yieldRow: { flexDirection: 'row', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
+  yield: {
+    fontFamily: F.bold,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.cane,
+    marginBottom: 12,
+  },
 });

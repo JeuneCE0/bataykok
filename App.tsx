@@ -13,7 +13,6 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Backdrop from './src/components/Backdrop';
 import DailyModal from './src/components/DailyModal';
-import DayEventBanner from './src/components/DayEventBanner';
 import Hud from './src/components/Hud';
 import LevelUpOverlay from './src/components/LevelUpOverlay';
 import Rooster from './src/components/Rooster';
@@ -23,21 +22,21 @@ import { BODY_COLORS, COMB_COLORS } from './src/game/bots';
 import ArenaScreen from './src/screens/ArenaScreen';
 import CharacterScreen from './src/screens/CharacterScreen';
 import CreationScreen from './src/screens/CreationScreen';
+import DungeonScreen from './src/screens/DungeonScreen';
 import GuildScreen from './src/screens/GuildScreen';
 import QuestScreen from './src/screens/QuestScreen';
-import RankingScreen from './src/screens/RankingScreen';
 import ShopScreen from './src/screens/ShopScreen';
 import { useAlerts } from './src/store/alerts';
 import { useGame } from './src/store/gameStore';
 import { C, F, G, R } from './src/theme';
 
-type Tab = 'kok' | 'quetes' | 'rond' | 'palmares' | 'ecurie' | 'bazar';
+type Tab = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'kok', label: 'Mon Kok', icon: '🐓' },
   { id: 'quetes', label: 'Quêtes', icon: '🗺️' },
   { id: 'rond', label: 'Le Rond', icon: '⚔️' },
-  { id: 'palmares', label: 'Palmarès', icon: '🏆' },
+  { id: 'donjon', label: 'Donjon', icon: '🗝️' },
   { id: 'ecurie', label: 'Écurie', icon: '🏠' },
   { id: 'bazar', label: 'Bazar', icon: '🛒' },
 ];
@@ -83,13 +82,12 @@ export default function App() {
             ) : (
               <View style={{ flex: 1 }}>
                 {!combatActive && <Hud />}
-                {!combatActive && <DayEventBanner />}
                 {!combatActive && <StepBanner onGo={setTab} />}
                 <View style={{ flex: 1 }}>
                   {tab === 'kok' && <CharacterScreen />}
                   {tab === 'quetes' && <QuestScreen />}
                   {tab === 'rond' && <ArenaScreen />}
-                  {tab === 'palmares' && <RankingScreen />}
+                  {tab === 'donjon' && <DungeonScreen />}
                   {tab === 'ecurie' && <GuildScreen />}
                   {tab === 'bazar' && <ShopScreen />}
                 </View>

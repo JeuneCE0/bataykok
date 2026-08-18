@@ -17,6 +17,7 @@ import {
   guildUpgradeCost,
 } from '../game/guilds';
 import { albumXpBonus, itemAlbumKey } from '../game/album';
+import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { generateItem, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
@@ -126,6 +127,9 @@ interface GameState {
   /** pass Ti Planteur : fin d'abonnement + dernier jour encaissé */
   passUntil: number;
   passClaimedDay: string | null;
+  /** Route des Cirques : étages franchis et clés en poche */
+  dungeonFloor: number;
+  keys: number;
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -167,6 +171,11 @@ interface GameState {
   pickTalent: (id: string) => void;
   buyPass: () => void;
   claimPassPiments: () => number;
+  buyKey: () => void;
+  applyBossResult: (
+    won: boolean,
+    floor: number
+  ) => { grains: number; xp: number; levels: number; item: Item | null } | null;
 }
 
 function today(): string {
@@ -269,6 +278,8 @@ export const useGame = create<GameState>()(
         album: [],
         passUntil: 0,
         passClaimedDay: null,
+        dungeonFloor: 0,
+        keys: 2,
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -319,6 +330,8 @@ export const useGame = create<GameState>()(
             album: [],
             passUntil: 0,
             passClaimedDay: null,
+            dungeonFloor: 0,
+            keys: 2,
           });
         },
 
@@ -350,6 +363,8 @@ export const useGame = create<GameState>()(
             album: [],
             passUntil: 0,
             passClaimedDay: null,
+            dungeonFloor: 0,
+            keys: 2,
           }),
 
         ensureDaily: () => {
@@ -370,6 +385,7 @@ export const useGame = create<GameState>()(
             streakClaimedDay: null,
             adsToday: 0,
             adNextAt: 0,
+            keys: Math.min(MAX_KEYS, s.keys + 1),
           });
         },
 
@@ -912,6 +928,68 @@ export const useGame = create<GameState>()(
           const tier = pendingTier(s.player.level, talents);
           if (!tier || !tier.choices.some((c) => c.id === id)) return;
           set({ player: { ...s.player, talents: [...talents, id] } });
+        },
+
+        buyKey: () => {
+          const s = get();
+          if (!s.player || s.player.piments < KEY_PIMENT_COST) return;
+          if (s.keys >= MAX_KEYS) return;
+          set({
+            player: { ...s.player, piments: s.player.piments - KEY_PIMENT_COST },
+            keys: s.keys + 1,
+          });
+        },
+
+        /**
+         * Un étage se tente contre une clé (perdue même en cas d'échec) et ne
+         * se franchit qu'une fois : les récompenses sont garanties, donc non
+         * farmables.
+         */
+        applyBossResult: (won, floor) => {
+          const s = get();
+          if (!s.player) return null;
+          if (s.keys <= 0) return null;
+          const boss = BOSSES.find((b) => b.floor === floor);
+          if (!boss || floor !== s.dungeonFloor + 1) return null;
+
+          if (!won) {
+            set({ keys: s.keys - 1 });
+            return { grains: 0, xp: 0, levels: 0, item: null };
+          }
+
+          const p: PlayerState = {
+            ...s.player,
+            baseAttrs: { ...s.player.baseAttrs },
+            inventory: [...s.player.inventory],
+          };
+          const ev = eventOfDay(today());
+          const t = talentEffects(p.talents ?? []);
+          const grains = Math.round(
+            boss.reward.grains * (1 + t.gold) * (ev.kind === 'grains' ? ev.mult : 1)
+          );
+          const xp = Math.round(
+            boss.reward.xp *
+              (1 + t.xp) *
+              (1 + albumXpBonus(s.album.length)) *
+              (s.passUntil > Date.now() ? 1.1 : 1) *
+              (ev.kind === 'xp' ? ev.mult : 1)
+          );
+          p.grains += grains;
+          p.piments += boss.reward.piments;
+          const levels = applyXp(p, xp);
+          let item: Item | null = null;
+          if (p.inventory.length < 24) {
+            item = generateItem(Math.max(p.level, boss.level), undefined, boss.reward.rarity);
+            p.inventory.push(item);
+          }
+          set({
+            player: p,
+            keys: s.keys - 1,
+            dungeonFloor: floor,
+            album: item ? addToAlbum(s.album, item) : s.album,
+            foundMitik: s.foundMitik || item?.rarity === 'mitik',
+          });
+          return { grains, xp, levels, item };
         },
 
         buyPass: () => {

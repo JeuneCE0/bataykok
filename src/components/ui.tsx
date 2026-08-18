@@ -333,6 +333,36 @@ export function StatRow({
   );
 }
 
+/** Bascule entre deux lectures d'un même onglet — évite les écrans fleuves. */
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { id: T; label: string }[];
+}) {
+  return (
+    <View style={styles.segWrap}>
+      {options.map((o) => {
+        const on = o.id === value;
+        return (
+          <Pressable
+            key={o.id}
+            onPress={() => onChange(o.id)}
+            style={[styles.segBtn, on && styles.segBtnOn]}
+          >
+            <Text style={[styles.segText, on && styles.segTextOn]} numberOfLines={1}>
+              {o.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 export const T = TYPO;
 
 const styles = StyleSheet.create({
@@ -444,4 +474,24 @@ const styles = StyleSheet.create({
   statRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statValue: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.text },
+  segWrap: {
+    flexDirection: 'row',
+    gap: 4,
+    marginHorizontal: 14,
+    marginTop: 10,
+    padding: 4,
+    borderRadius: R.pill,
+    backgroundColor: 'rgba(6,3,12,0.5)',
+    borderWidth: 1,
+    borderColor: C.hairlineSoft,
+  },
+  segBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: R.pill,
+    alignItems: 'center',
+  },
+  segBtnOn: { backgroundColor: 'rgba(255,201,60,0.18)' },
+  segText: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 18, color: C.textDim },
+  segTextOn: { fontFamily: F.black, color: C.gold },
 });

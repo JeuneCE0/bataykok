@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import AdButton from '../components/AdButton';
 import FadeIn from '../components/FadeIn';
@@ -32,6 +32,7 @@ const PIMENT_PACKS = [
 ];
 
 export default function ShopScreen() {
+  const [open, setOpen] = useState<string | null>(null);
   const player = useGame((s) => s.player);
   const shop = useGame((s) => s.shop);
   const buyItem = useGame((s) => s.buyItem);
@@ -76,31 +77,36 @@ export default function ShopScreen() {
         const cmp = compareToEquipped(it, player);
         return (
           <FadeIn key={it.id} index={si}>
-          <Card glow={cmp.diff > 0 ? C.cane : col} compact>
+          <Card glow={cmp.diff > 0 ? C.cane : undefined} compact>
             <View style={styles.itemRow}>
               <View style={[styles.itemIcon, { borderColor: col, backgroundColor: `${col}1A` }]}>
                 <Text style={{ fontSize: 24 }}>{SLOT_ICONS[it.slot]}</Text>
               </View>
-              <View style={{ flex: 1, gap: 4 }}>
+              <Pressable
+                style={{ flex: 1, gap: 4 }}
+                onPress={() => setOpen(open === it.id ? null : it.id)}
+              >
                 <Text style={[styles.itemName, { color: col }]} numberOfLines={1}>
                   {it.name}
                 </Text>
-                <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <Chip label={RARITY_LABELS[it.rarity]} color={col} />
-                  <Chip label={`niv. ${it.level}`} color={C.textDim} />
+                <View style={styles.chipLine}>
                   <VerdictBadge cmp={cmp} />
                   {it.setId && SET_BY_ID[it.setId] && (
                     <Chip
-                      label={`${SET_BY_ID[it.setId].icon} ${SET_BY_ID[it.setId].name}`}
+                      label={SET_BY_ID[it.setId].icon}
                       color={SET_BY_ID[it.setId].color}
                     />
                   )}
                 </View>
                 <Text style={styles.itemStats} numberOfLines={2}>
-                  {itemStats(it)}
+                  {RARITY_LABELS[it.rarity]} · niv. {it.level} · {itemStats(it)}
                 </Text>
-                <CompareLines cmp={cmp} />
-              </View>
+                {open === it.id ? (
+                  <CompareLines cmp={cmp} />
+                ) : (
+                  <Text style={styles.more}>Toucher pou compare en détay</Text>
+                )}
+              </Pressable>
               <Button
                 size="sm"
                 variant={cmp.diff > 0 ? 'cane' : 'gold'}
@@ -357,6 +363,8 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: C.textDim,
   },
+  chipLine: { flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center' },
+  more: { fontFamily: F.regular, fontSize: 11.5, lineHeight: 15, color: C.textFaint },
   owned: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.cane },
   starterHead: { marginBottom: 10 },
   starterTag: {

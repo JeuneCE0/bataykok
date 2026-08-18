@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import Collection from '../components/Collection';
 import DailyMissions from '../components/DailyMissions';
+import DayEventBanner from '../components/DayEventBanner';
 import FreeChest from '../components/FreeChest';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 import Rooster from '../components/Rooster';
@@ -13,7 +14,9 @@ import {
   Card,
   Chip,
   GhostButton,
+  ScreenTitle,
   SectionTitle,
+  Segmented,
   T,
 } from '../components/ui';
 import { ATTR_ICONS, ATTR_LABELS, CLASSES } from '../game/classes';
@@ -55,6 +58,7 @@ export default function CharacterScreen() {
   const sellItem = useGame((s) => s.sellItem);
   const [selected, setSelected] = useState<Item | null>(null);
   const [bulk, setBulk] = useState(1);
+  const [view, setView] = useState<'kok' | 'kaz'>('kok');
   const [flash, setFlash] = useState<string | null>(null);
   const equipBest = useGame((s) => s.equipBest);
   const sellJunk = useGame((s) => s.sellJunk);
@@ -81,8 +85,41 @@ export default function CharacterScreen() {
     (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
   );
 
+  const switcher = (
+    <Segmented
+      value={view}
+      onChange={setView}
+      options={[
+        { id: 'kok', label: '🐓  Mon Kok' },
+        { id: 'kaz', label: '🏡  La Kaz' },
+      ]}
+    />
+  );
+
+  if (view === 'kaz') {
+    return (
+      <View style={{ flex: 1 }}>
+        {switcher}
+        <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+          <ScreenTitle title="La Kaz" sub="Out rendé-vou du jour" />
+          <DayEventBanner />
+          <FreeChest />
+          <DailyMissions />
+          <Collection />
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
+    <View style={{ flex: 1 }}>
+    {switcher}
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      {flash && (
+        <Card glow={C.cane} compact>
+          <Text style={styles.flash}>{flash}</Text>
+        </Card>
+      )}
       {/* ─── Fiche ─── */}
       <Card glow={cls.color} style={{ paddingBottom: 10 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -113,16 +150,6 @@ export default function CharacterScreen() {
         </View>
         <Text style={styles.classDesc}>{cls.description}</Text>
       </Card>
-
-      {flash && (
-        <Card glow={C.cane} compact>
-          <Text style={styles.flash}>{flash}</Text>
-        </Card>
-      )}
-
-      <FreeChest />
-
-      <DailyMissions />
 
       {/* ─── Attributs ─── */}
       <Card>
@@ -308,8 +335,6 @@ export default function CharacterScreen() {
         )}
       </Card>
 
-      <Collection />
-
       {selected && (
         <Card glow={RARITY_COLORS[selected.rarity]}>
           <Text style={[styles.invName, { color: RARITY_COLORS[selected.rarity], fontSize: 16 }]}>
@@ -339,6 +364,7 @@ export default function CharacterScreen() {
         </Card>
       )}
     </ScrollView>
+    </View>
   );
 }
 

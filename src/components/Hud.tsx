@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { CLASSES } from '../game/classes';
+import { eventOfDay } from '../game/events';
 import { fmt, xpForLevel } from '../game/formulas';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
@@ -15,6 +16,7 @@ export default function Hud() {
   if (!player) return null;
   const cls = CLASSES[player.classId];
   const need = xpForLevel(player.level);
+  const ev = eventOfDay(new Date().toISOString().slice(0, 10));
 
   return (
     <LinearGradient
@@ -47,15 +49,18 @@ export default function Hud() {
       </View>
 
       <View style={styles.xpRow}>
-        <Text style={styles.xpLabel}>XP</Text>
         <View style={{ flex: 1 }}>
           <Bar
             value={player.xp}
             max={need}
             variant="mystic"
             height={11}
-            label={`${fmt(player.xp)} / ${fmt(need)}`}
+            label={`${fmt(player.xp)} / ${fmt(need)} XP`}
           />
+        </View>
+        <View style={[styles.evPill, { borderColor: `${ev.color}66` }]}>
+          <Text style={{ fontSize: 11 }}>{ev.icon}</Text>
+          <Text style={[styles.evText, { color: ev.color }]}>{ev.short}</Text>
         </View>
       </View>
     </LinearGradient>
@@ -153,11 +158,15 @@ const styles = StyleSheet.create({
   },
   purseValue: { fontFamily: F.black, fontSize: 14.5, lineHeight: 19, color: C.text },
   xpRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  xpLabel: {
-    fontFamily: F.black,
-    fontSize: 11.5,
-    lineHeight: 15,
-    color: C.textDim,
-    letterSpacing: 1,
+  evPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: R.pill,
+    borderWidth: 1,
+    backgroundColor: 'rgba(6,3,12,0.5)',
   },
+  evText: { fontFamily: F.black, fontSize: 11, lineHeight: 15 },
 });

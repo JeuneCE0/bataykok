@@ -11,11 +11,12 @@ export type StepId =
   | 'win'
   | 'guild'
   | 'level3'
+  | 'donjon'
   | 'transport'
   | 'level5'
   | 'mitik';
 
-export type TabId = 'kok' | 'quetes' | 'rond' | 'palmares' | 'ecurie' | 'bazar';
+export type TabId = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
 export interface StepDef {
   id: StepId;
@@ -92,6 +93,15 @@ export const STEPS: StepDef[] = [
     tab: 'ecurie',
     grains: 150,
     piments: 1,
+  },
+  {
+    id: 'donjon',
+    title: 'Bat out prémié gardien',
+    hint: 'Su la Rout dé Sirk, chak gardien i lâche in ékipman garanti.',
+    icon: '🗝️',
+    tab: 'donjon',
+    grains: 200,
+    piments: 2,
   },
   {
     id: 'level3',
