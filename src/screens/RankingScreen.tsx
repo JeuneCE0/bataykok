@@ -1,7 +1,9 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Card, Chip, ScreenTitle } from '../components/ui';
+import { Button, Card, Chip, ScreenTitle } from '../components/ui';
+import { fmt } from '../game/formulas';
+import { SEASON_MS, tierForRank } from '../game/seasons';
 import { generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { useGame } from '../store/gameStore';
@@ -14,9 +16,18 @@ const MEDALS = ['🥇', '🥈', '🥉'];
 export default function RankingScreen() {
   const player = useGame((s) => s.player);
   const ladderOrder = useGame((s) => s.ladderOrder);
+  const seasonStart = useGame((s) => s.seasonStart);
+  const seasonNo = useGame((s) => s.seasonNo);
+  const seasonPending = useGame((s) => s.seasonPending);
+  const claimSeason = useGame((s) => s.claimSeason);
   if (!player) return null;
 
   const myIdx = ladderOrder.indexOf('me');
+  const tier = tierForRank(myIdx + 1);
+  const daysLeft = Math.max(
+    0,
+    Math.ceil((seasonStart + SEASON_MS - Date.now()) / 86_400_000)
+  );
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
@@ -28,6 +39,40 @@ export default function RankingScreen() {
         <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
         <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
       </View>
+
+      {seasonPending && (
+        <Card glow={C.gold}>
+          <Text style={styles.seasonTitle}>
+            🏁 Saizon {seasonPending.season} lé fini !
+          </Text>
+          <Text style={styles.seasonSub}>
+            Ou la fini #{seasonPending.rank} —{' '}
+            {tierForRank(seasonPending.rank).label}
+          </Text>
+          <Button
+            full
+            style={{ marginTop: 10 }}
+            label={`Récupérer 🌽${fmt(tierForRank(seasonPending.rank).grains)} · 🌶️${
+              tierForRank(seasonPending.rank).piments
+            }`}
+            onPress={claimSeason}
+          />
+        </Card>
+      )}
+
+      <Card compact>
+        <View style={styles.seasonRow}>
+          <Text style={{ fontSize: 20 }}>{tier.icon}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.seasonTitle}>
+              Saizon {seasonNo} · {daysLeft} jour restan
+            </Text>
+            <Text style={styles.seasonSub}>
+              À ton rang : {tier.label} → 🌽{fmt(tier.grains)} · 🌶️{tier.piments}
+            </Text>
+          </View>
+        </View>
+      </Card>
 
       <Card>
         {ladderOrder.map((id, i) => {
@@ -119,5 +164,8 @@ const styles = StyleSheet.create({
     width: 52,
     textAlign: 'right',
   },
+  seasonRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  seasonTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  seasonSub: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
   dots: { color: C.textFaint, textAlign: 'center', fontSize: 18, paddingVertical: 6 },
 });

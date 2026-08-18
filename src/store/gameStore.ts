@@ -21,6 +21,7 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { generateItem, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
+import { SEASON_MS, tierForRank } from '../game/seasons';
 import { pendingTier, talentEffects } from '../game/talents';
 import {
   AD_COOLDOWN_MS,
@@ -130,6 +131,11 @@ interface GameState {
   /** Route des Cirques : étages franchis et clés en poche */
   dungeonFloor: number;
   keys: number;
+  /** saison en cours du rond */
+  seasonStart: number;
+  seasonNo: number;
+  /** récompense de fin de saison en attente d'être encaissée */
+  seasonPending: { season: number; rank: number } | null;
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -176,6 +182,7 @@ interface GameState {
     won: boolean,
     floor: number
   ) => { grains: number; xp: number; levels: number; item: Item | null } | null;
+  claimSeason: () => { grains: number; piments: number } | null;
 }
 
 function today(): string {
@@ -280,6 +287,9 @@ export const useGame = create<GameState>()(
         passClaimedDay: null,
         dungeonFloor: 0,
         keys: 2,
+        seasonStart: Date.now(),
+        seasonNo: 1,
+        seasonPending: null,
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -332,6 +342,9 @@ export const useGame = create<GameState>()(
             passClaimedDay: null,
             dungeonFloor: 0,
             keys: 2,
+            seasonStart: Date.now(),
+            seasonNo: 1,
+            seasonPending: null,
           });
         },
 
@@ -365,6 +378,9 @@ export const useGame = create<GameState>()(
             passClaimedDay: null,
             dungeonFloor: 0,
             keys: 2,
+            seasonStart: Date.now(),
+            seasonNo: 1,
+            seasonPending: null,
           }),
 
         ensureDaily: () => {
@@ -386,6 +402,16 @@ export const useGame = create<GameState>()(
             adsToday: 0,
             adNextAt: 0,
             keys: Math.min(MAX_KEYS, s.keys + 1),
+            ...(Date.now() >= s.seasonStart + SEASON_MS && !s.seasonPending
+              ? {
+                  seasonPending: {
+                    season: s.seasonNo,
+                    rank: s.ladderOrder.indexOf('me') + 1,
+                  },
+                  seasonStart: Date.now(),
+                  seasonNo: s.seasonNo + 1,
+                }
+              : {}),
           });
         },
 
@@ -990,6 +1016,21 @@ export const useGame = create<GameState>()(
             foundMitik: s.foundMitik || item?.rarity === 'mitik',
           });
           return { grains, xp, levels, item };
+        },
+
+        claimSeason: () => {
+          const s = get();
+          if (!s.player || !s.seasonPending) return null;
+          const tier = tierForRank(s.seasonPending.rank);
+          set({
+            player: {
+              ...s.player,
+              grains: s.player.grains + tier.grains,
+              piments: s.player.piments + tier.piments,
+            },
+            seasonPending: null,
+          });
+          return { grains: tier.grains, piments: tier.piments };
         },
 
         buyPass: () => {

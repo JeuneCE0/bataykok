@@ -44,6 +44,26 @@ Ou scanne le QR code avec l'app **Expo Go** sur un vrai téléphone (iOS ou Andr
 - **Économie double** : 🌽 grains (or) + 🌶️ piments (premium), reset quotidien de la motivation et de la boutique.
 - **Sauvegarde automatique** (AsyncStorage) — ferme l'app, tout est conservé.
 
+## Contenu de jeu
+
+- **La Route des Cirques** (onglet Donjon) : 13 gardiens sur des lieux réels de
+  l'île, chacun franchi **une seule fois**, nettement au-dessus du joueur, avec une
+  récompense garantie (grains, XP, piments, ékipman d'une rareté fixée). Une tentative
+  coûte une **clé** — une offerte par jour, perdue même en cas d'échec.
+- **Talents** : un choix tous les 5 niveaux (5 paliers × 3 options exclusives) qui
+  agissent réellement sur les dégâts, les PV, l'armure, le crit, les gains, les jetons
+  de batay et la durée des quêtes. C'est le seul endroit où deux koks de même classe
+  divergent.
+- **Panoplies** : 5 sets (2 et 4 pièces), pour que le choix d'équipement ne se résume
+  pas à « le plus gros score ».
+- **Zalbum** : 32 cases emplacement × rareté, +1 % d'XP permanent par case découverte.
+- **Saisons du rond** : 14 jours, récompense selon le rang atteint (du Batayeur au
+  Roi du rond).
+- **Jetons de batay** : 3 (rechargeables), pour enchaîner plusieurs combats au lieu
+  d'un cooldown sec.
+- **Événement du jour** (tirage stable) : jour de marsé (grains ×1,5), lékol (XP ×1,5),
+  chans du gramoune (loot ×2), brad o Bazar (−30 %), gran kabar (+2 jetons).
+
 ## Progression, fidélité, monétisation
 
 - **Comparaison d'équipement** : chaque objet du Bazar et du sak affiche un verdict
@@ -55,12 +75,13 @@ Ou scanne le QR code avec l'app **Expo Go** sur un vrai téléphone (iOS ou Andr
   sur le bon onglet d'un tap, puis se transforme en récompense à encaisser.
 - **Défis du jour** : 3 objectifs tirés chaque jour (tirage stable) + coffre bonus quand
   les trois tombent.
+- **Kofr gratui** toutes les 4 h : grains, piments ou ékipman.
 - **Série de connexions** : récompense croissante J1 → J7, présentée à l'ouverture.
 - **Pubs récompensées** (simulation du SDK, à brancher sur AdMob/RevenueCat en prod) :
   Dodo offerte, sac de grains, **doublement** de la récompense de quête, batay immédiate.
   6 par jour, avec cooldown.
-- **Offre de bienvenue** « Pak Ti Batayeur » (une seule fois) et packs de piments avec
-  bonus affiché.
+- **Offre de bienvenue** « Pak Ti Batayeur » (une seule fois), packs de piments avec
+  bonus affiché, et **Pass Ti Planteur** (20 piments par jour + 10 % d'XP).
 - **Rappels locaux** : notification à la fin d'une quête et quand le rond redevient
   disponible (`expo-notifications`, 100 % local, aucun serveur).
 - **Pastilles d'appel à l'action** sur la barre d'onglets : une amélioration dans le sak,
@@ -86,6 +107,12 @@ src/
     items.ts       # génération d'objets (raretés, bonus)
     power.ts       # score de puissance + comparaison d'équipement
     progress.ts    # étapes d'onboarding, défis du jour, série, offres de pub
+    dungeons.ts    # les 13 gardiens de la Route des Cirques
+    talents.ts     # paliers de talents et leurs effets
+    sets.ts        # panoplies et bonus de set
+    album.ts       # Zalbum (collection)
+    events.ts      # événement du jour
+    seasons.ts     # saisons du rond et paliers de récompense
     quests.ts      # quêtes (lieux de La Réunion)
     bots.ts        # 60 adversaires déterministes + apparences
     guilds.ts      # écuries et bonus
@@ -97,13 +124,15 @@ src/
   lib/
     notifications.ts # rappels locaux (fin de quête, rond disponible)
   components/
+    CombatView.tsx # scène de combat animée (rond et donjons)
     Rooster.tsx    # coq cartoon SVG paramétrique (respiration, clignement)
     Backdrop.tsx   # fond de nuit volcanique
     Hud.tsx        # barre du haut (portrait, niveau, XP, monnaies)
     ui.tsx         # kit d'interface (Card, Button, Bar, Chip, Well…)
     ItemCompare.tsx / AdButton.tsx / StepBanner.tsx / DailyModal.tsx
     DailyMissions.tsx / LevelUpOverlay.tsx / FadeIn.tsx / Counter.tsx
-  screens/         # les 7 écrans du jeu
+  screens/         # les écrans du jeu (Mon Kok / La Kaz, Quêtes, Rond +
+                   # Palmarès, Donjon, Écurie, Bazar)
 ```
 
 ## Vers la vraie prod (multi-joueur réel)
