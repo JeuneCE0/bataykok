@@ -36,7 +36,14 @@ export default function DungeonScreen() {
     boss: Boss;
     result: CombatResult;
   } | null>(null);
-  const [outcome, setOutcome] = useState<{ won: boolean; text: string } | null>(null);
+  const [outcome, setOutcome] = useState<{
+    won: boolean;
+    grains: number;
+    xp: number;
+    item: string | null;
+    piments: number;
+    damage: number;
+  } | null>(null);
 
   if (!player) return null;
 
@@ -48,14 +55,21 @@ export default function DungeonScreen() {
         result={fight.result}
         onDone={() => {
           const won = fight.result.winner === 0;
-          const r = applyBossResult(won, fight.boss.floor);
+          // part des PV retirés au gardien : ce qui reste au dernier round
+          const last = fight.result.rounds[fight.result.rounds.length - 1];
+          const maxBoss = fight.result.maxHp[1] || 1;
+          const damage = Math.max(
+            0,
+            Math.min(1, 1 - Math.max(0, last?.hpAfter[1] ?? maxBoss) / maxBoss)
+          );
+          const r = applyBossResult(won, fight.boss.floor, damage);
           setOutcome({
             won,
-            text: won
-              ? `+🌽${fmt(r?.grains ?? 0)} · +${fmt(r?.xp ?? 0)} XP · 🌶️${
-                  fight.boss.reward.piments
-                }${r?.item ? ` · 🎁 ${r.item.name}` : ''}`
-              : `${fight.boss.name} la tienbo. Va renforsi out kok, pi revien.`,
+            grains: r?.grains ?? 0,
+            xp: r?.xp ?? 0,
+            item: r?.item?.name ?? null,
+            piments: won ? fight.boss.reward.piments : 0,
+            damage,
           });
           setFight(null);
         }}
@@ -127,7 +141,36 @@ export default function DungeonScreen() {
           >
             {outcome.won ? '🏆 GARDIEN VINKU !' : '💀 SA LA PA PASSÉ…'}
           </Text>
-          <Text style={T.body}>{outcome.text}</Text>
+          <View style={styles.gainRow}>
+            {outcome.grains > 0 && (
+              <Text style={styles.gain}>🌽 +{fmt(outcome.grains)}</Text>
+            )}
+            {outcome.xp > 0 && (
+              <Text style={styles.gain}>✨ +{fmt(outcome.xp)} XP</Text>
+            )}
+            {outcome.piments > 0 && (
+              <Text style={styles.gain}>🌶️ +{outcome.piments}</Text>
+            )}
+          </View>
+          {outcome.item && (
+            <Text style={styles.lootLine}>🎁 {outcome.item}</Text>
+          )}
+          {!outcome.won && (
+            <>
+              <Text style={styles.damageLine}>
+                Ou la retir {Math.round(outcome.damage * 100)} % de sa vi —
+                {outcome.grains > 0 || outcome.xp > 0
+                  ? ' out kok i gagne kan mèm in ti kèk chose.'
+                  : ' pa assé pou ramène aryen.'}
+              </Text>
+              <Bar
+                value={outcome.damage}
+                max={1}
+                variant="piment"
+                height={8}
+              />
+            </>
+          )}
         </Card>
       )}
 
@@ -253,6 +296,16 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     color: C.gold,
     marginBottom: 4,
+  },
+  gainRow: { flexDirection: 'row', gap: 16, flexWrap: 'wrap', marginBottom: 4 },
+  gain: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
+  lootLine: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.gold },
+  damageLine: {
+    fontFamily: F.regular,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: C.textDim,
+    marginBottom: 8,
   },
   bossRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   portrait: { width: 86, height: 86, alignItems: 'center', justifyContent: 'center' },

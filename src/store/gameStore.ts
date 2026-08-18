@@ -21,6 +21,7 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { generateItem, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
+import { arenaReward, bossConsolation, BatayReward } from '../game/rewards';
 import { SEASON_MS, tierForRank } from '../game/seasons';
 import { pendingTier, talentEffects } from '../game/talents';
 import {
@@ -121,6 +122,8 @@ interface GameState {
   starterPackBought: boolean;
   /** vrai pendant l'animation d'un combat : l'UI passe en mode scène */
   combatActive: boolean;
+  /** état de la liaison multijoueur, pour qu'un échec ne soit jamais muet */
+  onlineState: 'off' | 'sync' | 'ok' | 'error';
   /** coffre gratuit : date de la prochaine ouverture */
   chestNextAt: number;
   /** Zalbum : clés emplacement:rareté déjà rencontrées */
@@ -136,6 +139,8 @@ interface GameState {
   seasonNo: number;
   /** récompense de fin de saison en attente d'être encaissée */
   seasonPending: { season: number; rank: number } | null;
+  /** série de victoires en cours au rond */
+  winStreak: number;
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -153,8 +158,9 @@ interface GameState {
   refillMotivation: () => void;
   applyArenaResult: (
     won: boolean,
-    opponentId: string
-  ) => { gold: number; xp: number; levels: number };
+    opponentId: string,
+    context?: { myPower?: number; opPower?: number; online?: boolean }
+  ) => BatayReward & { levels: number; streak: number };
   buyArenaTicket: () => void;
   refreshShop: (payWithPiment: boolean) => void;
   buyItem: (item: Item) => void;
@@ -173,6 +179,7 @@ interface GameState {
   watchAd: (kind: AdKind) => boolean;
   buyStarterPack: () => void;
   setCombatActive: (v: boolean) => void;
+  setOnlineState: (v: GameState['onlineState']) => void;
   openFreeChest: () => { grains: number; piments: number; item: Item | null } | null;
   pickTalent: (id: string) => void;
   buyPass: () => void;
@@ -180,7 +187,9 @@ interface GameState {
   buyKey: () => void;
   applyBossResult: (
     won: boolean,
-    floor: number
+    floor: number,
+    /** part des PV du gardien retirés — sert à la consolation */
+    damageRatio?: number
   ) => { grains: number; xp: number; levels: number; item: Item | null } | null;
   claimSeason: () => { grains: number; piments: number } | null;
 }
@@ -281,6 +290,7 @@ export const useGame = create<GameState>()(
         adNextAt: 0,
         starterPackBought: false,
         combatActive: false,
+        onlineState: 'off',
         chestNextAt: 0,
         album: [],
         passUntil: 0,
@@ -290,6 +300,7 @@ export const useGame = create<GameState>()(
         seasonStart: Date.now(),
         seasonNo: 1,
         seasonPending: null,
+        winStreak: 0,
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -345,6 +356,7 @@ export const useGame = create<GameState>()(
             seasonStart: Date.now(),
             seasonNo: 1,
             seasonPending: null,
+            winStreak: 0,
           });
         },
 
@@ -381,6 +393,7 @@ export const useGame = create<GameState>()(
             seasonStart: Date.now(),
             seasonNo: 1,
             seasonPending: null,
+            winStreak: 0,
           }),
 
         ensureDaily: () => {
@@ -603,49 +616,61 @@ export const useGame = create<GameState>()(
           });
         },
 
-        applyArenaResult: (won, opponentId) => {
+        applyArenaResult: (won, opponentId, context) => {
           const s = get();
-          if (!s.player) return { gold: 0, xp: 0, levels: 0 };
+          const empty = {
+            gold: 0,
+            xp: 0,
+            honor: 0,
+            parts: [],
+            levels: 0,
+            streak: 0,
+          };
+          if (!s.player) return empty;
           const p: PlayerState = {
             ...s.player,
             baseAttrs: { ...s.player.baseAttrs },
           };
-          let gold = 0;
-          let xp = 0;
-          let levels = 0;
+          const ev = eventOfDay(today());
+          const t = talentEffects(p.talents ?? []);
+
+          const reward = arenaReward({
+            won,
+            level: p.level,
+            myPower: context?.myPower ?? 1,
+            opPower: context?.opPower ?? 1,
+            streak: s.winStreak,
+            online: context?.online ?? false,
+          });
+
+          const gold = Math.round(
+            reward.gold * (1 + t.gold) * (ev.kind === 'grains' ? ev.mult : 1)
+          );
+          const xp = Math.round(
+            reward.xp *
+              (1 + t.xp) *
+              (1 + albumXpBonus(s.album.length)) *
+              (s.passUntil > Date.now() ? 1.1 : 1) *
+              (ev.kind === 'xp' ? ev.mult : 1)
+          );
+
+          p.grains += gold;
+          const levels = applyXp(p, xp);
+          p.honor = Math.max(0, p.honor + reward.honor);
+          if (won) p.wins += 1;
+          else p.losses += 1;
+
           const order = [...s.ladderOrder];
           const myIdx = order.indexOf('me');
           const opIdx = order.indexOf(opponentId);
-          const ev = eventOfDay(today());
-          const t = talentEffects(p.talents ?? []);
-          if (won) {
-            gold = Math.round(
-              arenaGold(p.level) * (1 + t.gold) * (ev.kind === 'grains' ? ev.mult : 1)
-            );
-            xp = Math.round(
-              arenaXp(p.level) *
-                (1 + t.xp) *
-                (1 + albumXpBonus(s.album.length)) *
-                (s.passUntil > Date.now() ? 1.1 : 1) *
-                (ev.kind === 'xp' ? ev.mult : 1)
-            );
-            p.grains += gold;
-            levels = applyXp(p, xp);
-            p.honor += 8;
-            p.wins += 1;
-            if (opIdx >= 0 && opIdx < myIdx) {
-              order.splice(myIdx, 1);
-              order.splice(opIdx, 0, 'me');
-            }
-          } else {
-            p.honor = Math.max(0, p.honor - 5);
-            p.losses += 1;
+          if (won && opIdx >= 0 && opIdx < myIdx) {
+            order.splice(myIdx, 1);
+            order.splice(opIdx, 0, 'me');
           }
           p.rank = order.indexOf('me') + 1;
-          const max = maxArenaTickets(
-            p.talents,
-            ev.kind === 'batay' ? 2 : 0
-          );
+
+          const streak = won ? s.winStreak + 1 : 0;
+          const max = maxArenaTickets(p.talents, ev.kind === 'batay' ? 2 : 0);
           const tickets = Math.max(0, s.arenaTickets - 1);
           set({
             player: p,
@@ -653,10 +678,11 @@ export const useGame = create<GameState>()(
             arenaTickets: tickets,
             nextTicketAt:
               tickets >= max ? 0 : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
+            winStreak: streak,
           });
           track('arena');
           if (won) track('win');
-          return { gold, xp, levels };
+          return { ...reward, gold, xp, levels, streak };
         },
 
         buyArenaTicket: () => {
@@ -913,6 +939,8 @@ export const useGame = create<GameState>()(
 
         setCombatActive: (v) => set({ combatActive: v }),
 
+        setOnlineState: (v) => set({ onlineState: v }),
+
         /** Coffre gratuit toutes les 4 h : le rendez-vous « gratter ». */
         openFreeChest: () => {
           const s = get();
@@ -971,7 +999,7 @@ export const useGame = create<GameState>()(
          * se franchit qu'une fois : les récompenses sont garanties, donc non
          * farmables.
          */
-        applyBossResult: (won, floor) => {
+        applyBossResult: (won, floor, damageRatio = 0) => {
           const s = get();
           if (!s.player) return null;
           if (s.keys <= 0) return null;
@@ -979,8 +1007,15 @@ export const useGame = create<GameState>()(
           if (!boss || floor !== s.dungeonFloor + 1) return null;
 
           if (!won) {
-            set({ keys: s.keys - 1 });
-            return { grains: 0, xp: 0, levels: 0, item: null };
+            const c = bossConsolation(boss.reward, damageRatio);
+            const lost: PlayerState = {
+              ...s.player,
+              baseAttrs: { ...s.player.baseAttrs },
+            };
+            lost.grains += c.grains;
+            const lvls = applyXp(lost, c.xp);
+            set({ player: lost, keys: s.keys - 1 });
+            return { grains: c.grains, xp: c.xp, levels: lvls, item: null };
           }
 
           const p: PlayerState = {
@@ -1075,7 +1110,7 @@ export const useGame = create<GameState>()(
       // les sauvegardes d'avant la progression restent valides : le merge
       // shallow de zustand complète les nouveaux champs avec leurs défauts.
       migrate: (persisted) => persisted as GameState,
-      partialize: ({ combatActive, ...rest }) => rest as GameState,
+      partialize: ({ combatActive, onlineState, ...rest }) => rest as GameState,
     }
   )
 );

@@ -26,7 +26,7 @@ Projet **`bataykok`** (`pwxyezofejjvwochqycy`, eu-west-3) — créé le 2026-08-
 | Migration appliquée (tables, RLS, RPC, vue `ladder`) | ✅ |
 | `.env.local` renseigné (URL + clé publishable) | ✅ |
 | Connexions anonymes activées | ✅ (2026-08-18) |
-| Multijoueur vérifié bout en bout | ✅ lecture du classement depuis l'app |
+| Multijoueur vérifié bout en bout | ✅ publication du snapshot, lecture du classement, RPC de combat |
 | Variables posées dans EAS | ❌ à faire avant le premier build |
 
 ### Vérifier que les connexions anonymes répondent
@@ -46,6 +46,18 @@ mode local : `ensureSession()` renvoie `null`, aucun snapshot n'est publié, la
 section « Batay en lign » ne s'affiche pas. **Aucune erreur visible côté
 joueur** — c'est voulu, mais ça veut dire que le multijoueur peut rester muet
 sans qu'on s'en rende compte.
+
+### Piège corrigé : une session morte échoue en silence
+
+Une session peut rester valide **localement** alors que le compte n'existe plus
+côté serveur (purge, reset de base, changement de projet). L'app restait alors
+« connectée » et toutes ses écritures échouaient sans le moindre signe.
+
+`pushSnapshot` et `submitResult` détectent maintenant ces codes (`23503`,
+`42501`, `PGRST301`, messages JWT), repartent sur une session neuve et
+retentent une fois. Et l'état de la liaison est affiché dans **La Kaz**
+(`Zwé en lokal` / `Sinkronizasyon…` / `En lign` / `Sinkro inposib`) — le
+multijoueur ne peut plus être muet.
 
 ### Piège corrigé : les comptes anonymes en double
 

@@ -39,6 +39,13 @@ import { AttrId, Item, SlotId } from '../game/types';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
 
+const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
+  off: '📴 Zwé en lokal',
+  sync: '🔄 Sinkronizasyon…',
+  ok: '🌐 En lign',
+  error: '⚠️ Sinkro inposib',
+};
+
 const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
 const SLOTS: SlotId[] = [
   'arme',
@@ -59,6 +66,7 @@ export default function CharacterScreen() {
   const [selected, setSelected] = useState<Item | null>(null);
   const [bulk, setBulk] = useState(1);
   const [view, setView] = useState<'kok' | 'kaz'>('kok');
+  const onlineState = useGame((s) => s.onlineState);
   const [flash, setFlash] = useState<string | null>(null);
   const equipBest = useGame((s) => s.equipBest);
   const sellJunk = useGame((s) => s.sellJunk);
@@ -102,6 +110,19 @@ export default function CharacterScreen() {
         {switcher}
         <ScrollView style={styles.root} contentContainerStyle={styles.content}>
           <ScreenTitle title="La Kaz" sub="Out rendé-vou du jour" />
+          <View style={{ alignItems: 'center', marginBottom: 10 }}>
+            <Chip
+              label={ONLINE_LABEL[onlineState]}
+              color={
+                onlineState === 'ok'
+                  ? C.cane
+                  : onlineState === 'error'
+                    ? C.piment
+                    : C.textDim
+              }
+              active={onlineState === 'ok'}
+            />
+          </View>
           <DayEventBanner />
           <FreeChest />
           <DailyMissions />

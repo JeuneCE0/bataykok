@@ -65,31 +65,72 @@ export async function ensureSession(): Promise<string | null> {
   return sessionPromise;
 }
 
-/** Publie l'état du kok. Silencieux en cas d'échec : le jeu prime. */
+/**
+ * Une session peut rester valide localement alors que le compte n'existe plus
+ * côté serveur (purge, changement de projet, reset de base). Sans ça, l'app
+ * reste « connectée » et échoue en silence pour toujours.
+ */
+async function resetSession(): Promise<string | null> {
+  sessionPromise = null;
+  try {
+    await supabase?.auth.signOut({ scope: 'local' });
+  } catch {
+    // rien à faire : on repart de toute façon sur une nouvelle session
+  }
+  return ensureSession();
+}
+
+/** Codes qui trahissent une session morte plutôt qu'une vraie erreur métier. */
+function isStaleSession(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  const code = error.code ?? '';
+  const msg = (error.message ?? '').toLowerCase();
+  return (
+    code === '23503' || // le compte référencé n'existe plus
+    code === '42501' || // RLS : l'uid ne correspond à rien
+    code === 'PGRST301' || // JWT expiré
+    msg.includes('jwt') ||
+    msg.includes('not authorized')
+  );
+}
+
+function snapshotRow(id: string, p: PlayerState) {
+  const f = playerToFighter(p);
+  return {
+    id,
+    name: p.name,
+    class_id: p.classId,
+    level: p.level,
+    appearance: p.appearance,
+    attrs: totalAttrs(p),
+    weapon_min: f.weaponMin,
+    weapon_max: f.weaponMax,
+    armor: playerArmor(p),
+    power: kokPower(p),
+    honor: p.honor,
+    wins: p.wins,
+    losses: p.losses,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+/** Publie l'état du kok. N'interrompt jamais la partie en cas d'échec. */
 export async function pushSnapshot(p: PlayerState): Promise<boolean> {
   if (!supabase) return false;
-  const id = await ensureSession();
+  let id = await ensureSession();
   if (!id) return false;
-  const f = playerToFighter(p);
-  const { error } = await supabase.from('koks').upsert(
-    {
-      id,
-      name: p.name,
-      class_id: p.classId,
-      level: p.level,
-      appearance: p.appearance,
-      attrs: totalAttrs(p),
-      weapon_min: f.weaponMin,
-      weapon_max: f.weaponMax,
-      armor: playerArmor(p),
-      power: kokPower(p),
-      honor: p.honor,
-      wins: p.wins,
-      losses: p.losses,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'id' }
-  );
+
+  let { error } = await supabase
+    .from('koks')
+    .upsert(snapshotRow(id, p), { onConflict: 'id' });
+
+  if (error && isStaleSession(error)) {
+    id = await resetSession();
+    if (!id) return false;
+    ({ error } = await supabase
+      .from('koks')
+      .upsert(snapshotRow(id, p), { onConflict: 'id' }));
+  }
   return !error;
 }
 
@@ -144,7 +185,12 @@ export async function submitResult(
     p_defender: defenderId,
     p_attacker_won: won,
   });
-  if (error || !data?.length) return null;
+  if (error) {
+    // le plus souvent : le kok de l'attaquant n'est pas encore publié
+    if (isStaleSession(error)) await resetSession();
+    return null;
+  }
+  if (!data?.length) return null;
   return data[0].new_honor ?? null;
 }
 

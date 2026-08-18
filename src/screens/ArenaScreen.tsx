@@ -21,6 +21,7 @@ import { simulateCombat } from '../game/combat';
 import { eventOfDay } from '../game/events';
 import { fmt, playerToFighter } from '../game/formulas';
 import { fighterPower } from '../game/power';
+import { BatayReward } from '../game/rewards';
 import { Bot, CombatResult, Fighter } from '../game/types';
 import { scheduleArenaReady } from '../lib/notifications';
 import {
@@ -64,6 +65,7 @@ export default function ArenaScreen() {
   const [now, setNow] = useState(Date.now());
   const [view, setView] = useState<'batay' | 'palmares'>('batay');
   const [rivals, setRivals] = useState<OnlineKok[]>([]);
+  const onlineState = useGame((s) => s.onlineState);
   const [fight, setFight] = useState<{
     me: Fighter;
     op: Fighter;
@@ -72,7 +74,9 @@ export default function ArenaScreen() {
     /** id du joueur réel affronté, le cas échéant */
     onlineId?: string;
   } | null>(null);
-  const [reward, setReward] = useState<{ won: boolean; text: string } | null>(null);
+  const [reward, setReward] = useState<
+    (BatayReward & { won: boolean; levels: number; streak: number }) | null
+  >(null);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -82,9 +86,11 @@ export default function ArenaScreen() {
     return () => clearInterval(t);
   }, [regenTickets]);
 
-  // adversaires réels : n'apparaissent que si le backend est branché
+  // Les adversaires réels ne se chargent qu'une fois le snapshot publié :
+  // interroger le classement avant que la session soit prête renvoyait une
+  // liste vide, définitivement (l'effet ne tournait qu'au montage).
   useEffect(() => {
-    if (!isOnlineEnabled) return;
+    if (!isOnlineEnabled || onlineState !== 'ok') return;
     let alive = true;
     void fetchRivals(3).then((r) => {
       if (alive) setRivals(r);
@@ -92,7 +98,7 @@ export default function ArenaScreen() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [onlineState]);
 
   if (!player) return null;
 
@@ -105,16 +111,15 @@ export default function ArenaScreen() {
         onDone={() => {
           const won = fight.result.winner === 0;
           if (fight.onlineId) void submitResult(fight.onlineId, won);
-          const r = applyArenaResult(won, fight.opId);
+          const r = applyArenaResult(won, fight.opId, {
+            myPower: fighterPower(fight.me),
+            opPower: fighterPower(fight.op),
+            online: Boolean(fight.onlineId),
+          });
           if (useGame.getState().arenaTickets === 0) {
             scheduleArenaReady(ARENA_TICKET_SEC);
           }
-          setReward({
-            won,
-            text: won
-              ? `+🌽${fmt(r.gold)} · +${fmt(r.xp)} XP${r.levels > 0 ? ' · 🎉 NIVEAU SUP !' : ''}`
-              : 'Ton kok i sar rouler dann poussière. Antrèn a li !',
-          });
+          setReward({ ...r, won });
           setFight(null);
         }}
       />
@@ -145,7 +150,8 @@ export default function ArenaScreen() {
     setFight({
       me,
       op,
-      opId: 'me',
+      // le classement local ne connaît pas les joueurs réels : aucun rang à échanger
+      opId: 'online',
       onlineId: k.id,
       result: simulateCombat(me, op),
     });
@@ -233,7 +239,41 @@ export default function ArenaScreen() {
           <Text style={[styles.rewardTitle, { color: reward.won ? C.cane : C.piment }]}>
             {reward.won ? '🏆 VIKTOIR !' : '💀 DÉFÈT…'}
           </Text>
-          <Text style={T.body}>{reward.text}</Text>
+          <View style={styles.gainRow}>
+            <Text style={styles.gain}>🌽 +{fmt(reward.gold)}</Text>
+            <Text style={styles.gain}>✨ +{fmt(reward.xp)} XP</Text>
+            <Text
+              style={[
+                styles.gain,
+                { color: reward.honor >= 0 ? C.cane : C.piment },
+              ]}
+            >
+              🎖️ {reward.honor >= 0 ? '+' : ''}
+              {reward.honor}
+            </Text>
+          </View>
+          {reward.parts.length > 0 && (
+            <View style={styles.bonusRow}>
+              {reward.parts.map((b) => (
+                <Chip
+                  key={b.label}
+                  label={`${b.label} ×${b.mult.toFixed(2).replace('.', ',')}`}
+                  color={b.mult >= 1 ? C.gold : C.textDim}
+                />
+              ))}
+            </View>
+          )}
+          {reward.levels > 0 && (
+            <Text style={styles.levelUp}>🎉 NIVO SUPÉRIÈR !</Text>
+          )}
+          {!reward.won && (
+            <Text style={styles.consolation}>
+              Ton kok la pri in kou, mé li la apri. Antrèn a li !
+            </Text>
+          )}
+          {reward.won && reward.streak >= 2 && (
+            <Text style={styles.streak}>🔥 {reward.streak} viktoir d'affilé</Text>
+          )}
         </Card>
       )}
 
@@ -410,4 +450,16 @@ const styles = StyleSheet.create({
   },
   rankBadgeText: { fontFamily: F.black, fontSize: 10, color: C.gold },
   opName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
+  gainRow: { flexDirection: 'row', gap: 16, flexWrap: 'wrap', marginBottom: 8 },
+  gain: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
+  bonusRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  levelUp: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.gold, marginTop: 8 },
+  streak: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.ember, marginTop: 8 },
+  consolation: {
+    fontFamily: F.regular,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: C.textDim,
+    marginTop: 8,
+  },
 });
