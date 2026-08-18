@@ -17,7 +17,9 @@ import {
 import { ATTR_LABELS } from '../game/classes';
 import { fmt, grainsPerPiment, SLOT_ICONS } from '../game/formulas';
 import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
+import { eventOfDay } from '../game/events';
 import { compareToEquipped } from '../game/power';
+import { SET_BY_ID } from '../game/sets';
 import { TRANSPORTS } from '../game/transport';
 import { AttrId, Item } from '../game/types';
 import { useGame } from '../store/gameStore';
@@ -39,6 +41,13 @@ export default function ShopScreen() {
   const addPiments = useGame((s) => s.addPiments);
   const starterPackBought = useGame((s) => s.starterPackBought);
   const buyStarterPack = useGame((s) => s.buyStarterPack);
+  const passUntil = useGame((s) => s.passUntil);
+  const buyPass = useGame((s) => s.buyPass);
+  const claimPassPiments = useGame((s) => s.claimPassPiments);
+  const passClaimedDay = useGame((s) => s.passClaimedDay);
+  const dayEvent = eventOfDay(new Date().toISOString().slice(0, 10));
+  const priceOf = (base: number) =>
+    Math.round(base * (dayEvent.kind === 'shop' ? dayEvent.mult : 1));
 
   if (!player) return null;
 
@@ -80,6 +89,12 @@ export default function ShopScreen() {
                   <Chip label={RARITY_LABELS[it.rarity]} color={col} />
                   <Chip label={`niv. ${it.level}`} color={C.textDim} />
                   <VerdictBadge cmp={cmp} />
+                  {it.setId && SET_BY_ID[it.setId] && (
+                    <Chip
+                      label={`${SET_BY_ID[it.setId].icon} ${SET_BY_ID[it.setId].name}`}
+                      color={SET_BY_ID[it.setId].color}
+                    />
+                  )}
                 </View>
                 <Text style={styles.itemStats} numberOfLines={2}>
                   {itemStats(it)}
@@ -89,9 +104,9 @@ export default function ShopScreen() {
               <Button
                 size="sm"
                 variant={cmp.diff > 0 ? 'cane' : 'gold'}
-                label={`🌽${fmt(it.price)}`}
-                onPress={() => buyItem(it)}
-                disabled={player.grains < it.price}
+                label={`🌽${fmt(priceOf(it.price))}`}
+                onPress={() => buyItem({ ...it, price: priceOf(it.price) })}
+                disabled={player.grains < priceOf(it.price)}
               />
             </View>
           </Card>
@@ -175,6 +190,58 @@ export default function ShopScreen() {
             />
           ))}
         </View>
+      </Card>
+
+      <Card glow={passUntil > Date.now() ? C.cane : C.mystic}>
+        <View style={styles.starterHead}>
+          <Text style={[styles.starterTag, { color: C.mystic }]}>
+            ABONMAN · 30 JOUR
+          </Text>
+          <Text style={styles.starterTitle}>Pass Ti Planteur</Text>
+        </View>
+        <View style={{ gap: 5, marginBottom: 12 }}>
+          <Text style={styles.passLine}>🌶️ 20 piments chaque jour</Text>
+          <Text style={styles.passLine}>✨ +10 % d'XP su tout</Text>
+          <Text style={styles.passLine}>🧧 Kofr gratui prioritèr</Text>
+        </View>
+        {passUntil > Date.now() ? (
+          <>
+            <Chip
+              label={`Actif jusqu'au ${new Date(passUntil).toLocaleDateString('fr-FR')}`}
+              color={C.cane}
+              active
+              style={{ alignSelf: 'flex-start', marginBottom: 10 }}
+            />
+            <Button
+              full
+              variant="cane"
+              label={
+                passClaimedDay === new Date().toISOString().slice(0, 10)
+                  ? 'Piments du jour déjà pris'
+                  : 'Récupérer 🌶️20 du jour'
+              }
+              disabled={passClaimedDay === new Date().toISOString().slice(0, 10)}
+              onPress={claimPassPiments}
+            />
+          </>
+        ) : (
+          <Button
+            full
+            variant="mystic"
+            size="lg"
+            label="S'abonner · 6,99 € / moi"
+            onPress={() =>
+              Alert.alert(
+                'Abonnement simulé 💳',
+                'En prod : abonnement RevenueCat (6,99 €/mois). Pour le prototype, il est offert !',
+                [
+                  { text: 'Annuler', style: 'cancel' },
+                  { text: 'Activer le pass', onPress: buyPass },
+                ]
+              )
+            }
+          />
+        )}
       </Card>
 
       {!starterPackBought && (
@@ -315,4 +382,5 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   newPrice: { fontFamily: F.black, fontSize: 20, color: C.cane },
+  passLine: { fontFamily: F.semi, fontSize: 14, lineHeight: 19, color: C.text },
 });

@@ -13,10 +13,12 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Backdrop from './src/components/Backdrop';
 import DailyModal from './src/components/DailyModal';
+import DayEventBanner from './src/components/DayEventBanner';
 import Hud from './src/components/Hud';
 import LevelUpOverlay from './src/components/LevelUpOverlay';
 import Rooster from './src/components/Rooster';
 import StepBanner from './src/components/StepBanner';
+import TalentModal from './src/components/TalentModal';
 import { BODY_COLORS, COMB_COLORS } from './src/game/bots';
 import ArenaScreen from './src/screens/ArenaScreen';
 import CharacterScreen from './src/screens/CharacterScreen';
@@ -81,6 +83,7 @@ export default function App() {
             ) : (
               <View style={{ flex: 1 }}>
                 {!combatActive && <Hud />}
+                {!combatActive && <DayEventBanner />}
                 {!combatActive && <StepBanner onGo={setTab} />}
                 <View style={{ flex: 1 }}>
                   {tab === 'kok' && <CharacterScreen />}
@@ -95,6 +98,7 @@ export default function App() {
                 )}
                 <DailyModal />
                 <LevelUpOverlay />
+                <TalentModal />
               </View>
             )}
           </SafeAreaView>

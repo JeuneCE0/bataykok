@@ -1,4 +1,6 @@
 import { CLASSES } from './classes';
+import { setBonuses } from './sets';
+import { talentEffects } from './talents';
 import { Attributes, AttrId, Fighter, Item, PlayerState, SlotId } from './types';
 
 // ─── RNG utilitaire (seedable pour les bots) ─────────────────────────────
@@ -38,6 +40,10 @@ export function totalAttrs(p: PlayerState): Attributes {
       t[k] += it.bonuses[k] ?? 0;
     });
   });
+  const sets = setBonuses(p.equipment, p.level);
+  (Object.keys(sets) as AttrId[]).forEach((k) => {
+    t[k] += sets[k] ?? 0;
+  });
   return t;
 }
 
@@ -64,14 +70,20 @@ export function maxHp(f: Fighter): number {
 
 export function playerToFighter(p: PlayerState): Fighter {
   const w = playerWeapon(p);
+  const t = talentEffects(p.talents ?? []);
+  const attrs = totalAttrs(p);
   return {
     name: p.name,
     level: p.level,
     classId: p.classId,
-    attrs: totalAttrs(p),
-    weaponMin: w.min,
-    weaponMax: w.max,
-    armor: playerArmor(p),
+    attrs: {
+      ...attrs,
+      endurance: Math.round(attrs.endurance * (1 + t.hp)),
+      chance: Math.round(attrs.chance * (1 + t.crit)),
+    },
+    weaponMin: Math.round(w.min * (1 + t.dmg)),
+    weaponMax: Math.round(w.max * (1 + t.dmg)),
+    armor: Math.round(playerArmor(p) * (1 + t.armor)),
     appearance: p.appearance,
   };
 }

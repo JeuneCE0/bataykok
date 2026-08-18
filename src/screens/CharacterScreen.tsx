@@ -2,7 +2,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import Collection from '../components/Collection';
 import DailyMissions from '../components/DailyMissions';
+import FreeChest from '../components/FreeChest';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 import Rooster from '../components/Rooster';
 import {
@@ -28,6 +30,8 @@ import {
 } from '../game/formulas';
 import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
 import { compareToEquipped, kokPower } from '../game/power';
+import { SET_BY_ID } from '../game/sets';
+import { TALENT_BY_ID } from '../game/talents';
 import { AttrId, Item, SlotId } from '../game/types';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
@@ -116,6 +120,8 @@ export default function CharacterScreen() {
         </Card>
       )}
 
+      <FreeChest />
+
       <DailyMissions />
 
       {/* ─── Attributs ─── */}
@@ -168,6 +174,25 @@ export default function CharacterScreen() {
           );
         })}
       </Card>
+
+      {(player.talents ?? []).length > 0 && (
+        <Card>
+          <SectionTitle icon="🌟">Talan</SectionTitle>
+          {(player.talents ?? []).map((id) => {
+            const t = TALENT_BY_ID[id];
+            if (!t) return null;
+            return (
+              <View key={id} style={styles.talentRow}>
+                <Text style={{ fontSize: 18 }}>{t.icon}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.talentName}>{t.title}</Text>
+                  <Text style={styles.talentDesc}>{t.desc}</Text>
+                </View>
+              </View>
+            );
+          })}
+        </Card>
+      )}
 
       {/* ─── Équipement ─── */}
       <Card>
@@ -252,7 +277,15 @@ export default function CharacterScreen() {
                 <Text style={[styles.invName, { color: RARITY_COLORS[it.rarity] }]} numberOfLines={1}>
                   {it.name} <Text style={styles.invLevel}>niv.{it.level}</Text>
                 </Text>
-                <VerdictBadge cmp={cmp} />
+                <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                  <VerdictBadge cmp={cmp} />
+                  {it.setId && SET_BY_ID[it.setId] && (
+                    <Chip
+                      label={`${SET_BY_ID[it.setId].icon} ${SET_BY_ID[it.setId].name}`}
+                      color={SET_BY_ID[it.setId].color}
+                    />
+                  )}
+                </View>
                 <Text style={styles.invStats} numberOfLines={2}>
                   {itemStats(it)}
                 </Text>
@@ -274,6 +307,8 @@ export default function CharacterScreen() {
           })
         )}
       </Card>
+
+      <Collection />
 
       {selected && (
         <Card glow={RARITY_COLORS[selected.rarity]}>
@@ -355,6 +390,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   flash: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.cane },
+  talentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: C.hairlineSoft,
+  },
+  talentName: { fontFamily: F.black, fontSize: 14.5, lineHeight: 19, color: C.text },
+  talentDesc: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
   portrait: { width: 132, alignItems: 'center', justifyContent: 'center' },
   halo: {
     position: 'absolute',

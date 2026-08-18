@@ -16,8 +16,11 @@ import {
   GUILD_XP_BONUS_PER_LEVEL,
   guildUpgradeCost,
 } from '../game/guilds';
+import { albumXpBonus, itemAlbumKey } from '../game/album';
+import { eventOfDay } from '../game/events';
 import { generateItem, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
+import { pendingTier, talentEffects } from '../game/talents';
 import {
   AD_COOLDOWN_MS,
   AdKind,
@@ -53,8 +56,19 @@ import {
  * combats d'affilée (le pic de plaisir du jeu) et la recharge ne bloque que
  * les sessions longues. Même friction à l'heure, bien meilleur ressenti.
  */
-export const MAX_ARENA_TICKETS = 3;
+export const BASE_ARENA_TICKETS = 3;
 export const ARENA_TICKET_MS = 2 * 60 * 1000;
+export const CHEST_MS = 4 * 60 * 60 * 1000;
+export const PASS_DAYS = 30;
+export const PASS_DAILY_PIMENTS = 20;
+
+/** plafond de jetons : base + talents + événement du jour */
+export function maxArenaTickets(
+  talents: string[] | undefined,
+  eventBonus: number
+): number {
+  return BASE_ARENA_TICKETS + talentEffects(talents ?? []).tickets + eventBonus;
+}
 
 export interface QuestOutcome {
   gold: number;
@@ -105,6 +119,13 @@ interface GameState {
   starterPackBought: boolean;
   /** vrai pendant l'animation d'un combat : l'UI passe en mode scène */
   combatActive: boolean;
+  /** coffre gratuit : date de la prochaine ouverture */
+  chestNextAt: number;
+  /** Zalbum : clés emplacement:rareté déjà rencontrées */
+  album: string[];
+  /** pass Ti Planteur : fin d'abonnement + dernier jour encaissé */
+  passUntil: number;
+  passClaimedDay: string | null;
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -142,6 +163,10 @@ interface GameState {
   watchAd: (kind: AdKind) => boolean;
   buyStarterPack: () => void;
   setCombatActive: (v: boolean) => void;
+  openFreeChest: () => { grains: number; piments: number; item: Item | null } | null;
+  pickTalent: (id: string) => void;
+  buyPass: () => void;
+  claimPassPiments: () => number;
 }
 
 function today(): string {
@@ -170,6 +195,11 @@ function applyXp(p: PlayerState, xp: number): number {
     gained++;
   }
   return gained;
+}
+
+function addToAlbum(album: string[], it: Item): string[] {
+  const key = itemAlbumKey(it);
+  return album.includes(key) ? album : [...album, key];
 }
 
 function bumpMissions(
@@ -217,7 +247,7 @@ export const useGame = create<GameState>()(
         motivation: MAX_MOTIVATION,
         dodosToday: 0,
         lastDaily: today(),
-        arenaTickets: MAX_ARENA_TICKETS,
+        arenaTickets: BASE_ARENA_TICKETS,
         nextTicketAt: 0,
         shop: [],
         guildLevel: 0,
@@ -235,6 +265,10 @@ export const useGame = create<GameState>()(
         adNextAt: 0,
         starterPackBought: false,
         combatActive: false,
+        chestNextAt: 0,
+        album: [],
+        passUntil: 0,
+        passClaimedDay: null,
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -256,6 +290,7 @@ export const useGame = create<GameState>()(
             losses: 0,
             guildId: null,
             transport: 0,
+            talents: [],
           };
           set({
             player: p,
@@ -265,7 +300,7 @@ export const useGame = create<GameState>()(
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
             lastDaily: today(),
-            arenaTickets: MAX_ARENA_TICKETS,
+            arenaTickets: BASE_ARENA_TICKETS,
             nextTicketAt: 0,
             guildLevel: 0,
             activeQuest: null,
@@ -280,6 +315,10 @@ export const useGame = create<GameState>()(
             adsToday: 0,
             adNextAt: 0,
             starterPackBought: false,
+            chestNextAt: 0,
+            album: [],
+            passUntil: 0,
+            passClaimedDay: null,
           });
         },
 
@@ -291,7 +330,7 @@ export const useGame = create<GameState>()(
             activeQuest: null,
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
-            arenaTickets: MAX_ARENA_TICKETS,
+            arenaTickets: BASE_ARENA_TICKETS,
             nextTicketAt: 0,
             shop: [],
             guildLevel: 0,
@@ -307,6 +346,10 @@ export const useGame = create<GameState>()(
             adsToday: 0,
             adNextAt: 0,
             starterPackBought: false,
+            chestNextAt: 0,
+            album: [],
+            passUntil: 0,
+            passClaimedDay: null,
           }),
 
         ensureDaily: () => {
@@ -403,16 +446,18 @@ export const useGame = create<GameState>()(
         /** rend les jetons de batay dus depuis la dernière visite */
         regenTickets: () => {
           const s = get();
-          if (s.arenaTickets >= MAX_ARENA_TICKETS) return;
+          const max = maxArenaTickets(
+            s.player?.talents,
+            eventOfDay(today()).kind === 'batay' ? 2 : 0
+          );
+          if (s.arenaTickets >= max) return;
           const now = Date.now();
           if (!s.nextTicketAt || now < s.nextTicketAt) return;
-          const gained =
-            1 + Math.floor((now - s.nextTicketAt) / ARENA_TICKET_MS);
-          const tickets = Math.min(MAX_ARENA_TICKETS, s.arenaTickets + gained);
+          const gained = 1 + Math.floor((now - s.nextTicketAt) / ARENA_TICKET_MS);
+          const tickets = Math.min(max, s.arenaTickets + gained);
           set({
             arenaTickets: tickets,
-            nextTicketAt:
-              tickets >= MAX_ARENA_TICKETS ? 0 : now + ARENA_TICKET_MS,
+            nextTicketAt: tickets >= max ? 0 : now + ARENA_TICKET_MS,
           });
         },
 
@@ -446,18 +491,26 @@ export const useGame = create<GameState>()(
             baseAttrs: { ...s.player.baseAttrs },
             inventory: [...s.player.inventory],
           };
-          const goldBonus = p.guildId
-            ? 1 + (s.guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / 100
-            : 1;
-          const xpBonus = p.guildId
-            ? 1 + (s.guildLevel * GUILD_XP_BONUS_PER_LEVEL) / 100
-            : 1;
+          const ev = eventOfDay(today());
+          const t = talentEffects(p.talents ?? []);
+          const goldBonus =
+            (p.guildId ? 1 + (s.guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / 100 : 1) *
+            (1 + t.gold) *
+            (ev.kind === 'grains' ? ev.mult : 1);
+          const xpBonus =
+            (p.guildId ? 1 + (s.guildLevel * GUILD_XP_BONUS_PER_LEVEL) / 100 : 1) *
+            (1 + t.xp) *
+            (1 + albumXpBonus(s.album.length)) *
+            (s.passUntil > Date.now() ? 1.1 : 1) *
+            (ev.kind === 'xp' ? ev.mult : 1);
           const gold = Math.round(q.gold * goldBonus);
           const xp = Math.round(q.xp * xpBonus);
           p.grains += gold;
           const levels = applyXp(p, xp);
           let item: Item | null = null;
-          if (Math.random() < q.itemChance && p.inventory.length < 24) {
+          const lootChance =
+            q.itemChance * (ev.kind === 'loot' ? ev.mult : 1);
+          if (Math.random() < lootChance && p.inventory.length < 24) {
             item = generateItem(p.level);
             p.inventory.push(item);
           }
@@ -480,6 +533,7 @@ export const useGame = create<GameState>()(
             quests: generateQuests(p.level),
             lastOutcome: outcome,
             foundMitik: s.foundMitik || item?.rarity === 'mitik',
+            album: item ? addToAlbum(s.album, item) : s.album,
           });
           track('quest');
           return outcome;
@@ -520,9 +574,19 @@ export const useGame = create<GameState>()(
           const order = [...s.ladderOrder];
           const myIdx = order.indexOf('me');
           const opIdx = order.indexOf(opponentId);
+          const ev = eventOfDay(today());
+          const t = talentEffects(p.talents ?? []);
           if (won) {
-            gold = arenaGold(p.level);
-            xp = arenaXp(p.level);
+            gold = Math.round(
+              arenaGold(p.level) * (1 + t.gold) * (ev.kind === 'grains' ? ev.mult : 1)
+            );
+            xp = Math.round(
+              arenaXp(p.level) *
+                (1 + t.xp) *
+                (1 + albumXpBonus(s.album.length)) *
+                (s.passUntil > Date.now() ? 1.1 : 1) *
+                (ev.kind === 'xp' ? ev.mult : 1)
+            );
             p.grains += gold;
             levels = applyXp(p, xp);
             p.honor += 8;
@@ -536,15 +600,17 @@ export const useGame = create<GameState>()(
             p.losses += 1;
           }
           p.rank = order.indexOf('me') + 1;
+          const max = maxArenaTickets(
+            p.talents,
+            ev.kind === 'batay' ? 2 : 0
+          );
           const tickets = Math.max(0, s.arenaTickets - 1);
           set({
             player: p,
             ladderOrder: order,
             arenaTickets: tickets,
             nextTicketAt:
-              tickets >= MAX_ARENA_TICKETS
-                ? 0
-                : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
+              tickets >= max ? 0 : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
           });
           track('arena');
           if (won) track('win');
@@ -554,7 +620,11 @@ export const useGame = create<GameState>()(
         buyArenaTicket: () => {
           const s = get();
           if (!s.player || s.player.piments < 1) return;
-          if (s.arenaTickets >= MAX_ARENA_TICKETS) return;
+          const max = maxArenaTickets(
+            s.player.talents,
+            eventOfDay(today()).kind === 'batay' ? 2 : 0
+          );
+          if (s.arenaTickets >= max) return;
           set({
             player: { ...s.player, piments: s.player.piments - 1 },
             arenaTickets: s.arenaTickets + 1,
@@ -588,6 +658,7 @@ export const useGame = create<GameState>()(
             },
             shop: s.shop.filter((i) => i.id !== item.id),
             foundMitik: s.foundMitik || item.rarity === 'mitik',
+            album: addToAlbum(s.album, item),
           });
           track('buy');
         },
@@ -772,10 +843,11 @@ export const useGame = create<GameState>()(
               },
             });
           } else if (kind === 'arena') {
-            set({
-              ...spend,
-              arenaTickets: Math.min(MAX_ARENA_TICKETS, s.arenaTickets + 1),
-            });
+            const max = maxArenaTickets(
+              s.player.talents,
+              eventOfDay(today()).kind === 'batay' ? 2 : 0
+            );
+            set({ ...spend, arenaTickets: Math.min(max, s.arenaTickets + 1) });
           } else if (kind === 'double') {
             const o = s.lastOutcome;
             if (!o || o.doubled) return false;
@@ -798,6 +870,70 @@ export const useGame = create<GameState>()(
         },
 
         setCombatActive: (v) => set({ combatActive: v }),
+
+        /** Coffre gratuit toutes les 4 h : le rendez-vous « gratter ». */
+        openFreeChest: () => {
+          const s = get();
+          if (!s.player || Date.now() < s.chestNextAt) return null;
+          const p: PlayerState = {
+            ...s.player,
+            inventory: [...s.player.inventory],
+          };
+          const roll = Math.random();
+          let grains = 0;
+          let piments = 0;
+          let item: Item | null = null;
+          if (roll < 0.55) {
+            grains = Math.round((60 + p.level * 40) * (0.8 + Math.random() * 0.6));
+            p.grains += grains;
+          } else if (roll < 0.82) {
+            piments = 1 + Math.floor(Math.random() * 3);
+            p.piments += piments;
+          } else if (p.inventory.length < 24) {
+            item = generateItem(p.level, undefined, Math.random() < 0.3 ? 'kalite' : 'korek');
+            p.inventory.push(item);
+          } else {
+            grains = Math.round(80 + p.level * 50);
+            p.grains += grains;
+          }
+          set({
+            player: p,
+            chestNextAt: Date.now() + CHEST_MS,
+            album: item ? addToAlbum(s.album, item) : s.album,
+            foundMitik: s.foundMitik || item?.rarity === 'mitik',
+          });
+          return { grains, piments, item };
+        },
+
+        pickTalent: (id) => {
+          const s = get();
+          if (!s.player) return;
+          const talents = s.player.talents ?? [];
+          const tier = pendingTier(s.player.level, talents);
+          if (!tier || !tier.choices.some((c) => c.id === id)) return;
+          set({ player: { ...s.player, talents: [...talents, id] } });
+        },
+
+        buyPass: () => {
+          const s = get();
+          if (!s.player) return;
+          const from = Math.max(Date.now(), s.passUntil);
+          set({ passUntil: from + PASS_DAYS * 86_400_000 });
+        },
+
+        claimPassPiments: () => {
+          const s = get();
+          if (!s.player || s.passUntil < Date.now()) return 0;
+          if (s.passClaimedDay === today()) return 0;
+          set({
+            player: {
+              ...s.player,
+              piments: s.player.piments + PASS_DAILY_PIMENTS,
+            },
+            passClaimedDay: today(),
+          });
+          return PASS_DAILY_PIMENTS;
+        },
 
         buyStarterPack: () => {
           const s = get();

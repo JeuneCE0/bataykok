@@ -37,6 +37,8 @@ export interface Item {
   armor?: number;
   bonuses: Partial<Attributes>;
   price: number;
+  /** panoplie éventuelle (voir game/sets.ts) */
+  setId?: string;
 }
 
 export interface Appearance {
@@ -74,6 +76,8 @@ export interface PlayerState {
   losses: number;
   guildId: string | null;
   transport: number; // index du moyen de transport possédé
+  /** talents choisis (voir game/talents.ts) */
+  talents: string[];
 }
 
 export interface Quest {

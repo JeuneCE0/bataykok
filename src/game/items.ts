@@ -1,5 +1,6 @@
-import { AttrId, Item, Rarity, SlotId } from './types';
 import { rnd } from './formulas';
+import { SETS } from './sets';
+import { AttrId, Item, Rarity, SlotId } from './types';
 
 export const RARITY_LABELS: Record<Rarity, string> = {
   commun: 'Commun',
@@ -80,14 +81,24 @@ export function generateItem(level: number, slot?: SlotId, rarity?: Rarity): Ite
     bonuses[a] = Math.max(1, Math.round((1 + level * 0.7) * mult * (0.7 + Math.random() * 0.6)));
   });
 
+  // une pièce sur cinq appartient à une panoplie (jamais sur du commun :
+  // les sets doivent rester un objectif, pas un acquis de départ)
+  const set =
+    tier >= 1 && Math.random() < 0.22
+      ? SETS[rnd(0, SETS.length - 1)]
+      : null;
+
   const item: Item = {
     id: `it${Date.now()}_${itemSeq++}`,
     slot: s,
-    name,
+    name: set ? `${baseName} ${set.name}` : name,
     rarity: r,
     level,
     bonuses,
-    price: Math.round((15 + level * 9) * mult * (0.8 + Math.random() * 0.4)),
+    price: Math.round(
+      (15 + level * 9) * mult * (0.8 + Math.random() * 0.4) * (set ? 1.25 : 1)
+    ),
+    ...(set ? { setId: set.id } : {}),
   };
 
   if (s === 'arme') {

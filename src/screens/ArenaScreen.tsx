@@ -25,10 +25,11 @@ import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { simulateCombat } from '../game/combat';
 import { fmt, maxHp, playerToFighter } from '../game/formulas';
+import { eventOfDay } from '../game/events';
 import { fighterPower } from '../game/power';
 import { Bot, CombatResult, CombatRound, Fighter } from '../game/types';
 import { scheduleArenaReady } from '../lib/notifications';
-import { MAX_ARENA_TICKETS, useGame } from '../store/gameStore';
+import { maxArenaTickets, useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
 const LADDER = generateLadder();
@@ -102,6 +103,11 @@ export default function ArenaScreen() {
     );
   }
 
+  const dayEvent = eventOfDay(new Date().toISOString().slice(0, 10));
+  const maxTickets = maxArenaTickets(
+    player.talents,
+    dayEvent.kind === 'batay' ? 2 : 0
+  );
   const refill = Math.max(0, Math.ceil((nextTicketAt - now) / 1000));
   const myIdx = ladderOrder.indexOf('me');
   const botById = new Map(LADDER.map((b) => [b.id, b]));
@@ -137,7 +143,7 @@ export default function ArenaScreen() {
       <Card compact>
         <View style={styles.ticketRow}>
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            {Array.from({ length: MAX_ARENA_TICKETS }, (_, i) => (
+            {Array.from({ length: maxTickets }, (_, i) => (
               <View
                 key={i}
                 style={[
@@ -158,7 +164,7 @@ export default function ArenaScreen() {
                 : 'Pu de batay pou lo moman'}
             </Text>
             <Text style={styles.ticketSub}>
-              {arenaTickets >= MAX_ARENA_TICKETS
+              {arenaTickets >= maxTickets
                 ? 'Jetons o max — anon !'
                 : `Prochain jeton dans ${formatSec(refill)}`}
             </Text>
