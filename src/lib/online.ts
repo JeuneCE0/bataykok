@@ -1,7 +1,12 @@
 import { playerArmor, playerToFighter, totalAttrs } from '../game/formulas';
 import { kokPower } from '../game/power';
 import { Appearance, Attributes, ClassId, Fighter, PlayerState } from '../game/types';
+import { Platform } from 'react-native';
+
 import { isOnlineEnabled, supabase } from './supabase';
+
+const APP_VERSION =
+  (require('../../app.json') as { expo: { version: string } }).expo.version;
 
 /**
  * Multijoueur asynchrone : on publie un *snapshot* de son kok, et on affronte
@@ -94,7 +99,7 @@ function isStaleSession(error: { code?: string; message?: string } | null): bool
   );
 }
 
-function snapshotRow(id: string, p: PlayerState) {
+function snapshotRow(id: string, p: PlayerState, extra?: SnapshotExtra) {
   const f = playerToFighter(p);
   return {
     id,
@@ -110,26 +115,45 @@ function snapshotRow(id: string, p: PlayerState) {
     honor: p.honor,
     wins: p.wins,
     losses: p.losses,
+    // pilotage : économie et progression, rien de personnel
+    grains: p.grains,
+    piments: p.piments,
+    talents: p.talents ?? [],
+    transport: p.transport,
+    guild_key: p.guildId,
+    equipped: Object.keys(p.equipment).length,
+    dungeon_floor: extra?.dungeonFloor ?? 0,
+    album_size: extra?.albumSize ?? 0,
+    platform: Platform.OS,
+    app_version: APP_VERSION,
     updated_at: new Date().toISOString(),
   };
 }
 
+export interface SnapshotExtra {
+  dungeonFloor?: number;
+  albumSize?: number;
+}
+
 /** Publie l'état du kok. N'interrompt jamais la partie en cas d'échec. */
-export async function pushSnapshot(p: PlayerState): Promise<boolean> {
+export async function pushSnapshot(
+  p: PlayerState,
+  extra?: SnapshotExtra
+): Promise<boolean> {
   if (!supabase) return false;
   let id = await ensureSession();
   if (!id) return false;
 
   let { error } = await supabase
     .from('koks')
-    .upsert(snapshotRow(id, p), { onConflict: 'id' });
+    .upsert(snapshotRow(id, p, extra), { onConflict: 'id' });
 
   if (error && isStaleSession(error)) {
     id = await resetSession();
     if (!id) return false;
     ({ error } = await supabase
       .from('koks')
-      .upsert(snapshotRow(id, p), { onConflict: 'id' }));
+      .upsert(snapshotRow(id, p, extra), { onConflict: 'id' }));
   }
   return !error;
 }

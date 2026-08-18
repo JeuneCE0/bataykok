@@ -9,13 +9,15 @@ import { claimDefenses, fetchMyHonor, isOnlineEnabled, pushSnapshot } from './on
  */
 export function useOnlineSync() {
   const player = useGame((s) => s.player);
+  const dungeonFloor = useGame((s) => s.dungeonFloor);
+  const albumSize = useGame((s) => s.album.length);
   const setOnlineState = useGame((s) => s.setOnlineState);
   const applyDefenses = useGame((s) => s.applyDefenses);
   const claimed = useRef(false);
   const signature = player
     ? `${player.level}:${player.honor}:${player.wins}:${player.losses}:${
         Object.keys(player.equipment).length
-      }`
+      }:${dungeonFloor}:${albumSize}:${Math.round(player.grains / 500)}`
     : '';
   const last = useRef<string>('');
 
@@ -27,7 +29,7 @@ export function useOnlineSync() {
     if (signature === last.current) return;
     last.current = signature;
     setOnlineState('sync');
-    void pushSnapshot(player).then(async (ok) => {
+    void pushSnapshot(player, { dungeonFloor, albumSize }).then(async (ok) => {
       setOnlineState(ok ? 'ok' : 'error');
       // un échec ne doit pas figer la signature : on retentera au prochain
       // changement, sinon une panne réseau condamnerait la session entière
@@ -42,5 +44,5 @@ export function useOnlineSync() {
       const [logs, honor] = await Promise.all([claimDefenses(), fetchMyHonor()]);
       applyDefenses(logs, honor);
     });
-  }, [signature, player, setOnlineState, applyDefenses]);
+  }, [signature, player, dungeonFloor, albumSize, setOnlineState, applyDefenses]);
 }
