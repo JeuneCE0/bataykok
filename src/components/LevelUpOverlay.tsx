@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 
+import { play } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
@@ -21,6 +22,7 @@ export default function LevelUpOverlay() {
 
   useEffect(() => {
     if (!show) return;
+    play('levelup');
     pop.setValue(0);
     Animated.sequence([
       Animated.spring(pop, {

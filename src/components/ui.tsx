@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import { play } from '../lib/sound';
 import { C, F, G, GradientKey, R, SHADOW, TYPO } from '../theme';
 
 // ─── Surfaces ────────────────────────────────────────────────────────────
@@ -104,7 +105,10 @@ export function Button({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        play(variant === 'piment' || variant === 'ember' ? 'confirm' : 'tap', 0.7);
+        onPress();
+      }}
       disabled={disabled}
       style={({ pressed }) => [
         styles.btnBase,
@@ -162,7 +166,10 @@ export function GhostButton({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        play('tap', 0.5);
+        onPress();
+      }}
       disabled={disabled}
       style={({ pressed }) => [
         styles.ghost,

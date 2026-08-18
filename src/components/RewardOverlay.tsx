@@ -4,6 +4,7 @@ import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 
 import { fmt } from '../game/formulas';
 import { RewardPart } from '../game/rewards';
+import { play } from '../lib/sound';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button, Chip } from './ui';
 
@@ -38,6 +39,7 @@ export default function RewardOverlay({
 
   useEffect(() => {
     if (!reward) return;
+    if (reward.gold > 0 || reward.xp > 0) play('coin', 0.9);
     pop.setValue(0);
     coins.setValue(0);
     Animated.parallel([

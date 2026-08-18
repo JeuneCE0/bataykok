@@ -12,6 +12,7 @@ import {
 import { CLASSES } from '../game/classes';
 import { fmt, maxHp } from '../game/formulas';
 import { CombatResult, CombatRound, Fighter } from '../game/types';
+import { play } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
@@ -99,6 +100,7 @@ export default function CombatView({
     tagScale.setValue(0);
 
     const missed = r.kind === 'block' || r.kind === 'dodge';
+    play(missed ? 'dodge' : hard ? 'crit' : 'hit', missed ? 0.7 : 1);
 
     Animated.sequence([
       Animated.timing(anim[att].lunge, {
@@ -170,6 +172,7 @@ export default function CombatView({
 
   useEffect(() => {
     if (!finished) return;
+    play(result.winner === 0 ? 'victory' : 'defeat');
     winScale.setValue(0);
     Animated.spring(winScale, {
       toValue: 1,
@@ -177,7 +180,7 @@ export default function CombatView({
       tension: 80,
       useNativeDriver: true,
     }).start();
-  }, [finished, winScale]);
+  }, [finished, winScale, result.winner]);
 
   const hp: [number, number] =
     idx >= 0 ? result.rounds[idx].hpAfter : [maxHp(me), maxHp(op)];

@@ -1,0 +1,86 @@
+import React, { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+
+import {
+  getSoundState,
+  setMusicEnabled,
+  setSfxEnabled,
+} from '../lib/sound';
+import { C, F } from '../theme';
+import { Card, SectionTitle } from './ui';
+
+/** Réglages audio : certains jouent en silence, ça doit se couper en un geste. */
+export default function SoundSettings() {
+  const [sfx, setSfx] = useState(true);
+  const [music, setMusic] = useState(true);
+
+  useEffect(() => {
+    const s = getSoundState();
+    setSfx(s.sfx);
+    setMusic(s.music);
+  }, []);
+
+  return (
+    <Card>
+      <SectionTitle icon="🔊">Son</SectionTitle>
+      <Row
+        label="Brui du zé"
+        hint="Kou, piès, kofr, viktoir"
+        value={sfx}
+        onChange={(v) => {
+          setSfx(v);
+          setSfxEnabled(v);
+        }}
+      />
+      <Row
+        label="Mizik"
+        hint="Boukl séga en fon"
+        value={music}
+        onChange={(v) => {
+          setMusic(v);
+          setMusicEnabled(v);
+        }}
+      />
+    </Card>
+  );
+}
+
+function Row({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <Pressable style={styles.row} onPress={() => onChange(!value)}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.hint}>{hint}</Text>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ false: 'rgba(255,246,232,0.14)', true: C.cane }}
+        thumbColor="#fff"
+      />
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.hairlineSoft,
+  },
+  label: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
+  hint: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+});

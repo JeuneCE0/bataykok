@@ -8,6 +8,7 @@ import DailyMissions from '../components/DailyMissions';
 import DayEventBanner from '../components/DayEventBanner';
 import FreeChest from '../components/FreeChest';
 import ReferralCard from '../components/ReferralCard';
+import SoundSettings from '../components/SoundSettings';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 import Rooster from '../components/Rooster';
 import {
@@ -131,6 +132,7 @@ export default function CharacterScreen() {
           <BattleLog />
           <ReferralCard />
           <Collection />
+          <SoundSettings />
         </ScrollView>
       </View>
     );

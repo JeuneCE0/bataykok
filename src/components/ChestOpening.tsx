@@ -5,6 +5,7 @@ import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 import { fmt } from '../game/formulas';
 import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
 import { Item } from '../game/types';
+import { play } from '../lib/sound';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button } from './ui';
 
@@ -49,6 +50,7 @@ export default function ChestOpening({
 
   useEffect(() => {
     if (!loot) return;
+    play('chest');
     shake.setValue(0);
     chest.setValue(0);
     burst.setValue(0);
