@@ -27,6 +27,7 @@ import DungeonScreen from './src/screens/DungeonScreen';
 import GuildScreen from './src/screens/GuildScreen';
 import QuestScreen from './src/screens/QuestScreen';
 import ShopScreen from './src/screens/ShopScreen';
+import { flushEvents, trackEvent } from './src/lib/analytics';
 import { useOnlineSync } from './src/lib/useOnlineSync';
 import { useAlerts } from './src/store/alerts';
 import { useGame } from './src/store/gameStore';
@@ -57,6 +58,19 @@ export default function App() {
     Baloo2_700Bold,
     Baloo2_800ExtraBold,
   });
+
+  useEffect(() => {
+    trackEvent('app_open', { hasPlayer: Boolean(player) });
+    return () => {
+      flushEvents();
+    };
+    // au montage seulement : c'est l'ouverture de l'app
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    trackEvent('screen_view', { tab });
+  }, [tab]);
 
   useEffect(() => {
     ensureDaily();

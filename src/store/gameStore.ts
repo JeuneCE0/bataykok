@@ -58,6 +58,7 @@ import {
   PlayerState,
   Quest,
 } from '../game/types';
+import { trackEvent } from '../lib/analytics';
 import { DefenseLog } from '../lib/online';
 
 /**
@@ -204,8 +205,9 @@ interface GameState {
       opPower?: number;
       online?: boolean;
       opponentName?: string;
+      opponentLevel?: number;
     }
-  ) => BatayReward & { levels: number; streak: number };
+  ) => BatayReward & { levels: number; streak: number; item: Item | null };
   buyArenaTicket: () => void;
   refreshShop: (payWithPiment: boolean) => void;
   buyItem: (item: Item) => void;
@@ -387,6 +389,7 @@ export const useGame = create<GameState>()(
             transport: 0,
             talents: [],
           };
+          trackEvent('player_created', { classId });
           set({
             player: p,
             ladderOrder: ladder,
@@ -662,6 +665,7 @@ export const useGame = create<GameState>()(
             keys: foundKey ? s.keys + 1 : s.keys,
           });
           track('quest');
+          trackEvent('quest_done', { gold, xp, item: Boolean(item) });
           return outcome;
         },
 
@@ -696,11 +700,13 @@ export const useGame = create<GameState>()(
             parts: [],
             levels: 0,
             streak: 0,
+            item: null,
           };
           if (!s.player) return empty;
           const p: PlayerState = {
             ...s.player,
             baseAttrs: { ...s.player.baseAttrs },
+            inventory: [...s.player.inventory],
           };
           const ev = eventOfDay(today());
           const t = talentEffects(p.talents ?? []);
@@ -731,6 +737,16 @@ export const useGame = create<GameState>()(
           if (won) p.wins += 1;
           else p.losses += 1;
 
+          // butin de batay : rare, mais c'est ce qui fait relancer un combat
+          let drop: Item | null = null;
+          const dropChance = 0.09 * (ev.kind === 'loot' ? ev.mult : 1);
+          if (won && p.inventory.length < 24 && Math.random() < dropChance) {
+            drop = generateItem(
+              Math.max(1, context?.opponentLevel ?? p.level)
+            );
+            p.inventory.push(drop);
+          }
+
           const order = [...s.ladderOrder];
           const myIdx = order.indexOf('me');
           const opIdx = order.indexOf(opponentId);
@@ -750,6 +766,8 @@ export const useGame = create<GameState>()(
             nextTicketAt:
               tickets >= max ? 0 : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
             winStreak: streak,
+            album: drop ? addToAlbum(s.album, drop) : s.album,
+            foundMitik: s.foundMitik || drop?.rarity === 'mitik',
             battleLog: pushLog(s.battleLog, {
               id: `a${Date.now()}`,
               kind: 'attack',
@@ -763,7 +781,12 @@ export const useGame = create<GameState>()(
           });
           track('arena');
           if (won) track('win');
-          return { ...reward, gold, xp, levels, streak };
+          trackEvent('arena_fight', {
+            won,
+            online: context?.online ?? false,
+            level: p.level,
+          });
+          return { ...reward, gold, xp, levels, streak, item: drop };
         },
 
         buyArenaTicket: () => {
@@ -1249,6 +1272,7 @@ export const useGame = create<GameState>()(
             item = generateItem(Math.max(p.level, boss.level), undefined, boss.reward.rarity);
             p.inventory.push(item);
           }
+          trackEvent('boss_cleared', { floor, level: p.level });
           set({
             player: p,
             keys: s.keys - 1,
@@ -1316,6 +1340,7 @@ export const useGame = create<GameState>()(
             },
             starterPackBought: true,
           });
+          trackEvent('purchase', { sku: 'starter_pack' });
         },
       };
     },
@@ -1335,7 +1360,7 @@ export const useGame = create<GameState>()(
 /** Une étape est franchie quand son objectif de jeu est atteint. */
 export function isStepComplete(
   id: StepId,
-  s: Pick<GameState, 'player' | 'stats' | 'foundMitik'>
+  s: Pick<GameState, 'player' | 'stats' | 'foundMitik' | 'dungeonFloor'>
 ): boolean {
   const p = s.player;
   if (!p) return false;
@@ -1355,6 +1380,8 @@ export function isStepComplete(
       return p.wins >= 1;
     case 'guild':
       return !!p.guildId;
+    case 'donjon':
+      return s.dungeonFloor >= 1;
     case 'level3':
       return p.level >= 3;
     case 'transport':
@@ -1373,6 +1400,7 @@ export function currentStep(s: {
   player: PlayerState | null;
   stats: LifetimeStats;
   foundMitik: boolean;
+  dungeonFloor: number;
   claimedSteps: StepId[];
 }) {
   const def = STEPS.find((x) => !s.claimedSteps.includes(x.id));

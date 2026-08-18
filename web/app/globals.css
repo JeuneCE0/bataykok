@@ -1,0 +1,101 @@
+/* Même direction artistique que le jeu : nuit volcanique, accents braise. */
+:root {
+  --night: #0a0713;
+  --night2: #160d22;
+  --card: rgba(41, 28, 58, 0.72);
+  --hairline: rgba(255, 246, 232, 0.14);
+  --text: #fff6ec;
+  --dim: #cdbeda;
+  --faint: #a08fb2;
+  --gold: #ffc93c;
+  --ember: #ff5a1f;
+  --cane: #3bd97e;
+  --lagoon: #2fc6e8;
+  --mystic: #b06bff;
+  --piment: #ff3b5c;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(1200px 600px at 50% 120%, rgba(255, 90, 31, 0.18), transparent 70%),
+    linear-gradient(180deg, var(--night2), var(--night));
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Baloo 2', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+
+header.top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+h1 { font-size: 34px; margin: 0; color: var(--gold); letter-spacing: 0.4px; }
+.sub { color: var(--dim); margin: 0 0 26px; font-size: 15px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.tile {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.tile .label {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+.tile .value { font-size: 34px; font-weight: 800; line-height: 1.1; }
+.tile .hint { font-size: 12.5px; color: var(--dim); margin-top: 4px; }
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  overflow-x: auto;
+}
+.panel h2 { font-size: 17px; margin: 0 0 14px; color: var(--text); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 420px; }
+th {
+  text-align: left;
+  font-size: 11.5px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 6px 10px 6px 0;
+  font-weight: 700;
+}
+td { padding: 7px 10px 7px 0; border-top: 1px solid rgba(255, 246, 232, 0.07); color: var(--dim); }
+td.num { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.bars { display: flex; align-items: flex-end; gap: 5px; height: 150px; }
+.bars .bar { flex: 1; background: linear-gradient(180deg, var(--gold), rgba(255,201,60,0.18)); border-radius: 4px 4px 0 0; min-height: 2px; position: relative; }
+.bars .bar span { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--faint); white-space: nowrap; }
+.axis { margin-top: 26px; font-size: 12px; color: var(--faint); }
+
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--cane); margin-right: 7px; box-shadow: 0 0 10px var(--cane); }
+
+.warn {
+  background: rgba(255, 59, 92, 0.12);
+  border: 1px solid rgba(255, 59, 92, 0.4);
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.warn code { background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 6px; }
+.foot { color: var(--faint); font-size: 12.5px; margin-top: 30px; }

@@ -28,7 +28,7 @@ export function useAlerts(now: number): Record<TabId, boolean> {
   };
   if (!player) return none;
 
-  const step = currentStep({ player, stats, foundMitik, claimedSteps });
+  const step = currentStep({ player, stats, foundMitik, dungeonFloor, claimedSteps });
   const missionReady = missions.some((m) => !m.claimed && m.progress >= m.def.target);
   const upgradeInBag = player.inventory.some(
     (it) => compareToEquipped(it, player).diff > 0

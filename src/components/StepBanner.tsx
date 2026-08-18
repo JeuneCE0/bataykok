@@ -15,10 +15,11 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
   const stats = useGame((s) => s.stats);
   const foundMitik = useGame((s) => s.foundMitik);
   const claimedSteps = useGame((s) => s.claimedSteps);
+  const dungeonFloor = useGame((s) => s.dungeonFloor);
   const claimStep = useGame((s) => s.claimStep);
 
   if (!player) return null;
-  const step = currentStep({ player, stats, foundMitik, claimedSteps });
+  const step = currentStep({ player, stats, foundMitik, dungeonFloor, claimedSteps });
   if (!step) return null;
 
   const done = claimedSteps.length;

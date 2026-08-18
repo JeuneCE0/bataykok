@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AD_OFFERS, AdKind, MAX_ADS_PER_DAY } from '../game/progress';
+import { trackEvent } from '../lib/analytics';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
@@ -47,7 +48,10 @@ export default function AdButton({
 
   useEffect(() => {
     if (!playing || left > 0) return;
-    if (watchAd(kind)) onRewarded?.();
+    if (watchAd(kind)) {
+      trackEvent('ad_completed', { kind });
+      onRewarded?.();
+    }
     setPlaying(false);
   }, [left, playing, kind, watchAd, onRewarded]);
 
@@ -67,7 +71,10 @@ export default function AdButton({
   return (
     <>
       <Pressable
-        onPress={() => setPlaying(true)}
+        onPress={() => {
+          trackEvent('ad_started', { kind });
+          setPlaying(true);
+        }}
         disabled={disabled}
         style={({ pressed }) => [
           styles.wrap,

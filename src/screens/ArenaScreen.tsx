@@ -18,6 +18,7 @@ import {
 } from '../components/ui';
 import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
+import { RARITY_COLORS } from '../game/items';
 import { simulateCombat } from '../game/combat';
 import { eventOfDay } from '../game/events';
 import { fmt, playerToFighter } from '../game/formulas';
@@ -115,6 +116,7 @@ export default function ArenaScreen() {
             opPower: fighterPower(fight.op),
             online: Boolean(fight.onlineId),
             opponentName: fight.op.name,
+            opponentLevel: fight.op.level,
           });
           if (useGame.getState().arenaTickets === 0) {
             scheduleArenaReady(ARENA_TICKET_SEC);
@@ -127,6 +129,8 @@ export default function ArenaScreen() {
             honor: r.honor,
             parts: r.parts,
             levels: r.levels,
+            itemName: r.item?.name ?? null,
+            itemColor: r.item ? RARITY_COLORS[r.item.rarity] : undefined,
             note: won
               ? r.streak >= 2
                 ? `🔥 ${r.streak} viktoir d'affilé`
