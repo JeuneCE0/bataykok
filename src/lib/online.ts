@@ -194,6 +194,53 @@ export async function submitResult(
   return data[0].new_honor ?? null;
 }
 
+export interface DefenseLog {
+  id: string;
+  attackerName: string;
+  attackerLevel: number;
+  attackerClass: ClassId;
+  /** true = l'attaquant a gagné, donc le kok a perdu sa défense */
+  attackerWon: boolean;
+  honorDelta: number;
+  happenedAt: string;
+}
+
+/**
+ * Relève les batays subies pendant l'absence, et les marque lues d'un même
+ * geste : les grains se versent côté client, il ne faut pas pouvoir les
+ * encaisser deux fois.
+ */
+export async function claimDefenses(): Promise<DefenseLog[]> {
+  if (!supabase) return [];
+  const id = await ensureSession();
+  if (!id) return [];
+  const { data, error } = await supabase.rpc('claim_defenses');
+  if (error || !data) return [];
+  return (data as DefenseRow[]).map((r) => ({
+    id: r.id,
+    attackerName: r.attacker_name,
+    attackerLevel: r.attacker_level,
+    attackerClass: r.attacker_class as ClassId,
+    attackerWon: r.attacker_won,
+    honorDelta: r.honor_delta,
+    happenedAt: r.happened_at,
+  }));
+}
+
+/** L'honneur fait autorité côté serveur : il faut réaligner le local. */
+export async function fetchMyHonor(): Promise<number | null> {
+  if (!supabase) return null;
+  const id = await ensureSession();
+  if (!id) return null;
+  const { data, error } = await supabase
+    .from('koks')
+    .select('honor')
+    .eq('id', id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data.honor as number;
+}
+
 export function onlineToFighter(k: OnlineKok): Fighter {
   return {
     name: k.name,
@@ -208,6 +255,16 @@ export function onlineToFighter(k: OnlineKok): Fighter {
 }
 
 export { isOnlineEnabled };
+
+interface DefenseRow {
+  id: string;
+  attacker_name: string;
+  attacker_level: number;
+  attacker_class: string;
+  attacker_won: boolean;
+  honor_delta: number;
+  happened_at: string;
+}
 
 interface LadderRow {
   id: string;

@@ -1,11 +1,13 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import KokProfileModal, { KokProfile } from '../components/KokProfileModal';
 import { Button, Card, Chip, ScreenTitle } from '../components/ui';
 import { fmt } from '../game/formulas';
 import { SEASON_MS, tierForRank } from '../game/seasons';
-import { generateLadder } from '../game/bots';
+import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
+import { playerArmor, playerToFighter, playerWeapon, totalAttrs } from '../game/formulas';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 
@@ -20,7 +22,51 @@ export default function RankingScreen() {
   const seasonNo = useGame((s) => s.seasonNo);
   const seasonPending = useGame((s) => s.seasonPending);
   const claimSeason = useGame((s) => s.claimSeason);
+  const [profile, setProfile] = useState<KokProfile | null>(null);
   if (!player) return null;
+
+  const openProfile = (id: string, rank: number) => {
+    if (id === 'me') {
+      const f = playerToFighter(player);
+      const w = playerWeapon(player);
+      setProfile({
+        name: player.name,
+        classId: player.classId,
+        level: player.level,
+        appearance: player.appearance,
+        attrs: totalAttrs(player),
+        weaponMin: w.min,
+        weaponMax: w.max,
+        armor: playerArmor(player),
+        honor: player.honor,
+        wins: player.wins,
+        losses: player.losses,
+        rank,
+        guildId: player.guildId,
+        equipment: player.equipment,
+        isMe: true,
+      });
+      return;
+    }
+    const bot = botById.get(id);
+    if (!bot) return;
+    const f = botToFighter(bot);
+    setProfile({
+      name: bot.name,
+      classId: bot.classId,
+      level: bot.level,
+      appearance: bot.appearance,
+      attrs: f.attrs,
+      weaponMin: f.weaponMin,
+      weaponMax: f.weaponMax,
+      armor: f.armor,
+      // les bots n'ont pas d'historique propre : on montre ce qui a du sens
+      honor: Math.max(0, 400 - rank * 5),
+      wins: Math.max(0, 90 - rank),
+      losses: Math.max(0, rank),
+      rank,
+    });
+  };
 
   const myIdx = ladderOrder.indexOf('me');
   const tier = tierForRank(myIdx + 1);
@@ -96,7 +142,15 @@ export default function RankingScreen() {
           }
 
           return (
-            <View key={id} style={[styles.row, isMe && styles.meRow]}>
+            <Pressable
+              key={id}
+              onPress={() => openProfile(id, i + 1)}
+              style={({ pressed }) => [
+                styles.row,
+                isMe && styles.meRow,
+                pressed && { opacity: 0.6 },
+              ]}
+            >
               <View
                 style={[
                   styles.rankBox,
@@ -117,10 +171,13 @@ export default function RankingScreen() {
               </Text>
               <Text style={[styles.cls, { color: cls.color }]}>{cls.emoji}</Text>
               <Text style={styles.level}>niv. {level}</Text>
-            </View>
+              <Text style={styles.chevron}>›</Text>
+            </Pressable>
           );
         })}
       </Card>
+
+      <KokProfileModal profile={profile} onClose={() => setProfile(null)} />
     </ScrollView>
   );
 }
@@ -167,5 +224,6 @@ const styles = StyleSheet.create({
   seasonRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   seasonTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   seasonSub: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  chevron: { fontFamily: F.black, fontSize: 20, color: C.textFaint, marginLeft: -2 },
   dots: { color: C.textFaint, textAlign: 'center', fontSize: 18, paddingVertical: 6 },
 });

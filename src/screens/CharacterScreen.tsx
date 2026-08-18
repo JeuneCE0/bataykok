@@ -2,10 +2,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import BattleLog from '../components/BattleLog';
 import Collection from '../components/Collection';
 import DailyMissions from '../components/DailyMissions';
 import DayEventBanner from '../components/DayEventBanner';
 import FreeChest from '../components/FreeChest';
+import ReferralCard from '../components/ReferralCard';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 import Rooster from '../components/Rooster';
 import {
@@ -126,6 +128,8 @@ export default function CharacterScreen() {
           <DayEventBanner />
           <FreeChest />
           <DailyMissions />
+          <BattleLog />
+          <ReferralCard />
           <Collection />
         </ScrollView>
       </View>

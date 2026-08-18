@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import AdButton from '../components/AdButton';
 import CombatView from '../components/CombatView';
 import FadeIn from '../components/FadeIn';
+import RewardOverlay, { RewardView } from '../components/RewardOverlay';
 import Rooster from '../components/Rooster';
 import {
   Button,
@@ -74,9 +75,7 @@ export default function ArenaScreen() {
     /** id du joueur réel affronté, le cas échéant */
     onlineId?: string;
   } | null>(null);
-  const [reward, setReward] = useState<
-    (BatayReward & { won: boolean; levels: number; streak: number }) | null
-  >(null);
+  const [reward, setReward] = useState<RewardView | null>(null);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -115,11 +114,25 @@ export default function ArenaScreen() {
             myPower: fighterPower(fight.me),
             opPower: fighterPower(fight.op),
             online: Boolean(fight.onlineId),
+            opponentName: fight.op.name,
           });
           if (useGame.getState().arenaTickets === 0) {
             scheduleArenaReady(ARENA_TICKET_SEC);
           }
-          setReward({ ...r, won });
+          setReward({
+            won,
+            title: won ? '🏆 VIKTOIR !' : '💀 DÉFÈT…',
+            gold: r.gold,
+            xp: r.xp,
+            honor: r.honor,
+            parts: r.parts,
+            levels: r.levels,
+            note: won
+              ? r.streak >= 2
+                ? `🔥 ${r.streak} viktoir d'affilé`
+                : null
+              : 'Ton kok la pri in kou, mé li la apri. Antrèn a li !',
+          });
           setFight(null);
         }}
       />
@@ -197,6 +210,8 @@ export default function ArenaScreen() {
         accent={C.ember}
       />
 
+      <RewardOverlay reward={reward} onClose={() => setReward(null)} />
+
       <View style={styles.rankBanner}>
         <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
         <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
@@ -233,90 +248,6 @@ export default function ArenaScreen() {
           </View>
         </View>
       </Card>
-
-      {reward && (
-        <Card glow={reward.won ? C.cane : C.piment}>
-          <Text style={[styles.rewardTitle, { color: reward.won ? C.cane : C.piment }]}>
-            {reward.won ? '🏆 VIKTOIR !' : '💀 DÉFÈT…'}
-          </Text>
-          <View style={styles.gainRow}>
-            <Text style={styles.gain}>🌽 +{fmt(reward.gold)}</Text>
-            <Text style={styles.gain}>✨ +{fmt(reward.xp)} XP</Text>
-            <Text
-              style={[
-                styles.gain,
-                { color: reward.honor >= 0 ? C.cane : C.piment },
-              ]}
-            >
-              🎖️ {reward.honor >= 0 ? '+' : ''}
-              {reward.honor}
-            </Text>
-          </View>
-          {reward.parts.length > 0 && (
-            <View style={styles.bonusRow}>
-              {reward.parts.map((b) => (
-                <Chip
-                  key={b.label}
-                  label={`${b.label} ×${b.mult.toFixed(2).replace('.', ',')}`}
-                  color={b.mult >= 1 ? C.gold : C.textDim}
-                />
-              ))}
-            </View>
-          )}
-          {reward.levels > 0 && (
-            <Text style={styles.levelUp}>🎉 NIVO SUPÉRIÈR !</Text>
-          )}
-          {!reward.won && (
-            <Text style={styles.consolation}>
-              Ton kok la pri in kou, mé li la apri. Antrèn a li !
-            </Text>
-          )}
-          {reward.won && reward.streak >= 2 && (
-            <Text style={styles.streak}>🔥 {reward.streak} viktoir d'affilé</Text>
-          )}
-        </Card>
-      )}
-
-      {rivals.length > 0 && (
-        <>
-          <SectionTitle icon="🌐">Batay en lign</SectionTitle>
-          {rivals.map((k) => {
-            const cls = CLASSES[k.classId];
-            const chance = odds(myPower, k.power);
-            return (
-              <Card key={k.id} compact glow={C.lagoon}>
-                <View style={styles.opRow}>
-                  <View style={styles.opPortrait}>
-                    <View style={[styles.opHalo, { backgroundColor: cls.color }]} />
-                    <Rooster appearance={k.appearance} size={78} flip ground={false} />
-                    <View style={styles.rankBadge}>
-                      <Text style={styles.rankBadgeText}>#{k.rank}</Text>
-                    </View>
-                  </View>
-                  <View style={{ flex: 1, gap: 5 }}>
-                    <Text style={styles.opName} numberOfLines={1}>
-                      {k.name}
-                    </Text>
-                    <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-                      <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
-                      <Chip label={`Niv. ${k.level}`} color={C.textDim} />
-                      <Chip label={chance.label} color={chance.color} active />
-                    </View>
-                  </View>
-                  <Button
-                    variant="lagoon"
-                    size="sm"
-                    icon="⚔️"
-                    label="Batay !"
-                    onPress={() => launchOnline(k)}
-                    disabled={arenaTickets <= 0}
-                  />
-                </View>
-              </Card>
-            );
-          })}
-        </>
-      )}
 
       {arenaTickets <= 0 ? (
         <Card>

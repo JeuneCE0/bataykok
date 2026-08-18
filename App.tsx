@@ -13,6 +13,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Backdrop from './src/components/Backdrop';
 import DailyModal from './src/components/DailyModal';
+import DefenseReport from './src/components/DefenseReport';
 import Hud from './src/components/Hud';
 import LevelUpOverlay from './src/components/LevelUpOverlay';
 import Rooster from './src/components/Rooster';
@@ -97,6 +98,7 @@ export default function App() {
                   <TabBar active={tab} onChange={setTab} now={now} />
                 )}
                 <DailyModal />
+                <DefenseReport />
                 <LevelUpOverlay />
                 <TalentModal />
               </View>

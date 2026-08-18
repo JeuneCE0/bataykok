@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import CombatView from '../components/CombatView';
 import FadeIn from '../components/FadeIn';
+import RewardOverlay, { RewardView } from '../components/RewardOverlay';
 import Rooster from '../components/Rooster';
 import {
   Bar,
@@ -36,14 +37,7 @@ export default function DungeonScreen() {
     boss: Boss;
     result: CombatResult;
   } | null>(null);
-  const [outcome, setOutcome] = useState<{
-    won: boolean;
-    grains: number;
-    xp: number;
-    item: string | null;
-    piments: number;
-    damage: number;
-  } | null>(null);
+  const [outcome, setOutcome] = useState<RewardView | null>(null);
 
   if (!player) return null;
 
@@ -65,11 +59,16 @@ export default function DungeonScreen() {
           const r = applyBossResult(won, fight.boss.floor, damage);
           setOutcome({
             won,
-            grains: r?.grains ?? 0,
+            title: won ? '🏆 GARDIEN VINKU !' : '💀 SA LA PA PASSÉ…',
+            gold: r?.grains ?? 0,
             xp: r?.xp ?? 0,
-            item: r?.item?.name ?? null,
             piments: won ? fight.boss.reward.piments : 0,
-            damage,
+            itemName: r?.item?.name ?? null,
+            itemColor: r?.item ? RARITY_COLORS[r.item.rarity] : undefined,
+            levels: r?.levels ?? 0,
+            note: won
+              ? null
+              : `Ou la retir ${Math.round(damage * 100)} % de sa vi. Renforsi out kok, pi revien.`,
           });
           setFight(null);
         }}
@@ -95,6 +94,8 @@ export default function DungeonScreen() {
         sub="13 gardien su la rout. Chak étaz i pass in sèl foi."
         accent={C.mystic}
       />
+
+      <RewardOverlay reward={outcome} onClose={() => setOutcome(null)} />
 
       {/* Clés */}
       <Card compact>
@@ -133,46 +134,6 @@ export default function DungeonScreen() {
           label={`${dungeonFloor} / ${BOSSES.length} gardien vinku`}
         />
       </Card>
-
-      {outcome && (
-        <Card glow={outcome.won ? C.cane : C.piment}>
-          <Text
-            style={[styles.outcomeTitle, { color: outcome.won ? C.cane : C.piment }]}
-          >
-            {outcome.won ? '🏆 GARDIEN VINKU !' : '💀 SA LA PA PASSÉ…'}
-          </Text>
-          <View style={styles.gainRow}>
-            {outcome.grains > 0 && (
-              <Text style={styles.gain}>🌽 +{fmt(outcome.grains)}</Text>
-            )}
-            {outcome.xp > 0 && (
-              <Text style={styles.gain}>✨ +{fmt(outcome.xp)} XP</Text>
-            )}
-            {outcome.piments > 0 && (
-              <Text style={styles.gain}>🌶️ +{outcome.piments}</Text>
-            )}
-          </View>
-          {outcome.item && (
-            <Text style={styles.lootLine}>🎁 {outcome.item}</Text>
-          )}
-          {!outcome.won && (
-            <>
-              <Text style={styles.damageLine}>
-                Ou la retir {Math.round(outcome.damage * 100)} % de sa vi —
-                {outcome.grains > 0 || outcome.xp > 0
-                  ? ' out kok i gagne kan mèm in ti kèk chose.'
-                  : ' pa assé pou ramène aryen.'}
-              </Text>
-              <Bar
-                value={outcome.damage}
-                max={1}
-                variant="piment"
-                height={8}
-              />
-            </>
-          )}
-        </Card>
-      )}
 
       {done && (
         <Card glow={C.gold}>

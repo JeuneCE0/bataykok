@@ -21,7 +21,12 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { generateItem, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
-import { arenaReward, bossConsolation, BatayReward } from '../game/rewards';
+import {
+  arenaReward,
+  bossConsolation,
+  BatayReward,
+  defenseReward,
+} from '../game/rewards';
 import { SEASON_MS, tierForRank } from '../game/seasons';
 import { pendingTier, talentEffects } from '../game/talents';
 import {
@@ -53,6 +58,7 @@ import {
   PlayerState,
   Quest,
 } from '../game/types';
+import { DefenseLog } from '../lib/online';
 
 /**
  * Jetons de batay plutôt qu'un cooldown sec : le joueur peut enchaîner trois
@@ -71,6 +77,34 @@ export function maxArenaTickets(
   eventBonus: number
 ): number {
   return BASE_ARENA_TICKETS + talentEffects(talents ?? []).tickets + eventBonus;
+}
+
+/** Journal des batays, consultable dans La Kaz. */
+export interface BattleLogEntry {
+  id: string;
+  kind: 'attack' | 'defense' | 'dungeon';
+  opponent: string;
+  won: boolean;
+  gold: number;
+  xp: number;
+  honorDelta: number;
+  at: number;
+}
+
+const LOG_MAX = 25;
+
+/** Ce que le joueur voit à son retour, une ligne par batay subie. */
+export interface DefenseSummary {
+  id: string;
+  attackerName: string;
+  attackerLevel: number;
+  attackerClass: ClassId;
+  /** true = le kok a repoussé l'attaque */
+  defended: boolean;
+  honorDelta: number;
+  gold: number;
+  xp: number;
+  happenedAt: string;
 }
 
 export interface QuestOutcome {
@@ -141,6 +175,10 @@ interface GameState {
   seasonPending: { season: number; rank: number } | null;
   /** série de victoires en cours au rond */
   winStreak: number;
+  /** batays subies hors ligne, en attente d'être lues par le joueur */
+  pendingDefenses: DefenseSummary[];
+  /** historique des batays (attaques, défenses, gardiens) */
+  battleLog: BattleLogEntry[];
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -159,7 +197,12 @@ interface GameState {
   applyArenaResult: (
     won: boolean,
     opponentId: string,
-    context?: { myPower?: number; opPower?: number; online?: boolean }
+    context?: {
+      myPower?: number;
+      opPower?: number;
+      online?: boolean;
+      opponentName?: string;
+    }
   ) => BatayReward & { levels: number; streak: number };
   buyArenaTicket: () => void;
   refreshShop: (payWithPiment: boolean) => void;
@@ -180,6 +223,14 @@ interface GameState {
   buyStarterPack: () => void;
   setCombatActive: (v: boolean) => void;
   setOnlineState: (v: GameState['onlineState']) => void;
+  /** encaisse les défenses relevées au serveur et réaligne l'honneur */
+  applyDefenses: (
+    logs: DefenseLog[],
+    serverHonor: number | null
+  ) => { gold: number; xp: number; levels: number } | null;
+  clearDefenses: () => void;
+  /** crédit direct (parrainage, offres) — le serveur ne tient pas la bourse */
+  grantBonus: (b: { grains?: number; piments?: number }) => void;
   openFreeChest: () => { grains: number; piments: number; item: Item | null } | null;
   pickTalent: (id: string) => void;
   buyPass: () => void;
@@ -220,6 +271,10 @@ function applyXp(p: PlayerState, xp: number): number {
     gained++;
   }
   return gained;
+}
+
+function pushLog(log: BattleLogEntry[], entry: BattleLogEntry): BattleLogEntry[] {
+  return [entry, ...log].slice(0, LOG_MAX);
 }
 
 function addToAlbum(album: string[], it: Item): string[] {
@@ -301,6 +356,8 @@ export const useGame = create<GameState>()(
         seasonNo: 1,
         seasonPending: null,
         winStreak: 0,
+        pendingDefenses: [],
+        battleLog: [],
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -357,6 +414,8 @@ export const useGame = create<GameState>()(
             seasonNo: 1,
             seasonPending: null,
             winStreak: 0,
+            pendingDefenses: [],
+            battleLog: [],
           });
         },
 
@@ -394,6 +453,8 @@ export const useGame = create<GameState>()(
             seasonNo: 1,
             seasonPending: null,
             winStreak: 0,
+            pendingDefenses: [],
+            battleLog: [],
           }),
 
         ensureDaily: () => {
@@ -679,6 +740,16 @@ export const useGame = create<GameState>()(
             nextTicketAt:
               tickets >= max ? 0 : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
             winStreak: streak,
+            battleLog: pushLog(s.battleLog, {
+              id: `a${Date.now()}`,
+              kind: 'attack',
+              opponent: context?.opponentName ?? 'In kok',
+              won,
+              gold,
+              xp,
+              honorDelta: reward.honor,
+              at: Date.now(),
+            }),
           });
           track('arena');
           if (won) track('win');
@@ -941,6 +1012,82 @@ export const useGame = create<GameState>()(
 
         setOnlineState: (v) => set({ onlineState: v }),
 
+        applyDefenses: (logs, serverHonor) => {
+          const s = get();
+          if (!s.player || logs.length === 0) {
+            if (s.player && serverHonor !== null && serverHonor !== s.player.honor) {
+              set({ player: { ...s.player, honor: serverHonor } });
+            }
+            return null;
+          }
+          const p: PlayerState = {
+            ...s.player,
+            baseAttrs: { ...s.player.baseAttrs },
+          };
+          let gold = 0;
+          let xp = 0;
+          const summaries: DefenseSummary[] = [];
+
+          logs.forEach((l) => {
+            const defended = !l.attackerWon;
+            const r = defenseReward(defended, p.level);
+            gold += r.gold;
+            xp += r.xp;
+            if (defended) p.wins += 1;
+            else p.losses += 1;
+            summaries.push({
+              id: l.id,
+              attackerName: l.attackerName,
+              attackerLevel: l.attackerLevel,
+              attackerClass: l.attackerClass,
+              defended,
+              honorDelta: -l.honorDelta,
+              gold: r.gold,
+              xp: r.xp,
+              happenedAt: l.happenedAt,
+            });
+          });
+
+          p.grains += gold;
+          const levels = applyXp(p, xp);
+          // le serveur fait foi sur l'honneur : il a arbitré ces combats
+          if (serverHonor !== null) p.honor = serverHonor;
+
+          set({
+            player: p,
+            pendingDefenses: summaries,
+            battleLog: summaries.reduce(
+              (log, d) =>
+                pushLog(log, {
+                  id: d.id,
+                  kind: 'defense',
+                  opponent: d.attackerName,
+                  won: d.defended,
+                  gold: d.gold,
+                  xp: d.xp,
+                  honorDelta: d.honorDelta,
+                  at: new Date(d.happenedAt).getTime() || Date.now(),
+                }),
+              s.battleLog
+            ),
+          });
+          return { gold, xp, levels };
+        },
+
+        clearDefenses: () => set({ pendingDefenses: [] }),
+
+        grantBonus: ({ grains = 0, piments = 0 }) => {
+          const s = get();
+          if (!s.player) return;
+          set({
+            player: {
+              ...s.player,
+              grains: s.player.grains + grains,
+              piments: s.player.piments + piments,
+            },
+          });
+        },
+
         /** Coffre gratuit toutes les 4 h : le rendez-vous « gratter ». */
         openFreeChest: () => {
           const s = get();
@@ -1014,7 +1161,20 @@ export const useGame = create<GameState>()(
             };
             lost.grains += c.grains;
             const lvls = applyXp(lost, c.xp);
-            set({ player: lost, keys: s.keys - 1 });
+            set({
+              player: lost,
+              keys: s.keys - 1,
+              battleLog: pushLog(s.battleLog, {
+                id: `d${Date.now()}`,
+                kind: 'dungeon',
+                opponent: boss.name,
+                won: false,
+                gold: c.grains,
+                xp: c.xp,
+                honorDelta: 0,
+                at: Date.now(),
+              }),
+            });
             return { grains: c.grains, xp: c.xp, levels: lvls, item: null };
           }
 
@@ -1049,6 +1209,16 @@ export const useGame = create<GameState>()(
             dungeonFloor: floor,
             album: item ? addToAlbum(s.album, item) : s.album,
             foundMitik: s.foundMitik || item?.rarity === 'mitik',
+            battleLog: pushLog(s.battleLog, {
+              id: `d${Date.now()}`,
+              kind: 'dungeon',
+              opponent: boss.name,
+              won: true,
+              gold: grains,
+              xp,
+              honorDelta: 0,
+              at: Date.now(),
+            }),
           });
           return { grains, xp, levels, item };
         },
@@ -1110,7 +1280,8 @@ export const useGame = create<GameState>()(
       // les sauvegardes d'avant la progression restent valides : le merge
       // shallow de zustand complète les nouveaux champs avec leurs défauts.
       migrate: (persisted) => persisted as GameState,
-      partialize: ({ combatActive, onlineState, ...rest }) => rest as GameState,
+      partialize: ({ combatActive, onlineState, pendingDefenses, ...rest }) =>
+        rest as GameState,
     }
   )
 );

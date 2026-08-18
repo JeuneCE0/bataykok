@@ -5,6 +5,7 @@ import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { fmt } from '../game/formulas';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
+import ChestOpening, { ChestLoot } from './ChestOpening';
 import { Button, Card, SectionTitle } from './ui';
 
 /** Coffre gratuit toutes les 4 h : la raison de rouvrir l'app entre deux quêtes. */
@@ -12,7 +13,7 @@ export default function FreeChest() {
   const chestNextAt = useGame((s) => s.chestNextAt);
   const openFreeChest = useGame((s) => s.openFreeChest);
   const [now, setNow] = useState(Date.now());
-  const [loot, setLoot] = useState<string | null>(null);
+  const [loot, setLoot] = useState<ChestLoot | null>(null);
   const shake = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -86,7 +87,7 @@ export default function FreeChest() {
               ? 'Grains, piments ou in ékipman — o azar.'
               : `Disponib dan ${formatLong(remaining)}`}
           </Text>
-          {loot ? <Text style={styles.loot}>{loot}</Text> : null}
+
         </View>
 
         <Button
@@ -96,18 +97,12 @@ export default function FreeChest() {
           disabled={!ready}
           onPress={() => {
             const r = openFreeChest();
-            if (!r) return;
-            setLoot(
-              r.item
-                ? `🎁 ${r.item.name}`
-                : r.piments > 0
-                  ? `🌶️ +${r.piments}`
-                  : `🌽 +${fmt(r.grains)}`
-            );
-            setTimeout(() => setLoot(null), 6000);
+            if (r) setLoot(r);
           }}
         />
       </View>
+
+      <ChestOpening loot={loot} onClose={() => setLoot(null)} />
     </Card>
   );
 }
@@ -134,5 +129,4 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20, color: C.text },
   sub: { fontFamily: F.regular, fontSize: 13, lineHeight: 18, color: C.textDim },
-  loot: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.cane },
 });

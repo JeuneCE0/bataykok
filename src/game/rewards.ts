@@ -100,6 +100,23 @@ export function arenaReward({
 }
 
 /**
+ * Défense en l'absence du joueur : son snapshot s'est battu tout seul. La part
+ * est plus faible qu'une batay menée à la main — il n'a rien fait — mais elle
+ * existe, sinon rouvrir l'app après une nuit d'attaques n'apporte que des
+ * mauvaises nouvelles.
+ */
+export function defenseReward(
+  defended: boolean,
+  level: number
+): { gold: number; xp: number } {
+  const g = arenaGold(level);
+  const x = arenaXp(level);
+  return defended
+    ? { gold: Math.round(g * 0.6), xp: Math.round(x * 0.4) }
+    : { gold: Math.round(g * 0.2), xp: Math.round(x * 0.2) };
+}
+
+/**
  * Donjon : un gardien qu'on n'a pas fait tomber laisse quand même de quoi
  * revenir — proportionnellement aux dégâts infligés. Échouer à 5 % près ne
  * doit pas donner la même chose que se faire balayer.
