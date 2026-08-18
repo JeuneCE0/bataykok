@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
     textShadowRadius: 16,
   },
   bonusHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  bonusLabel: { fontFamily: F.semi, fontSize: 12, color: C.textDim },
-  bonusValue: { fontFamily: F.black, fontSize: 14 },
+  bonusLabel: { fontFamily: F.semi, fontSize: 13.5, lineHeight: 18, color: C.textDim },
+  bonusValue: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20 },
   emblemBox: {
     width: 54,
     height: 54,
@@ -188,8 +188,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  guildName: { fontFamily: F.black, fontSize: 17, color: C.text },
-  motto: { fontFamily: F.regular, fontStyle: 'italic', fontSize: 12, color: C.textDim },
+  guildName: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
+  motto: {
+    fontFamily: F.regular,
+    fontStyle: 'italic',
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: C.textDim,
+  },
   members: { ...T.tiny, color: C.textFaint, marginVertical: 10 },
   memberRow: {
     flexDirection: 'row',
@@ -200,6 +206,6 @@ const styles = StyleSheet.create({
     borderBottomColor: C.hairlineSoft,
   },
   meRow: { borderBottomColor: 'transparent' },
-  member: { fontFamily: F.semi, fontSize: 13, color: C.textDim },
-  memberMe: { fontFamily: F.black, fontSize: 13.5, color: C.gold },
+  member: { fontFamily: F.semi, fontSize: 14.5, lineHeight: 20, color: C.textDim },
+  memberMe: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.gold },
 });

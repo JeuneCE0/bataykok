@@ -25,21 +25,39 @@ import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { simulateCombat } from '../game/combat';
 import { fmt, maxHp, playerToFighter } from '../game/formulas';
+import { fighterPower } from '../game/power';
 import { Bot, CombatResult, CombatRound, Fighter } from '../game/types';
 import { scheduleArenaReady } from '../lib/notifications';
-import { useGame } from '../store/gameStore';
+import { MAX_ARENA_TICKETS, useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
 const LADDER = generateLadder();
 const ROUND_MS = 720;
-const ARENA_COOLDOWN_SEC = 120;
+const ARENA_TICKET_SEC = 120;
+
+function formatSec(sec: number): string {
+  if (sec <= 0) return 'maintenant';
+  if (sec < 60) return `${sec} s`;
+  return `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')}`;
+}
+
+/** Lecture immédiate du rapport de force, pour choisir sa cible. */
+function odds(mine: number, theirs: number) {
+  const r = theirs > 0 ? mine / theirs : 2;
+  if (r >= 1.25) return { label: 'FASIL', color: C.cane };
+  if (r >= 0.95) return { label: 'SERRÉ', color: C.gold };
+  if (r >= 0.75) return { label: 'DIR', color: C.ember };
+  return { label: 'TRÈ DIR', color: C.piment };
+}
 
 export default function ArenaScreen() {
   const player = useGame((s) => s.player);
   const ladderOrder = useGame((s) => s.ladderOrder);
-  const arenaNextAt = useGame((s) => s.arenaNextAt);
+  const arenaTickets = useGame((s) => s.arenaTickets);
+  const nextTicketAt = useGame((s) => s.nextTicketAt);
+  const regenTickets = useGame((s) => s.regenTickets);
   const applyArenaResult = useGame((s) => s.applyArenaResult);
-  const skipArenaCooldown = useGame((s) => s.skipArenaCooldown);
+  const buyArenaTicket = useGame((s) => s.buyArenaTicket);
 
   const [now, setNow] = useState(Date.now());
   const [fight, setFight] = useState<{
@@ -51,9 +69,12 @@ export default function ArenaScreen() {
   const [reward, setReward] = useState<{ won: boolean; text: string } | null>(null);
 
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 500);
+    const t = setInterval(() => {
+      setNow(Date.now());
+      regenTickets();
+    }, 500);
     return () => clearInterval(t);
-  }, []);
+  }, [regenTickets]);
 
   if (!player) return null;
 
@@ -66,7 +87,9 @@ export default function ArenaScreen() {
         onDone={() => {
           const won = fight.result.winner === 0;
           const r = applyArenaResult(won, fight.opId);
-          scheduleArenaReady(ARENA_COOLDOWN_SEC);
+          if (useGame.getState().arenaTickets === 0) {
+            scheduleArenaReady(ARENA_TICKET_SEC);
+          }
           setReward({
             won,
             text: won
@@ -79,7 +102,7 @@ export default function ArenaScreen() {
     );
   }
 
-  const cooldown = Math.max(0, Math.ceil((arenaNextAt - now) / 1000));
+  const refill = Math.max(0, Math.ceil((nextTicketAt - now) / 1000));
   const myIdx = ladderOrder.indexOf('me');
   const botById = new Map(LADDER.map((b) => [b.id, b]));
   const targets: Bot[] = [];
@@ -88,7 +111,10 @@ export default function ArenaScreen() {
     if (b) targets.push(b);
   }
 
+  const myPower = fighterPower(playerToFighter(player));
+
   const launch = (bot: Bot) => {
+    if (useGame.getState().arenaTickets <= 0) return;
     const me = playerToFighter(player);
     const op = botToFighter(bot);
     setReward(null);
@@ -108,6 +134,38 @@ export default function ArenaScreen() {
         <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
       </View>
 
+      <Card compact>
+        <View style={styles.ticketRow}>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            {Array.from({ length: MAX_ARENA_TICKETS }, (_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.ticket,
+                  i < arenaTickets ? styles.ticketOn : styles.ticketOff,
+                ]}
+              >
+                <Text style={{ fontSize: 17, opacity: i < arenaTickets ? 1 : 0.3 }}>
+                  ⚔️
+                </Text>
+              </View>
+            ))}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.ticketTitle}>
+              {arenaTickets > 0
+                ? `${arenaTickets} batay dispo`
+                : 'Pu de batay pou lo moman'}
+            </Text>
+            <Text style={styles.ticketSub}>
+              {arenaTickets >= MAX_ARENA_TICKETS
+                ? 'Jetons o max — anon !'
+                : `Prochain jeton dans ${formatSec(refill)}`}
+            </Text>
+          </View>
+        </View>
+      </Card>
+
       {reward && (
         <Card glow={reward.won ? C.cane : C.piment}>
           <Text style={[styles.rewardTitle, { color: reward.won ? C.cane : C.piment }]}>
@@ -117,20 +175,20 @@ export default function ArenaScreen() {
         </Card>
       )}
 
-      {cooldown > 0 ? (
+      {arenaTickets <= 0 ? (
         <Card>
           <Text style={styles.cooldownLabel}>😤 Ton kok i reprend son souffle</Text>
           <Well style={{ alignItems: 'center' }}>
-            <Text style={styles.cooldownTime}>{cooldown}s</Text>
+            <Text style={styles.cooldownTime}>{formatSec(refill)}</Text>
           </Well>
           <View style={{ gap: 8, marginTop: 12 }}>
-            <AdButton kind="arena" full label="Batay tousuit (pub)" />
+            <AdButton kind="arena" full label="In batay tousuit (pub)" />
             <Button
               variant="piment"
               size="sm"
               icon="⏩"
-              label="Passer l'attente · 🌶️1"
-              onPress={skipArenaCooldown}
+              label="Jeton tousuit · 🌶️1"
+              onPress={buyArenaTicket}
               disabled={player.piments < 1}
             />
           </View>
@@ -144,6 +202,7 @@ export default function ArenaScreen() {
         targets.map((bot, bi) => {
           const rank = ladderOrder.indexOf(bot.id) + 1;
           const cls = CLASSES[bot.classId];
+          const chance = odds(myPower, fighterPower(botToFighter(bot)));
           return (
             <FadeIn key={bot.id} index={bi}>
             <Card compact>
@@ -162,6 +221,7 @@ export default function ArenaScreen() {
                   <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                     <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
                     <Chip label={`Niv. ${bot.level}`} color={C.textDim} />
+                    <Chip label={chance.label} color={chance.color} active />
                   </View>
                 </View>
                 <Button
@@ -170,6 +230,7 @@ export default function ArenaScreen() {
                   icon="⚔️"
                   label="Batay !"
                   onPress={() => launch(bot)}
+                  disabled={arenaTickets <= 0}
                 />
               </View>
             </Card>
@@ -711,9 +772,40 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 14, paddingBottom: 40 },
   rankBanner: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 6 },
-  rewardTitle: { fontFamily: F.black, fontSize: 18, color: C.gold, marginBottom: 4 },
-  cooldownLabel: { fontFamily: F.bold, fontSize: 14, color: C.text, marginBottom: 10 },
-  cooldownTime: { fontFamily: F.black, fontSize: 32, color: C.ember },
+  ticketRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  ticket: {
+    width: 36,
+    height: 36,
+    borderRadius: R.md,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ticketOn: {
+    borderColor: C.ember,
+    backgroundColor: 'rgba(255,90,31,0.16)',
+  },
+  ticketOff: {
+    borderColor: C.hairlineSoft,
+    backgroundColor: 'rgba(6,3,12,0.4)',
+  },
+  ticketTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  ticketSub: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  rewardTitle: {
+    fontFamily: F.black,
+    fontSize: 20,
+    lineHeight: 26,
+    color: C.gold,
+    marginBottom: 4,
+  },
+  cooldownLabel: {
+    fontFamily: F.bold,
+    fontSize: 15,
+    lineHeight: 20,
+    color: C.text,
+    marginBottom: 10,
+  },
+  cooldownTime: { fontFamily: F.black, fontSize: 36, lineHeight: 44, color: C.ember },
   opRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   opPortrait: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
   opHalo: {
@@ -735,7 +827,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
   },
   rankBadgeText: { fontFamily: F.black, fontSize: 10, color: C.gold },
-  opName: { fontFamily: F.black, fontSize: 15, color: C.text },
+  opName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
 
   combatRoot: { flex: 1, padding: 14, paddingTop: 20 },
   scene: { flex: 1, justifyContent: 'center', gap: 4 },
@@ -751,8 +843,14 @@ const styles = StyleSheet.create({
   },
   stageGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: 220 },
   stageHead: { alignItems: 'center', marginBottom: 6 },
-  stageTitle: { fontFamily: F.black, fontSize: 19, color: C.ember, letterSpacing: 1 },
-  roundCount: { fontFamily: F.semi, fontSize: 11, color: C.textFaint },
+  stageTitle: {
+    fontFamily: F.black,
+    fontSize: 21,
+    lineHeight: 27,
+    color: C.ember,
+    letterSpacing: 0.8,
+  },
+  roundCount: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17, color: C.textDim },
   fighters: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -786,7 +884,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  fighterName: { fontFamily: F.black, fontSize: 13, color: C.text },
+  fighterName: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   koStars: {
     position: 'absolute',
     top: 6,
@@ -797,8 +895,8 @@ const styles = StyleSheet.create({
     textShadowRadius: 6,
   },
   hpTrack: {
-    width: '92%',
-    height: 15,
+    width: '94%',
+    height: 18,
     borderRadius: 8,
     backgroundColor: 'rgba(6,3,12,0.65)',
     borderWidth: 1,
@@ -808,7 +906,7 @@ const styles = StyleSheet.create({
   },
   hpText: {
     fontFamily: F.black,
-    fontSize: 10,
+    fontSize: 11.5,
     color: '#fff',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.9)',
@@ -843,12 +941,12 @@ const styles = StyleSheet.create({
   },
   roundText: {
     fontFamily: F.semi,
-    fontSize: 13,
+    fontSize: 14.5,
     color: C.text,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
   },
-  logLine: { fontFamily: F.regular, fontSize: 11.5, marginBottom: 3, lineHeight: 16 },
+  logLine: { fontFamily: F.regular, fontSize: 13, marginBottom: 4, lineHeight: 18 },
   winBanner: {
     paddingHorizontal: 26,
     paddingVertical: 12,

@@ -99,12 +99,13 @@ const styles = StyleSheet.create({
   },
   kicker: {
     fontFamily: F.black,
-    fontSize: 9,
-    letterSpacing: 1.2,
-    color: C.textFaint,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 1,
+    color: C.textDim,
   },
-  title: { fontFamily: F.black, fontSize: 14.5, color: C.text },
-  hint: { fontFamily: F.regular, fontSize: 11.5, color: C.textDim, lineHeight: 15 },
+  title: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
+  hint: { fontFamily: F.regular, fontSize: 12.5, color: C.textDim, lineHeight: 17 },
   cta: {
     width: 34,
     height: 34,

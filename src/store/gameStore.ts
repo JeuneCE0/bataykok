@@ -17,6 +17,7 @@ import {
   guildUpgradeCost,
 } from '../game/guilds';
 import { generateItem, shopRotation } from '../game/items';
+import { compareToEquipped } from '../game/power';
 import {
   AD_COOLDOWN_MS,
   AdKind,
@@ -47,7 +48,13 @@ import {
   Quest,
 } from '../game/types';
 
-const ARENA_COOLDOWN_MS = 2 * 60 * 1000; // 2 min pour le prototype
+/**
+ * Jetons de batay plutôt qu'un cooldown sec : le joueur peut enchaîner trois
+ * combats d'affilée (le pic de plaisir du jeu) et la recharge ne bloque que
+ * les sessions longues. Même friction à l'heure, bien meilleur ressenti.
+ */
+export const MAX_ARENA_TICKETS = 3;
+export const ARENA_TICKET_MS = 2 * 60 * 1000;
 
 export interface QuestOutcome {
   gold: number;
@@ -77,7 +84,9 @@ interface GameState {
   motivation: number;
   dodosToday: number;
   lastDaily: string;
-  arenaNextAt: number;
+  arenaTickets: number;
+  /** date de régénération du prochain jeton */
+  nextTicketAt: number;
   shop: Item[];
   guildLevel: number;
   lastOutcome: QuestOutcome | null;
@@ -101,7 +110,10 @@ interface GameState {
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
   resetGame: () => void;
   ensureDaily: () => void;
-  buyAttr: (attr: AttrId) => void;
+  buyAttr: (attr: AttrId, times?: number) => void;
+  equipBest: () => number;
+  sellJunk: () => { count: number; grains: number };
+  regenTickets: () => void;
   rerollQuests: () => void;
   startQuest: (q: Quest) => void;
   cancelQuest: () => void;
@@ -112,7 +124,7 @@ interface GameState {
     won: boolean,
     opponentId: string
   ) => { gold: number; xp: number; levels: number };
-  skipArenaCooldown: () => void;
+  buyArenaTicket: () => void;
   refreshShop: (payWithPiment: boolean) => void;
   buyItem: (item: Item) => void;
   equipItem: (item: Item) => void;
@@ -205,7 +217,8 @@ export const useGame = create<GameState>()(
         motivation: MAX_MOTIVATION,
         dodosToday: 0,
         lastDaily: today(),
-        arenaNextAt: 0,
+        arenaTickets: MAX_ARENA_TICKETS,
+        nextTicketAt: 0,
         shop: [],
         guildLevel: 0,
         lastOutcome: null,
@@ -252,7 +265,8 @@ export const useGame = create<GameState>()(
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
             lastDaily: today(),
-            arenaNextAt: 0,
+            arenaTickets: MAX_ARENA_TICKETS,
+            nextTicketAt: 0,
             guildLevel: 0,
             activeQuest: null,
             stats: emptyStats(),
@@ -277,7 +291,8 @@ export const useGame = create<GameState>()(
             activeQuest: null,
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
-            arenaNextAt: 0,
+            arenaTickets: MAX_ARENA_TICKETS,
+            nextTicketAt: 0,
             shop: [],
             guildLevel: 0,
             lastOutcome: null,
@@ -315,16 +330,90 @@ export const useGame = create<GameState>()(
           });
         },
 
-        buyAttr: (attr) => {
+        buyAttr: (attr, times = 1) => {
           const s = get();
           if (!s.player) return;
-          const cost = attrCost(s.player.baseAttrs[attr]);
-          if (s.player.grains < cost) return;
           const p = { ...s.player, baseAttrs: { ...s.player.baseAttrs } };
-          p.grains -= cost;
-          p.baseAttrs[attr] += 1;
+          let bought = 0;
+          for (let i = 0; i < times; i++) {
+            const cost = attrCost(p.baseAttrs[attr]);
+            if (p.grains < cost) break;
+            p.grains -= cost;
+            p.baseAttrs[attr] += 1;
+            bought++;
+          }
+          if (!bought) return;
           set({ player: p });
-          track('attr');
+          track('attr', bought);
+        },
+
+        /** équipe d'un coup tout ce qui est meilleur que le porté */
+        equipBest: () => {
+          const s = get();
+          if (!s.player) return 0;
+          const p: PlayerState = {
+            ...s.player,
+            equipment: { ...s.player.equipment },
+            inventory: [...s.player.inventory],
+          };
+          let changed = 0;
+          let pass = true;
+          while (pass) {
+            pass = false;
+            for (const it of [...p.inventory]) {
+              if (compareToEquipped(it, p).diff <= 0) continue;
+              p.inventory = p.inventory.filter((x) => x.id !== it.id);
+              const prev = p.equipment[it.slot];
+              if (prev) p.inventory.push(prev);
+              p.equipment[it.slot] = it;
+              changed++;
+              pass = true;
+              break;
+            }
+          }
+          if (!changed) return 0;
+          set({ player: p });
+          track('equip', changed);
+          return changed;
+        },
+
+        /** vend tout ce qui est strictement moins bon que le porté */
+        sellJunk: () => {
+          const s = get();
+          if (!s.player) return { count: 0, grains: 0 };
+          const junk = s.player.inventory.filter(
+            (it) => compareToEquipped(it, s.player!).verdict === 'worse'
+          );
+          if (!junk.length) return { count: 0, grains: 0 };
+          const grains = junk.reduce(
+            (sum, it) => sum + Math.round(it.price * 0.4),
+            0
+          );
+          const ids = new Set(junk.map((i) => i.id));
+          set({
+            player: {
+              ...s.player,
+              grains: s.player.grains + grains,
+              inventory: s.player.inventory.filter((i) => !ids.has(i.id)),
+            },
+          });
+          return { count: junk.length, grains };
+        },
+
+        /** rend les jetons de batay dus depuis la dernière visite */
+        regenTickets: () => {
+          const s = get();
+          if (s.arenaTickets >= MAX_ARENA_TICKETS) return;
+          const now = Date.now();
+          if (!s.nextTicketAt || now < s.nextTicketAt) return;
+          const gained =
+            1 + Math.floor((now - s.nextTicketAt) / ARENA_TICKET_MS);
+          const tickets = Math.min(MAX_ARENA_TICKETS, s.arenaTickets + gained);
+          set({
+            arenaTickets: tickets,
+            nextTicketAt:
+              tickets >= MAX_ARENA_TICKETS ? 0 : now + ARENA_TICKET_MS,
+          });
         },
 
         rerollQuests: () => {
@@ -447,22 +536,28 @@ export const useGame = create<GameState>()(
             p.losses += 1;
           }
           p.rank = order.indexOf('me') + 1;
+          const tickets = Math.max(0, s.arenaTickets - 1);
           set({
             player: p,
             ladderOrder: order,
-            arenaNextAt: Date.now() + ARENA_COOLDOWN_MS,
+            arenaTickets: tickets,
+            nextTicketAt:
+              tickets >= MAX_ARENA_TICKETS
+                ? 0
+                : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
           });
           track('arena');
           if (won) track('win');
           return { gold, xp, levels };
         },
 
-        skipArenaCooldown: () => {
+        buyArenaTicket: () => {
           const s = get();
           if (!s.player || s.player.piments < 1) return;
+          if (s.arenaTickets >= MAX_ARENA_TICKETS) return;
           set({
             player: { ...s.player, piments: s.player.piments - 1 },
-            arenaNextAt: 0,
+            arenaTickets: s.arenaTickets + 1,
           });
         },
 
@@ -677,7 +772,10 @@ export const useGame = create<GameState>()(
               },
             });
           } else if (kind === 'arena') {
-            set({ ...spend, arenaNextAt: 0 });
+            set({
+              ...spend,
+              arenaTickets: Math.min(MAX_ARENA_TICKETS, s.arenaTickets + 1),
+            });
           } else if (kind === 'double') {
             const o = s.lastOutcome;
             if (!o || o.doubled) return false;

@@ -1,7 +1,7 @@
 import { CLASSES } from './classes';
 import { playerArmor, playerWeapon, totalAttrs } from './formulas';
 import { ATTR_LABELS } from './classes';
-import { AttrId, Item, PlayerState } from './types';
+import { AttrId, Fighter, Item, PlayerState } from './types';
 
 /**
  * Score de puissance : une seule note comparable entre deux objets. Pondérée
@@ -72,6 +72,20 @@ export function compareToEquipped(
     deltas,
   equipped: cur,
   };
+}
+
+/** Même échelle que kokPower, appliquée à un combattant prêt (joueur ou bot). */
+export function fighterPower(f: Fighter): number {
+  const cls = CLASSES[f.classId];
+  const a = f.attrs;
+  const main = a[cls.mainAttr];
+  return Math.round(
+    main * 2.4 +
+      (a.force + a.adresse + a.esprit + a.chance - main) * 0.9 +
+      a.endurance * cls.hpMult * 0.5 +
+      ((f.weaponMin + f.weaponMax) / 2) * cls.dmgMult * 3 +
+      f.armor * 1.2
+  );
 }
 
 /** Puissance globale du kok — la note que le joueur cherche à faire monter. */

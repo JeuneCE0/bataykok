@@ -111,10 +111,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontFamily: F.bold, fontSize: 13, color: C.text, flex: 1 },
+  title: { fontFamily: F.bold, fontSize: 14.5, lineHeight: 19, color: C.text, flex: 1 },
   done: { color: C.textFaint, textDecorationLine: 'line-through' },
-  count: { fontFamily: F.black, fontSize: 11.5, color: C.textDim },
-  reward: { fontFamily: F.semi, fontSize: 10.5, color: C.gold },
+  count: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.textDim },
+  reward: { fontFamily: F.bold, fontSize: 12, lineHeight: 16, color: C.gold },
   check: { fontSize: 18 },
   chest: {
     flexDirection: 'row',
@@ -126,6 +126,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.hairlineSoft,
   },
-  chestTitle: { fontFamily: F.black, fontSize: 13.5, color: C.text },
-  chestSub: { fontFamily: F.regular, fontSize: 11, color: C.textDim },
+  chestTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  chestSub: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
 });

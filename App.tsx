@@ -44,6 +44,7 @@ export default function App() {
   const player = useGame((s) => s.player);
   const combatActive = useGame((s) => s.combatActive);
   const ensureDaily = useGame((s) => s.ensureDaily);
+  const regenTickets = useGame((s) => s.regenTickets);
   const [tab, setTab] = useState<Tab>('kok');
   const [now, setNow] = useState(Date.now());
   const [fontsLoaded] = useFonts({
@@ -56,12 +57,15 @@ export default function App() {
   useEffect(() => {
     ensureDaily();
     const t = setInterval(ensureDaily, 60_000);
-    const tick = setInterval(() => setNow(Date.now()), 2_000);
+    const tick = setInterval(() => {
+      setNow(Date.now());
+      regenTickets();
+    }, 2_000);
     return () => {
       clearInterval(t);
       clearInterval(tick);
     };
-  }, [ensureDaily]);
+  }, [ensureDaily, regenTickets]);
 
   return (
     <SafeAreaProvider>
@@ -208,12 +212,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabIcon: { fontSize: 17 },
+  tabIcon: { fontSize: 18 },
   tabLabel: {
-    fontFamily: F.bold,
-    fontSize: 9.5,
-    color: C.textFaint,
-    letterSpacing: 0.2,
+    fontFamily: F.black,
+    fontSize: 10.5,
+    lineHeight: 14,
+    color: C.textDim,
+    letterSpacing: 0.1,
   },
   tabLabelOn: { color: C.gold },
   tabDot: {

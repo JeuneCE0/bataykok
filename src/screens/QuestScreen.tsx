@@ -184,7 +184,7 @@ export default function QuestScreen() {
               </View>
               <Text style={styles.flavor}>{q.flavor}</Text>
               <StatRow
-                style={{ marginBottom: 12 }}
+                style={{ marginBottom: 8 }}
                 items={[
                   {
                     icon: '⏱️',
@@ -195,6 +195,18 @@ export default function QuestScreen() {
                   { icon: '✨', value: `${fmt(q.xp)} XP`, color: C.mystic },
                 ]}
               />
+              <View style={styles.yieldRow}>
+                <Chip
+                  label={`${Math.round(q.gold / (q.motivationCost || 1))} 🌽 par ⚡`}
+                  color={C.gold}
+                />
+                <Chip
+                  label={`${Math.round(
+                    (q.gold / Math.max(1, q.durationSec * (1 - transport.reduction))) * 60
+                  )} 🌽 / min`}
+                  color={C.cane}
+                />
+              </View>
               <Button
                 full
                 label="Partir en quête"
@@ -235,25 +247,32 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 14, paddingBottom: 40 },
   motivHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  motivValue: { fontFamily: F.black, fontSize: 18, color: C.lagoon, marginBottom: 8 },
-  motivMax: { fontFamily: F.semi, fontSize: 12, color: C.textFaint },
+  motivValue: {
+    fontFamily: F.black,
+    fontSize: 20,
+    lineHeight: 26,
+    color: C.lagoon,
+    marginBottom: 8,
+  },
+  motivMax: { fontFamily: F.semi, fontSize: 13, color: C.textDim },
   actions: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' },
   transportRow: { flexDirection: 'row', marginTop: 12 },
   questHead: { gap: 8, alignItems: 'flex-start' },
-  questTitle: { fontFamily: F.black, fontSize: 17, color: C.text },
+  questTitle: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
   flavor: {
     fontFamily: F.regular,
-    fontStyle: 'italic',
-    fontSize: 12.5,
+    fontSize: 14,
     color: C.textDim,
     marginVertical: 10,
-    lineHeight: 18,
+    lineHeight: 21,
   },
   countdown: {
     fontFamily: F.black,
-    fontSize: 30,
+    fontSize: 34,
+    lineHeight: 42,
     color: C.gold,
     letterSpacing: 1,
   },
   levelUp: { ...T.body, fontFamily: F.black, color: C.gold, marginTop: 8 },
+  yieldRow: { flexDirection: 'row', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
 });

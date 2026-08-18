@@ -96,7 +96,7 @@ export function Button({
       : size === 'sm'
         ? { paddingVertical: 8, paddingHorizontal: 12 }
         : { paddingVertical: 11, paddingHorizontal: 16 };
-  const font = size === 'lg' ? 17 : size === 'sm' ? 12 : 14;
+  const font = size === 'lg' ? 18 : size === 'sm' ? 13 : 15;
   const grad = G[variant];
   const light = variant === 'gold' || variant === 'cane';
 
@@ -127,7 +127,11 @@ export function Button({
           <Text
             style={[
               styles.btnText,
-              { fontSize: font, color: light ? C.ink : '#FFF8F0' },
+              {
+                fontSize: font,
+                lineHeight: font * 1.35,
+                color: light ? C.ink : '#FFF8F0',
+              },
             ]}
             numberOfLines={1}
           >
@@ -209,7 +213,12 @@ export function Bar({
         ]}
       />
       {label ? (
-        <Text style={[styles.barLabel, { fontSize: height > 16 ? 12 : 10 }]}>
+        <Text
+          style={[
+            styles.barLabel,
+            { fontSize: height > 16 ? 12.5 : 11, lineHeight: height + 2 },
+          ]}
+        >
           {label}
         </Text>
       ) : null}
@@ -253,7 +262,7 @@ export function SectionTitle({
 }) {
   return (
     <View style={styles.sectionTitle}>
-      {icon ? <Text style={{ fontSize: 14 }}>{icon}</Text> : null}
+      {icon ? <Text style={{ fontSize: 15 }}>{icon}</Text> : null}
       <Text style={TYPO.label}>{children}</Text>
     </View>
   );
@@ -314,7 +323,7 @@ export function StatRow({
     <View style={[styles.statRow, style]}>
       {items.map((it, i) => (
         <View key={i} style={styles.stat}>
-          <Text style={{ fontSize: 12 }}>{it.icon}</Text>
+          <Text style={{ fontSize: 13.5 }}>{it.icon}</Text>
           <Text style={[styles.statValue, it.color ? { color: it.color } : null]}>
             {it.value}
           </Text>
@@ -376,7 +385,12 @@ const styles = StyleSheet.create({
     borderColor: C.hairline,
     backgroundColor: C.card,
   },
-  ghostText: { fontFamily: F.bold, fontSize: 12, color: C.textDim },
+  ghostText: {
+    fontFamily: F.bold,
+    fontSize: 13,
+    lineHeight: 18,
+    color: C.textDim,
+  },
   barOuter: {
     backgroundColor: 'rgba(6,3,12,0.6)',
     overflow: 'hidden',
@@ -401,27 +415,33 @@ const styles = StyleSheet.create({
   screenTitle: { alignItems: 'center', marginTop: 4, marginBottom: 10 },
   screenSub: {
     fontFamily: F.regular,
-    fontSize: 13,
+    fontSize: 14,
+    lineHeight: 20,
     color: C.textDim,
     textAlign: 'center',
-    marginTop: -4,
+    marginTop: -2,
   },
   titleRule: { flexDirection: 'row', width: 140, marginTop: 8 },
   sectionTitle: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 8,
+    gap: 7,
+    marginBottom: 10,
   },
   chip: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 11,
     paddingVertical: 4,
     borderRadius: R.pill,
     borderWidth: 1,
     backgroundColor: 'rgba(6,3,12,0.35)',
   },
-  chipText: { fontFamily: F.bold, fontSize: 11, letterSpacing: 0.3 },
+  chipText: {
+    fontFamily: F.bold,
+    fontSize: 12.5,
+    lineHeight: 17,
+    letterSpacing: 0.2,
+  },
   statRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  statValue: { fontFamily: F.bold, fontSize: 12.5, color: C.text },
+  statValue: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.text },
 });

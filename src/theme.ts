@@ -12,10 +12,10 @@ export const C = {
   night3: '#241533',
   // Surfaces (posées sur le fond avec transparence)
   card: 'rgba(255, 246, 232, 0.055)',
-  cardStrong: 'rgba(255, 246, 232, 0.09)',
-  hairline: 'rgba(255, 246, 232, 0.13)',
-  hairlineSoft: 'rgba(255, 246, 232, 0.07)',
-  well: 'rgba(6, 3, 12, 0.55)',
+  cardStrong: 'rgba(255, 246, 232, 0.10)',
+  hairline: 'rgba(255, 246, 232, 0.16)',
+  hairlineSoft: 'rgba(255, 246, 232, 0.10)',
+  well: 'rgba(8, 4, 16, 0.72)',
   // Accents
   ember: '#FF5A1F',
   emberDeep: '#C22E00',
@@ -26,10 +26,11 @@ export const C = {
   cane: '#3BD97E',
   lagoon: '#2FC6E8',
   mystic: '#B06BFF',
-  // Textes
-  text: '#FFF4E6',
-  textDim: '#B7A6C6',
-  textFaint: '#7C6C8C',
+  // Textes — les trois niveaux restent distincts mais tous lisibles sur
+  // surface sombre (le gris violacé d'origine tombait sous 3,5:1)
+  text: '#FFF6EC',
+  textDim: '#CDBEDA',
+  textFaint: '#A08FB2',
   ink: '#2A1206',
 } as const;
 
@@ -42,7 +43,7 @@ export const G = {
   lagoon: ['#7FE3F7', '#2FC6E8', '#0E8FB0'] as const,
   mystic: ['#D6A8FF', '#B06BFF', '#7B2FD6'] as const,
   slate: ['#5B4A6E', '#3D3050', '#241B33'] as const,
-  card: ['rgba(255,246,232,0.10)', 'rgba(255,246,232,0.035)'] as const,
+  card: ['rgba(41,28,58,0.88)', 'rgba(21,13,34,0.92)'] as const,
   night: ['#160D22', '#0A0713'] as const,
 } as const;
 
@@ -98,21 +99,53 @@ export const F = {
 export const TYPO = {
   display: {
     fontFamily: F.black,
-    fontSize: 30,
-    letterSpacing: 0.4,
+    fontSize: 31,
+    lineHeight: 40,
+    letterSpacing: 0.3,
     color: C.text,
   } as TextStyle,
-  h1: { fontFamily: F.black, fontSize: 22, color: C.text } as TextStyle,
-  h2: { fontFamily: F.bold, fontSize: 17, color: C.text } as TextStyle,
-  label: {
-    fontFamily: F.bold,
-    fontSize: 11,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: C.textFaint,
+  h1: {
+    fontFamily: F.black,
+    fontSize: 23,
+    lineHeight: 30,
+    color: C.text,
   } as TextStyle,
-  body: { fontFamily: F.regular, fontSize: 14, color: C.text } as TextStyle,
-  dim: { fontFamily: F.regular, fontSize: 13, color: C.textDim } as TextStyle,
-  tiny: { fontFamily: F.semi, fontSize: 11, color: C.textDim } as TextStyle,
-  num: { fontFamily: F.black, fontSize: 16, color: C.text } as TextStyle,
+  h2: {
+    fontFamily: F.bold,
+    fontSize: 18,
+    lineHeight: 24,
+    color: C.text,
+  } as TextStyle,
+  label: {
+    fontFamily: F.black,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+    color: C.textDim,
+  } as TextStyle,
+  body: {
+    fontFamily: F.regular,
+    fontSize: 15,
+    lineHeight: 22,
+    color: C.text,
+  } as TextStyle,
+  dim: {
+    fontFamily: F.regular,
+    fontSize: 14,
+    lineHeight: 21,
+    color: C.textDim,
+  } as TextStyle,
+  tiny: {
+    fontFamily: F.semi,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textDim,
+  } as TextStyle,
+  num: {
+    fontFamily: F.black,
+    fontSize: 17,
+    lineHeight: 22,
+    color: C.text,
+  } as TextStyle,
 } as const;

@@ -9,7 +9,7 @@ import { currentStep, useGame } from './gameStore';
 export function useAlerts(now: number): Record<TabId, boolean> {
   const player = useGame((s) => s.player);
   const activeQuest = useGame((s) => s.activeQuest);
-  const arenaNextAt = useGame((s) => s.arenaNextAt);
+  const arenaTickets = useGame((s) => s.arenaTickets);
   const shop = useGame((s) => s.shop);
   const missions = useGame((s) => s.dailyMissions);
   const stats = useGame((s) => s.stats);
@@ -38,7 +38,7 @@ export function useAlerts(now: number): Record<TabId, boolean> {
   return {
     kok: upgradeInBag || missionReady || !!step?.ready,
     quetes: !!activeQuest && now >= activeQuest.endsAt,
-    rond: now >= arenaNextAt,
+    rond: arenaTickets > 0,
     palmares: false,
     ecurie: !player.guildId,
     bazar: dealInShop,

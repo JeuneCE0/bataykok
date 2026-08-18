@@ -283,9 +283,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemName: { fontFamily: F.black, fontSize: 14.5, color: C.text },
-  itemStats: { fontFamily: F.regular, fontSize: 11.5, color: C.textDim },
-  owned: { fontFamily: F.black, fontSize: 13, color: C.cane },
+  itemName: { fontFamily: F.black, fontSize: 16.5, lineHeight: 21, color: C.text },
+  itemStats: {
+    fontFamily: F.regular,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textDim,
+  },
+  owned: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.cane },
   starterHead: { marginBottom: 10 },
   starterTag: {
     fontFamily: F.black,
@@ -293,7 +298,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.3,
     color: C.ember,
   },
-  starterTitle: { fontFamily: F.black, fontSize: 21, color: C.gold },
+  starterTitle: { fontFamily: F.black, fontSize: 23, lineHeight: 30, color: C.gold },
   starterGrid: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -140,8 +140,13 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.35)',
   },
   play: { fontFamily: F.black, fontSize: 15, color: '#06301F' },
-  title: { fontFamily: F.black, fontSize: 13.5, color: '#06301F' },
-  sub: { fontFamily: F.semi, fontSize: 10.5, color: 'rgba(6,48,31,0.75)' },
+  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: '#06301F' },
+  sub: {
+    fontFamily: F.bold,
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(6,48,31,0.8)',
+  },
   counter: {
     minWidth: 22,
     height: 22,

@@ -50,6 +50,15 @@ export default function CharacterScreen() {
   const equipItem = useGame((s) => s.equipItem);
   const sellItem = useGame((s) => s.sellItem);
   const [selected, setSelected] = useState<Item | null>(null);
+  const [bulk, setBulk] = useState(1);
+  const [flash, setFlash] = useState<string | null>(null);
+  const equipBest = useGame((s) => s.equipBest);
+  const sellJunk = useGame((s) => s.sellJunk);
+
+  const say = (msg: string) => {
+    setFlash(msg);
+    setTimeout(() => setFlash(null), 2600);
+  };
 
   if (!player) return null;
   const cls = CLASSES[player.classId];
@@ -58,6 +67,11 @@ export default function CharacterScreen() {
   const weapon = playerWeapon(player);
   const attrMax = Math.max(...ATTRS.map((a) => attrs[a]), 1);
   const power = kokPower(player);
+  const bulkCost = (a: AttrId) => {
+    let total = 0;
+    for (let i = 0; i < bulk; i++) total += attrCost(player.baseAttrs[a] + i);
+    return total;
+  };
   // les améliorations d'abord : le joueur voit tout de suite quoi équiper
   const bag = [...player.inventory].sort(
     (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
@@ -96,13 +110,32 @@ export default function CharacterScreen() {
         <Text style={styles.classDesc}>{cls.description}</Text>
       </Card>
 
+      {flash && (
+        <Card glow={C.cane} compact>
+          <Text style={styles.flash}>{flash}</Text>
+        </Card>
+      )}
+
       <DailyMissions />
 
       {/* ─── Attributs ─── */}
       <Card>
-        <SectionTitle icon="💪">Attributs</SectionTitle>
+        <View style={styles.sectionHead}>
+          <SectionTitle icon="💪">Attributs</SectionTitle>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            {[1, 5, 10].map((n) => (
+              <Chip
+                key={n}
+                label={`×${n}`}
+                color={C.gold}
+                active={bulk === n}
+                onPress={() => setBulk(n)}
+              />
+            ))}
+          </View>
+        </View>
         {ATTRS.map((a) => {
-          const cost = attrCost(player.baseAttrs[a]);
+          const cost = bulkCost(a);
           const bonus = attrs[a] - player.baseAttrs[a];
           const main = a === cls.mainAttr;
           return (
@@ -127,8 +160,8 @@ export default function CharacterScreen() {
               </View>
               <Button
                 size="sm"
-                label={`+1  🌽${fmt(cost)}`}
-                onPress={() => buyAttr(a)}
+                label={`+${bulk}  🌽${fmt(cost)}`}
+                onPress={() => buyAttr(a, bulk)}
                 disabled={player.grains < cost}
               />
             </View>
@@ -138,7 +171,22 @@ export default function CharacterScreen() {
 
       {/* ─── Équipement ─── */}
       <Card>
-        <SectionTitle icon="🎽">Ékipman</SectionTitle>
+        <View style={styles.sectionHead}>
+          <SectionTitle icon="🎽">Ékipman</SectionTitle>
+          <Button
+            size="sm"
+            variant="cane"
+            label="Ékip lo mèy"
+            onPress={() => {
+              const n = equipBest();
+              say(
+                n > 0
+                  ? `✅ ${n} ékipman changé — out kok lé pli for !`
+                  : 'Ton kok i port déjà lo mèy.'
+              );
+            }}
+          />
+        </View>
         <View style={styles.slotGrid}>
           {SLOTS.map((s) => {
             const it = player.equipment[s];
@@ -158,7 +206,7 @@ export default function CharacterScreen() {
                 <Text style={{ fontSize: 22, opacity: it ? 1 : 0.35 }}>{SLOT_ICONS[s]}</Text>
                 <Text
                   style={[styles.slotLabel, col ? { color: col } : null]}
-                  numberOfLines={1}
+                  numberOfLines={2}
                 >
                   {it ? it.name : SLOT_LABELS[s]}
                 </Text>
@@ -170,9 +218,20 @@ export default function CharacterScreen() {
 
       {/* ─── Inventaire ─── */}
       <Card>
-        <SectionTitle icon="🎒">
-          Sak — {player.inventory.length}/24
-        </SectionTitle>
+        <View style={styles.sectionHead}>
+          <SectionTitle icon="🎒">Sak — {player.inventory.length}/24</SectionTitle>
+          <GhostButton
+            label="Vann lo rest"
+            onPress={() => {
+              const r = sellJunk();
+              say(
+                r.count > 0
+                  ? `💰 ${r.count} objè vandi · +🌽${fmt(r.grains)}`
+                  : 'Rien à vendre : tout i sert encore.'
+              );
+            }}
+          />
+        </View>
         {bag.length === 0 ? (
           <Text style={T.dim}>Sak lé vide, ti kok. Passe au Bazar !</Text>
         ) : (
@@ -288,6 +347,14 @@ function itemStats(it: Item): string {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 14, paddingBottom: 40 },
+  sectionHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 4,
+  },
+  flash: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.cane },
   portrait: { width: 132, alignItems: 'center', justifyContent: 'center' },
   halo: {
     position: 'absolute',
@@ -297,7 +364,7 @@ const styles = StyleSheet.create({
     opacity: 0.14,
     top: 12,
   },
-  className: { fontFamily: F.black, fontSize: 19 },
+  className: { fontFamily: F.black, fontSize: 21, lineHeight: 27 },
   tile: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -316,26 +383,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tileLabel: { fontFamily: F.semi, fontSize: 11, color: C.textFaint, flex: 1 },
-  tileValue: { fontFamily: F.black, fontSize: 14, color: C.text },
+  tileLabel: {
+    fontFamily: F.bold,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textDim,
+    flex: 1,
+  },
+  tileValue: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20, color: C.text },
   recordRow: { flexDirection: 'row', gap: 6, marginTop: 12, flexWrap: 'wrap' },
   classDesc: {
     fontFamily: F.regular,
-    fontStyle: 'italic',
-    fontSize: 12,
+    fontSize: 13.5,
     color: C.textDim,
-    marginTop: 10,
-    lineHeight: 18,
+    marginTop: 12,
+    lineHeight: 20,
   },
   attrRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 6 },
   attrHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  attrName: { fontFamily: F.bold, fontSize: 13.5, color: C.text },
-  attrValue: { fontFamily: F.black, fontSize: 15, color: C.gold },
-  attrBonus: { color: C.cane, fontSize: 13 },
+  attrName: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
+  attrValue: { fontFamily: F.black, fontSize: 16.5, lineHeight: 21, color: C.gold },
+  attrBonus: { color: C.cane, fontSize: 14 },
   slotGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   slot: {
     width: '22.7%',
-    aspectRatio: 0.92,
+    aspectRatio: 0.8,
     backgroundColor: 'rgba(6,3,12,0.45)',
     borderRadius: R.md,
     borderWidth: 1.5,
@@ -350,9 +422,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   slotLabel: {
-    fontFamily: F.semi,
-    fontSize: 8.5,
-    color: C.textFaint,
+    fontFamily: F.bold,
+    fontSize: 10,
+    lineHeight: 12.5,
+    color: C.textDim,
     textAlign: 'center',
   },
   invRow: {
@@ -371,7 +444,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  invName: { fontFamily: F.black, fontSize: 13.5 },
-  invLevel: { fontFamily: F.regular, fontSize: 11, color: C.textFaint },
-  invStats: { fontFamily: F.regular, fontSize: 11.5, color: C.textDim, marginTop: 2 },
+  invName: { fontFamily: F.black, fontSize: 15, lineHeight: 20 },
+  invLevel: { fontFamily: F.regular, fontSize: 12.5, color: C.textFaint },
+  invStats: {
+    fontFamily: F.regular,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textDim,
+    marginTop: 2,
+  },
 });
