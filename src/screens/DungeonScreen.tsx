@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import AdButton from '../components/AdButton';
 import CombatView from '../components/CombatView';
 import FadeIn from '../components/FadeIn';
 import RewardOverlay, { RewardView } from '../components/RewardOverlay';
@@ -111,7 +112,9 @@ export default function DungeonScreen() {
             <Text style={styles.keyTitle}>
               {keys > 0 ? `${keys} clé dan out pòch` : 'Pu de clé'}
             </Text>
-            <Text style={styles.keySub}>In clé gratui chak jour · in clé par tentativ</Text>
+            <Text style={styles.keySub}>
+              1 gratui chak jour · kofr dé défi · 1 kèt su 12 · pub
+            </Text>
           </View>
           <Button
             size="sm"
@@ -121,6 +124,9 @@ export default function DungeonScreen() {
             disabled={player.piments < KEY_PIMENT_COST || keys >= MAX_KEYS}
           />
         </View>
+        {keys < MAX_KEYS && (
+          <AdButton kind="key" full label="Gagne in clé (pub)" />
+        )}
       </Card>
 
       {/* Progression */}

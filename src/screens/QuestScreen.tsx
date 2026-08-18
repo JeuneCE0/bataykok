@@ -158,6 +158,9 @@ export default function QuestScreen() {
                   ...(lastOutcome.item
                     ? [{ icon: '🎁', value: lastOutcome.item.name, color: C.text }]
                     : []),
+                  ...(lastOutcome.key
+                    ? [{ icon: '🗝️', value: 'In clé !', color: C.mystic }]
+                    : []),
                 ]}
               />
               {lastOutcome.levelsGained > 0 && (

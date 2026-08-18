@@ -5,6 +5,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import AdButton from '../components/AdButton';
 import FadeIn from '../components/FadeIn';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
+import MarketScreen from './MarketScreen';
 import {
   Button,
   Card,
@@ -12,6 +13,7 @@ import {
   GhostButton,
   ScreenTitle,
   SectionTitle,
+  Segmented,
   T,
 } from '../components/ui';
 import { ATTR_LABELS } from '../game/classes';
@@ -32,6 +34,7 @@ const PIMENT_PACKS = [
 ];
 
 export default function ShopScreen() {
+  const [tab, setTab] = useState<'bazar' | 'lotel'>('bazar');
   const [open, setOpen] = useState<string | null>(null);
   const player = useGame((s) => s.player);
   const shop = useGame((s) => s.shop);
@@ -63,7 +66,29 @@ export default function ShopScreen() {
     );
   };
 
+  const switcher = (
+    <Segmented
+      value={tab}
+      onChange={setTab}
+      options={[
+        { id: 'bazar', label: '🛒  Bazar' },
+        { id: 'lotel', label: '⚖️  Lotèl' },
+      ]}
+    />
+  );
+
+  if (tab === 'lotel') {
+    return (
+      <View style={{ flex: 1 }}>
+        {switcher}
+        <MarketScreen />
+      </View>
+    );
+  }
+
   return (
+    <View style={{ flex: 1 }}>
+    {switcher}
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
         title="Bazar Forain"
@@ -314,6 +339,7 @@ export default function ShopScreen() {
         </Card>
       ))}
     </ScrollView>
+    </View>
   );
 }
 

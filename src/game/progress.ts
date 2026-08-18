@@ -236,7 +236,7 @@ export function streakRewardFor(streak: number): StreakReward {
 
 // ─── Pub récompensée ─────────────────────────────────────────────────────
 
-export type AdKind = 'dodo' | 'grains' | 'double' | 'arena';
+export type AdKind = 'dodo' | 'grains' | 'double' | 'arena' | 'key';
 
 export interface AdOffer {
   kind: AdKind;
@@ -272,6 +272,12 @@ export const AD_OFFERS: Record<AdKind, AdOffer> = {
     title: 'Batay tousuit',
     reward: "annule l'attente du rond",
     icon: '⏩',
+  },
+  key: {
+    kind: 'key',
+    title: 'In clé pou lo donjon',
+    reward: '+1 clé',
+    icon: '🗝️',
   },
 };
 

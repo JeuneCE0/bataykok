@@ -6,32 +6,77 @@ export const RARITY_LABELS: Record<Rarity, string> = {
   commun: 'Commun',
   korek: 'Korek',
   kalite: 'Kalité',
+  rar: 'Rar',
+  lezand: 'Lézandèr',
   mitik: 'Mitik',
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  commun: '#95a5a6',
-  korek: '#2ecc71',
-  kalite: '#3498db',
-  mitik: '#f1c40f',
+  commun: '#9AA6AD',
+  korek: '#3BD97E',
+  kalite: '#3BA9F0',
+  rar: '#B06BFF',
+  lezand: '#FF8A3D',
+  mitik: '#FFC93C',
 };
+
+/** L'ordre fait foi : tri, comparaison, progression du Zalbum. */
+export const RARITY_ORDER: Rarity[] = [
+  'commun',
+  'korek',
+  'kalite',
+  'rar',
+  'lezand',
+  'mitik',
+];
+
+export function rarityRank(r: Rarity): number {
+  return RARITY_ORDER.indexOf(r);
+}
 
 const RARITY_MULT: Record<Rarity, number> = {
   commun: 1,
   korek: 1.35,
   kalite: 1.8,
-  mitik: 2.5,
+  rar: 2.4,
+  lezand: 3.2,
+  mitik: 4.4,
 };
 
+/** Un nom par gamme : la rareté doit s'entendre avant même de lire la couleur. */
 const SLOT_NAMES: Record<SlotId, string[]> = {
-  arme: ['Zéprons', 'Lames de patte', 'Zéprons forgés', 'Grif volkanik'],
-  tete: ['Kasket', 'Bandana', 'Chapo payanké', 'Kask la fournèz'],
-  torse: ['Gilet plimé', 'Plastron koko', 'Armure vakoa', 'Plimaz doré'],
-  pattes: ['Zergos', 'Bot la boue', 'Pat renforcées', 'Zergos siklone'],
-  amulette: ['Kolié koki', 'Kolié bwa de santal', 'Kolié perle noire', 'Kolié volkan'],
-  anneau: ['Bag laiton', 'Bag larzan', 'Bag lor', 'Bag mitik'],
-  ceinture: ['Sintir chanvre', 'Sintir kuir', 'Sintir géranium', 'Sintir gran-mèr kal'],
-  grigri: ['Ti gri-gri', 'Gri-gri tisanèr', 'Gri-gri sitarane', 'Gri-gri gramoune'],
+  arme: [
+    'Zéprons', 'Lames de patte', 'Zéprons forgés',
+    'Grif volkanik', 'Zéprons du Gran Brilé', 'Grif de Sitarane',
+  ],
+  tete: [
+    'Kasket', 'Bandana', 'Chapo payanké',
+    'Kask la fournèz', 'Kouronn de Mafate', 'Kask du Maloya Mistik',
+  ],
+  torse: [
+    'Gilet plimé', 'Plastron koko', 'Armure vakoa',
+    'Plimaz doré', 'Kirass du Piton', 'Plimaz de Grand-Mèr Kal',
+  ],
+  pattes: [
+    'Zergos', 'Bot la boue', 'Pat renforcées',
+    'Zergos siklone', 'Zergos du Papang Roi', 'Pat de la Fournèz',
+  ],
+  amulette: [
+    'Kolié koki', 'Kolié bwa de santal', 'Kolié perle noire',
+    'Kolié volkan', 'Kolié dé Sèt Kaskad', 'Kolié du Gran-Basin',
+  ],
+  anneau: [
+    'Bag laiton', 'Bag larzan', 'Bag lor',
+    'Bag mitik', 'Bag du Vié Tisanèr', 'Bag dé Anset',
+  ],
+  ceinture: [
+    'Sintir chanvre', 'Sintir kuir', 'Sintir géranium',
+    'Sintir gran-mèr kal', 'Sintir du Kabar', 'Sintir dé Sirk',
+  ],
+  grigri: [
+    'Ti gri-gri', 'Gri-gri tisanèr', 'Gri-gri sitarane',
+    'Gri-gri gramoune', 'Gri-gri du Volkan', 'Gri-gri dé Zanset',
+  ],
 };
 
 const SUFFIXES = [
@@ -53,11 +98,17 @@ const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
 
 let itemSeq = 0;
 
-export function rollRarity(): Rarity {
-  const r = Math.random();
-  if (r < 0.55) return 'commun';
-  if (r < 0.82) return 'korek';
-  if (r < 0.96) return 'kalite';
+/**
+ * Tirage de gamme. Les deux derniers paliers restent rares au point d'être un
+ * événement : c'est ce qui donne sa valeur au reste (et à l'hôtel des ventes).
+ */
+export function rollRarity(luck = 0): Rarity {
+  const r = Math.random() * (1 - Math.min(0.25, luck));
+  if (r < 0.46) return 'commun';
+  if (r < 0.74) return 'korek';
+  if (r < 0.90) return 'kalite';
+  if (r < 0.968) return 'rar';
+  if (r < 0.995) return 'lezand';
   return 'mitik';
 }
 
@@ -69,12 +120,12 @@ export function generateItem(level: number, slot?: SlotId, rarity?: Rarity): Ite
     ] as SlotId);
   const r = rarity ?? rollRarity();
   const mult = RARITY_MULT[r];
-  const tier = r === 'mitik' ? 3 : r === 'kalite' ? 2 : r === 'korek' ? 1 : 0;
+  const tier = rarityRank(r);
   const baseName = SLOT_NAMES[s][tier];
   const name =
     tier >= 1 ? `${baseName} ${SUFFIXES[rnd(0, SUFFIXES.length - 1)]}` : baseName;
 
-  const nBonuses = 1 + tier >= 3 ? 3 : 1 + Math.min(tier, 2);
+  const nBonuses = Math.min(4, 1 + Math.floor(tier / 1.4));
   const pool = [...ATTRS].sort(() => Math.random() - 0.5).slice(0, nBonuses);
   const bonuses: Partial<Record<AttrId, number>> = {};
   pool.forEach((a) => {

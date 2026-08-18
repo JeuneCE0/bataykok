@@ -12,7 +12,13 @@ export interface Attributes {
   chance: number;
 }
 
-export type Rarity = 'commun' | 'korek' | 'kalite' | 'mitik';
+export type Rarity =
+  | 'commun'
+  | 'korek'
+  | 'kalite'
+  | 'rar'
+  | 'lezand'
+  | 'mitik';
 
 export type SlotId =
   | 'arme'

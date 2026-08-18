@@ -99,7 +99,7 @@ export const BOSSES: Boss[] = [
     classId: 'malin',
     power: 1.35,
     appearance: look('#3b3b3b', '#6a1b9a', 3, 2),
-    reward: { grains: 2500, xp: 1250, piments: 3, rarity: 'kalite' },
+    reward: { grains: 2500, xp: 1250, piments: 3, rarity: 'rar' },
   },
   {
     floor: 7,
@@ -110,7 +110,7 @@ export const BOSSES: Boss[] = [
     classId: 'piman',
     power: 1.4,
     appearance: look('#b5541c', '#ff7043', 2, 0),
-    reward: { grains: 3600, xp: 1800, piments: 4, rarity: 'kalite' },
+    reward: { grains: 3600, xp: 1800, piments: 4, rarity: 'rar' },
   },
   {
     floor: 8,
@@ -121,7 +121,7 @@ export const BOSSES: Boss[] = [
     classId: 'tizane',
     power: 1.45,
     appearance: look('#e8e4d8', '#c2185b', 4, 3),
-    reward: { grains: 5000, xp: 2500, piments: 5, rarity: 'mitik' },
+    reward: { grains: 5000, xp: 2500, piments: 5, rarity: 'rar' },
   },
   {
     floor: 9,
@@ -132,7 +132,7 @@ export const BOSSES: Boss[] = [
     classId: 'gep',
     power: 1.5,
     appearance: look('#3b3b3b', '#e53935', 1, 1),
-    reward: { grains: 7000, xp: 3400, piments: 5, rarity: 'mitik' },
+    reward: { grains: 7000, xp: 3400, piments: 5, rarity: 'lezand' },
   },
   {
     floor: 10,
@@ -143,7 +143,7 @@ export const BOSSES: Boss[] = [
     classId: 'malin',
     power: 1.55,
     appearance: look('#5d4037', '#f9a825', 0, 2),
-    reward: { grains: 9500, xp: 4600, piments: 6, rarity: 'mitik' },
+    reward: { grains: 9500, xp: 4600, piments: 6, rarity: 'lezand' },
   },
   {
     floor: 11,
@@ -154,7 +154,7 @@ export const BOSSES: Boss[] = [
     classId: 'piman',
     power: 1.62,
     appearance: look('#b5541c', '#ff7043', 2, 4),
-    reward: { grains: 13000, xp: 6200, piments: 8, rarity: 'mitik' },
+    reward: { grains: 13000, xp: 6200, piments: 8, rarity: 'lezand' },
   },
   {
     floor: 12,

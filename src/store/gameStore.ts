@@ -114,6 +114,8 @@ export interface QuestOutcome {
   piments: number;
   levelsGained: number;
   doubled: boolean;
+  /** une clé de gardien trouvée en chemin */
+  key: boolean;
 }
 
 /** Compteurs cumulés — servent aux étapes du chemin et aux défis. */
@@ -231,6 +233,10 @@ interface GameState {
   clearDefenses: () => void;
   /** crédit direct (parrainage, offres) — le serveur ne tient pas la bourse */
   grantBonus: (b: { grains?: number; piments?: number }) => void;
+  /** sortie/entrée d'un objet du sak (hôtel des ventes) */
+  removeItem: (itemId: string) => boolean;
+  addItem: (item: Item) => boolean;
+  spendGrains: (n: number) => boolean;
   openFreeChest: () => { grains: number; piments: number; item: Item | null } | null;
   pickTalent: (id: string) => void;
   buyPass: () => void;
@@ -635,6 +641,8 @@ export const useGame = create<GameState>()(
             piments = 1;
             p.piments += 1;
           }
+          // une quête sur douze ramène une clé de gardien
+          const foundKey = Math.random() < 0.08 && s.keys < MAX_KEYS;
           const outcome: QuestOutcome = {
             gold,
             xp,
@@ -642,6 +650,7 @@ export const useGame = create<GameState>()(
             piments,
             levelsGained: levels,
             doubled: false,
+            key: foundKey,
           };
           set({
             player: p,
@@ -650,6 +659,7 @@ export const useGame = create<GameState>()(
             lastOutcome: outcome,
             foundMitik: s.foundMitik || item?.rarity === 'mitik',
             album: item ? addToAlbum(s.album, item) : s.album,
+            keys: foundKey ? s.keys + 1 : s.keys,
           });
           track('quest');
           return outcome;
@@ -942,6 +952,8 @@ export const useGame = create<GameState>()(
               piments: s.player.piments + DAILY_CHEST.piments,
             },
             dailyChestClaimed: true,
+            // les trois défis du jour valent une tentative de donjon
+            keys: Math.min(MAX_KEYS, s.keys + 1),
           });
         },
 
@@ -981,6 +993,9 @@ export const useGame = create<GameState>()(
                 grains: s.player.grains + adGrains(s.player.level),
               },
             });
+          } else if (kind === 'key') {
+            if (s.keys >= MAX_KEYS) return false;
+            set({ ...spend, keys: s.keys + 1 });
           } else if (kind === 'arena') {
             const max = maxArenaTickets(
               s.player.talents,
@@ -1075,6 +1090,37 @@ export const useGame = create<GameState>()(
         },
 
         clearDefenses: () => set({ pendingDefenses: [] }),
+
+        removeItem: (itemId) => {
+          const s = get();
+          if (!s.player) return false;
+          if (!s.player.inventory.some((i) => i.id === itemId)) return false;
+          set({
+            player: {
+              ...s.player,
+              inventory: s.player.inventory.filter((i) => i.id !== itemId),
+            },
+          });
+          return true;
+        },
+
+        addItem: (item) => {
+          const s = get();
+          if (!s.player || s.player.inventory.length >= 24) return false;
+          set({
+            player: { ...s.player, inventory: [...s.player.inventory, item] },
+            album: addToAlbum(s.album, item),
+            foundMitik: s.foundMitik || item.rarity === 'mitik',
+          });
+          return true;
+        },
+
+        spendGrains: (n) => {
+          const s = get();
+          if (!s.player || s.player.grains < n) return false;
+          set({ player: { ...s.player, grains: s.player.grains - n } });
+          return true;
+        },
 
         grantBonus: ({ grains = 0, piments = 0 }) => {
           const s = get();

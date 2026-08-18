@@ -16,7 +16,14 @@ export const ALBUM_SLOTS: SlotId[] = [
   'grigri',
 ];
 
-export const ALBUM_RARITIES: Rarity[] = ['commun', 'korek', 'kalite', 'mitik'];
+export const ALBUM_RARITIES: Rarity[] = [
+  'commun',
+  'korek',
+  'kalite',
+  'rar',
+  'lezand',
+  'mitik',
+];
 
 export const ALBUM_SIZE = ALBUM_SLOTS.length * ALBUM_RARITIES.length;
 
@@ -28,7 +35,7 @@ export function itemAlbumKey(it: Item): string {
   return albumKey(it.slot, it.rarity);
 }
 
-/** +1 % d'XP par case remplie : 32 % au Zalbum complet. */
+/** +0,7 % d'XP par case : ~34 % au Zalbum complet (48 cases). */
 export function albumXpBonus(count: number): number {
-  return count / 100;
+  return (count * 0.7) / 100;
 }
