@@ -10,6 +10,7 @@ import {
   Card,
   Chip,
   ScreenTitle,
+  SectionTitle,
   Segmented,
   T,
   Well,
@@ -22,6 +23,13 @@ import { fmt, playerToFighter } from '../game/formulas';
 import { fighterPower } from '../game/power';
 import { Bot, CombatResult, Fighter } from '../game/types';
 import { scheduleArenaReady } from '../lib/notifications';
+import {
+  fetchRivals,
+  isOnlineEnabled,
+  OnlineKok,
+  onlineToFighter,
+  submitResult,
+} from '../lib/online';
 import { maxArenaTickets, useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import RankingScreen from './RankingScreen';
@@ -55,11 +63,14 @@ export default function ArenaScreen() {
 
   const [now, setNow] = useState(Date.now());
   const [view, setView] = useState<'batay' | 'palmares'>('batay');
+  const [rivals, setRivals] = useState<OnlineKok[]>([]);
   const [fight, setFight] = useState<{
     me: Fighter;
     op: Fighter;
     opId: string;
     result: CombatResult;
+    /** id du joueur réel affronté, le cas échéant */
+    onlineId?: string;
   } | null>(null);
   const [reward, setReward] = useState<{ won: boolean; text: string } | null>(null);
 
@@ -71,6 +82,18 @@ export default function ArenaScreen() {
     return () => clearInterval(t);
   }, [regenTickets]);
 
+  // adversaires réels : n'apparaissent que si le backend est branché
+  useEffect(() => {
+    if (!isOnlineEnabled) return;
+    let alive = true;
+    void fetchRivals(3).then((r) => {
+      if (alive) setRivals(r);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   if (!player) return null;
 
   if (fight) {
@@ -81,6 +104,7 @@ export default function ArenaScreen() {
         result={fight.result}
         onDone={() => {
           const won = fight.result.winner === 0;
+          if (fight.onlineId) void submitResult(fight.onlineId, won);
           const r = applyArenaResult(won, fight.opId);
           if (useGame.getState().arenaTickets === 0) {
             scheduleArenaReady(ARENA_TICKET_SEC);
@@ -112,6 +136,20 @@ export default function ArenaScreen() {
   }
 
   const myPower = fighterPower(playerToFighter(player));
+
+  const launchOnline = (k: OnlineKok) => {
+    if (useGame.getState().arenaTickets <= 0) return;
+    const me = playerToFighter(player);
+    const op = onlineToFighter(k);
+    setReward(null);
+    setFight({
+      me,
+      op,
+      opId: 'me',
+      onlineId: k.id,
+      result: simulateCombat(me, op),
+    });
+  };
 
   const launch = (bot: Bot) => {
     if (useGame.getState().arenaTickets <= 0) return;
@@ -197,6 +235,47 @@ export default function ArenaScreen() {
           </Text>
           <Text style={T.body}>{reward.text}</Text>
         </Card>
+      )}
+
+      {rivals.length > 0 && (
+        <>
+          <SectionTitle icon="🌐">Batay en lign</SectionTitle>
+          {rivals.map((k) => {
+            const cls = CLASSES[k.classId];
+            const chance = odds(myPower, k.power);
+            return (
+              <Card key={k.id} compact glow={C.lagoon}>
+                <View style={styles.opRow}>
+                  <View style={styles.opPortrait}>
+                    <View style={[styles.opHalo, { backgroundColor: cls.color }]} />
+                    <Rooster appearance={k.appearance} size={78} flip ground={false} />
+                    <View style={styles.rankBadge}>
+                      <Text style={styles.rankBadgeText}>#{k.rank}</Text>
+                    </View>
+                  </View>
+                  <View style={{ flex: 1, gap: 5 }}>
+                    <Text style={styles.opName} numberOfLines={1}>
+                      {k.name}
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                      <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
+                      <Chip label={`Niv. ${k.level}`} color={C.textDim} />
+                      <Chip label={chance.label} color={chance.color} active />
+                    </View>
+                  </View>
+                  <Button
+                    variant="lagoon"
+                    size="sm"
+                    icon="⚔️"
+                    label="Batay !"
+                    onPress={() => launchOnline(k)}
+                    disabled={arenaTickets <= 0}
+                  />
+                </View>
+              </Card>
+            );
+          })}
+        </>
       )}
 
       {arenaTickets <= 0 ? (

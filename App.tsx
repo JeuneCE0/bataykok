@@ -26,6 +26,7 @@ import DungeonScreen from './src/screens/DungeonScreen';
 import GuildScreen from './src/screens/GuildScreen';
 import QuestScreen from './src/screens/QuestScreen';
 import ShopScreen from './src/screens/ShopScreen';
+import { useOnlineSync } from './src/lib/useOnlineSync';
 import { useAlerts } from './src/store/alerts';
 import { useGame } from './src/store/gameStore';
 import { C, F, G, R } from './src/theme';
@@ -46,6 +47,7 @@ export default function App() {
   const combatActive = useGame((s) => s.combatActive);
   const ensureDaily = useGame((s) => s.ensureDaily);
   const regenTickets = useGame((s) => s.regenTickets);
+  useOnlineSync();
   const [tab, setTab] = useState<Tab>('kok');
   const [now, setNow] = useState(Date.now());
   const [fontsLoaded] = useFonts({
