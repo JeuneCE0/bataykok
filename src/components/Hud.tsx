@@ -1,32 +1,87 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { CLASSES } from '../game/classes';
 import { fmt, xpForLevel } from '../game/formulas';
 import { useGame } from '../store/gameStore';
-import { Bar, COLORS } from './ui';
+import { C, F, G, R, SHADOW } from '../theme';
+import Counter from './Counter';
+import Rooster from './Rooster';
+import { Bar } from './ui';
 
 export default function Hud() {
   const player = useGame((s) => s.player);
   if (!player) return null;
+  const cls = CLASSES[player.classId];
+  const need = xpForLevel(player.level);
+
   return (
-    <View style={styles.hud}>
+    <LinearGradient
+      colors={['rgba(36,21,51,0.96)', 'rgba(12,7,20,0.92)']}
+      style={styles.hud}
+    >
       <View style={styles.row}>
-        <Text style={styles.name} numberOfLines={1}>
-          🐓 {player.name}
-        </Text>
-        <Text style={styles.level}>Niv. {player.level}</Text>
-        <View style={styles.currencies}>
-          <Text style={styles.currency}>🌽 {fmt(player.grains)}</Text>
-          <Text style={styles.currency}>🌶️ {fmt(player.piments)}</Text>
+        <View style={[styles.avatar, { borderColor: cls.color }]}>
+          <View style={styles.avatarClip}>
+            <Rooster appearance={player.appearance} size={50} ground={false} portrait />
+          </View>
+          <View style={styles.levelBadge}>
+            <Text style={styles.levelText}>{player.level}</Text>
+          </View>
+        </View>
+
+        <View style={{ flex: 1, marginLeft: 12, gap: 3 }}>
+          <Text style={styles.name} numberOfLines={1}>
+            {player.name}
+          </Text>
+          <Text style={[styles.cls, { color: cls.color }]} numberOfLines={1}>
+            {cls.emoji} {cls.name}
+          </Text>
+        </View>
+
+        <View style={{ gap: 5, alignItems: 'flex-end' }}>
+          <Purse icon="🌽" value={player.grains} colors={G.gold} />
+          <Purse icon="🌶️" value={player.piments} colors={G.piment} />
         </View>
       </View>
-      <Bar
-        value={player.xp}
-        max={xpForLevel(player.level)}
-        color={COLORS.purple}
-        height={10}
-        label={`${fmt(player.xp)} / ${fmt(xpForLevel(player.level))} XP`}
-      />
+
+      <View style={styles.xpRow}>
+        <Text style={styles.xpLabel}>XP</Text>
+        <View style={{ flex: 1 }}>
+          <Bar
+            value={player.xp}
+            max={need}
+            variant="mystic"
+            height={11}
+            label={`${fmt(player.xp)} / ${fmt(need)}`}
+          />
+        </View>
+      </View>
+    </LinearGradient>
+  );
+}
+
+function Purse({
+  icon,
+  value,
+  colors,
+}: {
+  icon: string;
+  value: number;
+  colors: readonly [string, string, string];
+}) {
+  return (
+    <View style={styles.purse}>
+      <LinearGradient
+        colors={colors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.purseDot}
+      >
+        <Text style={{ fontSize: 11 }}>{icon}</Text>
+      </LinearGradient>
+      <Counter value={value} style={styles.purseValue} />
     </View>
   );
 }
@@ -34,29 +89,74 @@ export default function Hud() {
 const styles = StyleSheet.create({
   hud: {
     paddingHorizontal: 14,
-    paddingTop: 6,
-    paddingBottom: 8,
-    backgroundColor: COLORS.bgLight,
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.panelBorder,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,246,232,0.10)',
     gap: 8,
   },
-  name: {
-    color: COLORS.text,
-    fontWeight: '900',
-    fontSize: 15,
-    flexShrink: 1,
+  row: { flexDirection: 'row', alignItems: 'center' },
+  avatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 2,
+    backgroundColor: 'rgba(6,3,12,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...SHADOW.card,
   },
-  level: {
-    color: COLORS.gold,
-    fontWeight: '800',
-    fontSize: 13,
+  avatarClip: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  currencies: { flexDirection: 'row', gap: 10, marginLeft: 'auto' },
-  currency: { color: COLORS.text, fontWeight: '800', fontSize: 13 },
+  levelBadge: {
+    position: 'absolute',
+    bottom: -5,
+    right: -5,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 4,
+    backgroundColor: C.gold,
+    borderWidth: 2,
+    borderColor: C.night,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  levelText: { fontFamily: F.black, fontSize: 12, color: C.ink, marginTop: -1 },
+  name: { fontFamily: F.black, fontSize: 17, color: C.text },
+  cls: { fontFamily: F.semi, fontSize: 12 },
+  purse: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(6,3,12,0.55)',
+    borderRadius: R.pill,
+    borderWidth: 1,
+    borderColor: C.hairlineSoft,
+    paddingRight: 10,
+    paddingLeft: 3,
+    paddingVertical: 3,
+    minWidth: 78,
+  },
+  purseDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  purseValue: { fontFamily: F.black, fontSize: 13, color: C.text },
+  xpRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  xpLabel: {
+    fontFamily: F.black,
+    fontSize: 10,
+    color: C.textFaint,
+    letterSpacing: 1.2,
+  },
 });

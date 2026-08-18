@@ -1,15 +1,16 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
 import Rooster from '../components/Rooster';
-import { COLORS, GoldButton, Panel, Subtitle, Title } from '../components/ui';
+import { Button, Card, Chip, SectionTitle, T } from '../components/ui';
 import {
   ACCESSORIES,
   BODY_COLORS,
@@ -20,6 +21,7 @@ import { CLASS_LIST } from '../game/classes';
 import { randomKokName } from '../game/names';
 import { Appearance } from '../game/types';
 import { useGame } from '../store/gameStore';
+import { C, F, R, SHADOW } from '../theme';
 
 export default function CreationScreen() {
   const createPlayer = useGame((s) => s.createPlayer);
@@ -33,147 +35,162 @@ export default function CreationScreen() {
   });
 
   const cls = CLASS_LIST[classIdx];
-
-  const prev = () =>
-    setClassIdx((classIdx - 1 + CLASS_LIST.length) % CLASS_LIST.length);
+  const prev = () => setClassIdx((classIdx - 1 + CLASS_LIST.length) % CLASS_LIST.length);
   const next = () => setClassIdx((classIdx + 1) % CLASS_LIST.length);
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Title>Batay Kok</Title>
-      <Subtitle>Kréé out kok, ti kok. Le rond i attend a ou !</Subtitle>
-
-      {/* Sélecteur de classe, façon carrousel */}
-      <View style={styles.classIcons}>
-        {CLASS_LIST.map((c, i) => (
-          <TouchableOpacity
-            key={c.id}
-            onPress={() => setClassIdx(i)}
-            style={[
-              styles.classIcon,
-              i === classIdx && { borderColor: COLORS.gold, backgroundColor: c.color },
-            ]}
-          >
-            <Text style={{ fontSize: 20 }}>{c.emoji}</Text>
-          </TouchableOpacity>
-        ))}
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <View style={styles.header}>
+        <Text style={styles.brand}>BATAY KOK</Text>
+        <Text style={styles.tagline}>Kréé out kok, ti kok. Le rond i attend a ou !</Text>
       </View>
 
-      <Panel>
-        <View style={styles.carousel}>
-          <TouchableOpacity onPress={prev} style={styles.arrow}>
-            <Text style={styles.arrowText}>◀</Text>
-          </TouchableOpacity>
-          <View style={{ alignItems: 'center', flex: 1 }}>
-            <Rooster appearance={appearance} size={150} />
-          </View>
-          <TouchableOpacity onPress={next} style={styles.arrow}>
-            <Text style={styles.arrowText}>▶</Text>
-          </TouchableOpacity>
+      {/* Sélecteur de classe */}
+      <View style={styles.classRow}>
+        {CLASS_LIST.map((c, i) => {
+          const on = i === classIdx;
+          return (
+            <Pressable key={c.id} onPress={() => setClassIdx(i)}>
+              <LinearGradient
+                colors={
+                  on
+                    ? [shade(c.color, 45), c.color, shade(c.color, -45)]
+                    : ['rgba(255,246,232,0.10)', 'rgba(255,246,232,0.03)']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0.6, y: 1 }}
+                style={[
+                  styles.classDot,
+                  on
+                    ? {
+                        borderColor: '#fff',
+                        shadowColor: c.color,
+                        shadowOpacity: 0.75,
+                        shadowRadius: 12,
+                        shadowOffset: { width: 0, height: 4 },
+                        transform: [{ scale: 1.08 }],
+                      }
+                    : { borderColor: C.hairline },
+                ]}
+              >
+                <Text style={{ fontSize: 19, opacity: on ? 1 : 0.5 }}>{c.emoji}</Text>
+              </LinearGradient>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Scène : le coq sur son podium */}
+      <Card glow={cls.color} style={{ paddingTop: 0 }}>
+        <View style={styles.stage}>
+          <View
+            style={[
+              styles.halo,
+              { backgroundColor: cls.color, shadowColor: cls.color },
+            ]}
+          />
+          <Arrow dir="left" onPress={prev} />
+          <Rooster appearance={appearance} size={168} alive />
+          <Arrow dir="right" onPress={next} />
         </View>
+
         <Text style={[styles.className, { color: cls.color }]}>
           {cls.emoji} {cls.name}
         </Text>
         <Text style={styles.classSub}>{cls.subtitle}</Text>
-        <Text style={styles.attr}>
-          ATTRIBUT PRINCIPAL : <Text style={{ color: COLORS.gold }}>{cls.mainAttrLabel}</Text>
-        </Text>
+
+        <View style={styles.chipRow}>
+          <Chip label={`★ ${cls.mainAttrLabel}`} color={C.gold} />
+          <Chip label={cls.subtitle} color={cls.color} />
+        </View>
+
         <Text style={styles.desc}>{cls.description}</Text>
         <Text style={styles.flavor}>« {cls.flavor} »</Text>
-      </Panel>
+      </Card>
 
       {/* Apparence */}
-      <Panel>
-        <Text style={styles.sectionTitle}>🎨 Plimaz (apparence)</Text>
-        <Text style={styles.optionLabel}>Couleur du corps</Text>
+      <Card>
+        <SectionTitle icon="🎨">Plimaz — apparence</SectionTitle>
+
+        <Text style={styles.optLabel}>Couleur du corps</Text>
         <View style={styles.swatchRow}>
           {BODY_COLORS.map((c) => (
-            <TouchableOpacity
+            <Swatch
               key={c}
+              color={c}
+              active={appearance.bodyColor === c}
               onPress={() => setAppearance({ ...appearance, bodyColor: c })}
-              style={[
-                styles.swatch,
-                { backgroundColor: c },
-                appearance.bodyColor === c && styles.swatchSelected,
-              ]}
             />
           ))}
         </View>
-        <Text style={styles.optionLabel}>Couleur de la crête</Text>
+
+        <Text style={styles.optLabel}>Couleur de la crête</Text>
         <View style={styles.swatchRow}>
           {COMB_COLORS.map((c) => (
-            <TouchableOpacity
+            <Swatch
               key={c}
+              color={c}
+              active={appearance.combColor === c}
               onPress={() => setAppearance({ ...appearance, combColor: c })}
-              style={[
-                styles.swatch,
-                { backgroundColor: c },
-                appearance.combColor === c && styles.swatchSelected,
-              ]}
             />
           ))}
         </View>
-        <Text style={styles.optionLabel}>Plumes de queue</Text>
+
+        <Text style={styles.optLabel}>Plumes de queue</Text>
         <View style={styles.swatchRow}>
           {TAIL_PALETTES.map((p, i) => (
-            <TouchableOpacity
+            <Pressable
               key={i}
               onPress={() => setAppearance({ ...appearance, tailPalette: i })}
               style={[
-                styles.paletteSwatch,
-                appearance.tailPalette === i && styles.swatchSelected,
+                styles.palette,
+                appearance.tailPalette === i ? styles.swatchOn : null,
               ]}
             >
               {p.map((c) => (
                 <View key={c} style={{ flex: 1, backgroundColor: c }} />
               ))}
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
-        <Text style={styles.optionLabel}>Accessoire</Text>
+
+        <Text style={styles.optLabel}>Accessoire</Text>
         <View style={styles.swatchRow}>
           {ACCESSORIES.map((a, i) => (
-            <TouchableOpacity
+            <Chip
               key={a}
+              label={a}
+              color={C.gold}
+              active={appearance.accessory === i}
               onPress={() => setAppearance({ ...appearance, accessory: i })}
-              style={[
-                styles.accessoryChip,
-                appearance.accessory === i && {
-                  backgroundColor: COLORS.gold,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.accessoryText,
-                  appearance.accessory === i && { color: '#3a2000' },
-                ]}
-              >
-                {a}
-              </Text>
-            </TouchableOpacity>
+            />
           ))}
         </View>
-      </Panel>
+      </Card>
 
       {/* Nom */}
-      <Panel>
-        <Text style={styles.sectionTitle}>📛 Nom de ton kok</Text>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
+      <Card>
+        <SectionTitle icon="📛">Nom de ton kok</SectionTitle>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
             maxLength={20}
             placeholder="Ti Zorro"
-            placeholderTextColor={COLORS.textDim}
+            placeholderTextColor={C.textFaint}
           />
-          <GoldButton small label="🎲" onPress={() => setName(randomKokName())} />
+          <Button label="🎲" size="sm" onPress={() => setName(randomKokName())} />
         </View>
-      </Panel>
+      </Card>
 
-      <GoldButton
+      <Button
         label="Rentre dann rond !"
+        icon="⚔️"
+        variant="ember"
+        size="lg"
+        full
+        style={{ marginTop: 10, ...SHADOW.glowEmber }}
         onPress={() => createPlayer(name, cls.id, appearance)}
         disabled={!name.trim()}
       />
@@ -181,101 +198,172 @@ export default function CreationScreen() {
   );
 }
 
+function Arrow({ dir, onPress }: { dir: 'left' | 'right'; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.arrow, pressed ? { opacity: 0.6 } : null]}
+    >
+      <Text style={styles.arrowText}>{dir === 'left' ? '‹' : '›'}</Text>
+    </Pressable>
+  );
+}
+
+function Swatch({
+  color,
+  active,
+  onPress,
+}: {
+  color: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[styles.swatch, { backgroundColor: color }, active ? styles.swatchOn : null]}
+    />
+  );
+}
+
+function shade(hex: string, amt: number): string {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const cl = (v: number) => Math.max(0, Math.min(255, v));
+  const r = cl((num >> 16) + amt);
+  const g = cl(((num >> 8) & 0xff) + amt);
+  const b = cl((num & 0xff) + amt);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+}
+
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
-  classIcons: {
+  root: { flex: 1 },
+  content: { padding: 16, paddingBottom: 48 },
+  header: { alignItems: 'center', marginTop: 10, marginBottom: 14 },
+  brand: {
+    fontFamily: F.black,
+    fontSize: 42,
+    color: C.gold,
+    letterSpacing: 1,
+    textShadowColor: 'rgba(255,90,31,0.55)',
+    textShadowRadius: 18,
+    textShadowOffset: { width: 0, height: 4 },
+  },
+  tagline: {
+    fontFamily: F.semi,
+    fontSize: 13,
+    color: C.textDim,
+    marginTop: -6,
+    textAlign: 'center',
+  },
+  classRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 6,
-    marginVertical: 6,
-    flexWrap: 'wrap',
+    gap: 9,
+    marginBottom: 10,
   },
-  classIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#222',
-    borderWidth: 2,
-    borderColor: '#555',
+  classDot: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  carousel: { flexDirection: 'row', alignItems: 'center' },
+  stage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+  },
+  halo: {
+    position: 'absolute',
+    alignSelf: 'center',
+    top: 26,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    opacity: 0.16,
+    shadowOpacity: 0.9,
+    shadowRadius: 40,
+  },
   arrow: {
-    padding: 10,
-    backgroundColor: COLORS.gold,
-    borderRadius: 8,
+    width: 38,
+    height: 46,
+    borderRadius: R.md,
+    backgroundColor: 'rgba(6,3,12,0.5)',
+    borderWidth: 1,
+    borderColor: C.hairline,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  arrowText: { fontSize: 18, fontWeight: '900', color: '#3a2000' },
-  className: {
-    fontSize: 24,
-    fontWeight: '900',
-    textAlign: 'center',
-    marginTop: 6,
-  },
+  arrowText: { fontFamily: F.black, fontSize: 26, color: C.gold, marginTop: -6 },
+  className: { fontFamily: F.black, fontSize: 26, textAlign: 'center', marginTop: 6 },
   classSub: {
-    color: COLORS.textDim,
-    textAlign: 'center',
-    fontSize: 14,
-    marginBottom: 6,
-  },
-  attr: {
-    color: COLORS.text,
-    fontWeight: '800',
-    textAlign: 'center',
+    fontFamily: F.semi,
     fontSize: 13,
-    marginBottom: 6,
-  },
-  desc: { color: COLORS.text, textAlign: 'center', fontSize: 13, lineHeight: 19 },
-  flavor: {
-    color: COLORS.textDim,
+    color: C.textDim,
     textAlign: 'center',
+    marginTop: -4,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginVertical: 8,
+    flexWrap: 'wrap',
+  },
+  desc: { ...T.body, textAlign: 'center', lineHeight: 20 },
+  flavor: {
+    fontFamily: F.regular,
     fontStyle: 'italic',
     fontSize: 12,
+    color: C.textFaint,
+    textAlign: 'center',
     marginTop: 8,
   },
-  sectionTitle: {
-    color: COLORS.gold,
-    fontWeight: '900',
-    fontSize: 15,
-    marginBottom: 8,
+  optLabel: {
+    fontFamily: F.semi,
+    fontSize: 12,
+    color: C.textFaint,
+    marginTop: 12,
+    marginBottom: 6,
   },
-  optionLabel: { color: COLORS.textDim, fontSize: 12, marginTop: 8, marginBottom: 4 },
-  swatchRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  swatchRow: { flexDirection: 'row', gap: 9, flexWrap: 'wrap', alignItems: 'center' },
   swatch: {
     width: 34,
     height: 34,
     borderRadius: 17,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: 'rgba(0,0,0,0.45)',
   },
-  swatchSelected: { borderColor: COLORS.gold, borderWidth: 3 },
-  paletteSwatch: {
-    width: 44,
+  swatchOn: {
+    borderColor: '#fff',
+    borderWidth: 2.5,
+    shadowColor: '#fff',
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    transform: [{ scale: 1.1 }],
+  },
+  palette: {
+    width: 46,
     height: 30,
-    borderRadius: 8,
+    borderRadius: 9,
     overflow: 'hidden',
     flexDirection: 'row',
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: 'rgba(0,0,0,0.45)',
   },
-  accessoryChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: '#222',
-    borderRadius: 14,
-  },
-  accessoryText: { color: COLORS.text, fontSize: 12, fontWeight: '700' },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(6,3,12,0.55)',
+    borderRadius: R.md,
     borderWidth: 1,
-    borderColor: COLORS.panelBorder,
-    color: COLORS.text,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    fontWeight: '700',
+    borderColor: C.hairline,
+    color: C.text,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    fontSize: 16,
+    fontFamily: F.bold,
   },
 });

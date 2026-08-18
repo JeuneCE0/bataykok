@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Bar, COLORS, GoldButton, Panel, Subtitle, Title } from '../components/ui';
+import AdButton from '../components/AdButton';
+import FadeIn from '../components/FadeIn';
+import {
+  Bar,
+  Button,
+  Card,
+  Chip,
+  GhostButton,
+  ScreenTitle,
+  SectionTitle,
+  StatRow,
+  T,
+  Well,
+} from '../components/ui';
 import { fmt } from '../game/formulas';
 import { MAX_DODOS_PER_DAY, MAX_MOTIVATION } from '../game/quests';
 import { TRANSPORTS } from '../game/transport';
 import { useGame } from '../store/gameStore';
+import { C, F } from '../theme';
 
 export default function QuestScreen() {
   const player = useGame((s) => s.player);
@@ -34,105 +48,194 @@ export default function QuestScreen() {
     : 0;
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Title>Chez Mémé Zizine</Title>
-      <Subtitle>Le snack-bar des koks batayeurs — quêtes péi</Subtitle>
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <ScreenTitle
+        title="Chez Mémé Zizine"
+        sub="Le snack-bar des koks batayeurs — quêtes péi"
+      />
 
-      <Panel>
-        <Text style={styles.motivLabel}>
-          ⚡ Motivation : {motivation}/{MAX_MOTIVATION}
-        </Text>
-        <Bar value={motivation} max={MAX_MOTIVATION} color={COLORS.blue} />
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-          <GoldButton
-            small
-            label={`🍺 Dodo fraîche (🌶️1) ${dodosToday}/${MAX_DODOS_PER_DAY}`}
+      {/* Motivation */}
+      <Card>
+        <View style={styles.motivHead}>
+          <SectionTitle icon="⚡">Motivation</SectionTitle>
+          <Text style={styles.motivValue}>
+            {motivation}
+            <Text style={styles.motivMax}> / {MAX_MOTIVATION}</Text>
+          </Text>
+        </View>
+        <Bar value={motivation} max={MAX_MOTIVATION} variant="lagoon" height={16} />
+        <View style={styles.actions}>
+          <Button
+            size="sm"
+            icon="🍺"
+            label={`Dodo fraîche 🌶️1 · ${dodosToday}/${MAX_DODOS_PER_DAY}`}
             onPress={drinkDodo}
             disabled={dodosToday >= MAX_DODOS_PER_DAY || player.piments < 1}
           />
-          <GoldButton
-            small
-            color="#e67e22"
-            label="Plein (🌶️5)"
+          <Button
+            size="sm"
+            variant="ember"
+            label="Plein 🌶️5"
             onPress={refillMotivation}
             disabled={player.piments < 5 || motivation >= MAX_MOTIVATION}
           />
         </View>
-        <Text style={styles.transport}>
-          {transport.emoji} Transport : {transport.name}
-          {transport.reduction > 0
-            ? ` (-${Math.round(transport.reduction * 100)}% de durée)`
-            : ''}
-        </Text>
-      </Panel>
+        <AdButton kind="dodo" full />
+        <View style={styles.transportRow}>
+          <Chip
+            label={`${transport.emoji} ${transport.name}${
+              transport.reduction > 0
+                ? ` · −${Math.round(transport.reduction * 100)}% durée`
+                : ''
+            }`}
+            color={C.mystic}
+          />
+        </View>
+      </Card>
 
       {activeQuest ? (
-        <Panel style={{ borderColor: COLORS.gold }}>
-          <Text style={styles.questTitle}>⏳ {activeQuest.quest.title}</Text>
-          <Text style={styles.place}>📍 {activeQuest.quest.place}</Text>
+        <Card glow={C.gold}>
+          <SectionTitle icon="⏳">Quête en cours</SectionTitle>
+          <Text style={styles.questTitle}>{activeQuest.quest.title}</Text>
+          <Chip
+            label={`📍 ${activeQuest.quest.place}`}
+            color={C.lagoon}
+            style={{ alignSelf: 'flex-start', marginTop: 6 }}
+          />
           <Text style={styles.flavor}>{activeQuest.quest.flavor}</Text>
           {remaining > 0 ? (
             <>
-              <Bar
-                value={activeQuest.quest.durationSec - remaining}
-                max={activeQuest.quest.durationSec}
-                color={COLORS.green}
-                label={`${remaining}s restantes`}
-                height={20}
+              <Well style={{ alignItems: 'center', gap: 8 }}>
+                <Text style={styles.countdown}>{formatTime(remaining)}</Text>
+                <Bar
+                  value={activeQuest.quest.durationSec - remaining}
+                  max={activeQuest.quest.durationSec}
+                  variant="gold"
+                  height={12}
+                />
+              </Well>
+              <GhostButton
+                label="Abandonner"
+                onPress={cancelQuest}
+                style={{ marginTop: 10 }}
               />
-              <View style={{ marginTop: 10 }}>
-                <GoldButton small color="#7f8c8d" label="Abandonner" onPress={cancelQuest} />
-              </View>
             </>
           ) : (
-            <GoldButton label="🎁 Récupérer la récompense !" onPress={() => collectQuest()} />
+            <Button
+              full
+              size="lg"
+              variant="cane"
+              icon="🎁"
+              label="Récupérer la récompense !"
+              onPress={() => collectQuest()}
+              style={{ marginTop: 6 }}
+            />
           )}
-        </Panel>
+        </Card>
       ) : (
         <>
           {lastOutcome && (
-            <Panel style={{ borderColor: COLORS.green }}>
-              <Text style={styles.outcome}>
-                ✅ Dernière quête : +🌽{fmt(lastOutcome.gold)} · +{fmt(lastOutcome.xp)} XP
-                {lastOutcome.piments > 0 ? ` · +🌶️${lastOutcome.piments}` : ''}
-                {lastOutcome.item ? ` · 🎁 ${lastOutcome.item.name}` : ''}
-                {lastOutcome.levelsGained > 0
-                  ? `\n🎉 NIVEAU ${player.level} ! Bravo ti kok !`
-                  : ''}
-              </Text>
-            </Panel>
+            <Card glow={C.cane}>
+              <SectionTitle icon="✅">Dernière quête</SectionTitle>
+              <StatRow
+                items={[
+                  { icon: '🌽', value: `+${fmt(lastOutcome.gold)}`, color: C.gold },
+                  { icon: '✨', value: `+${fmt(lastOutcome.xp)} XP`, color: C.mystic },
+                  ...(lastOutcome.piments > 0
+                    ? [{ icon: '🌶️', value: `+${lastOutcome.piments}`, color: C.piment }]
+                    : []),
+                  ...(lastOutcome.item
+                    ? [{ icon: '🎁', value: lastOutcome.item.name, color: C.text }]
+                    : []),
+                ]}
+              />
+              {lastOutcome.levelsGained > 0 && (
+                <Text style={styles.levelUp}>
+                  🎉 NIVEAU {player.level} ! Bravo ti kok !
+                </Text>
+              )}
+              {!lastOutcome.doubled && (
+                <AdButton
+                  kind="double"
+                  full
+                  label="Doubler cette récompense"
+                />
+              )}
+            </Card>
           )}
-          {quests.map((q) => (
-            <Panel key={q.id}>
-              <Text style={styles.questTitle}>{q.title}</Text>
-              <Text style={styles.place}>📍 {q.place}</Text>
+
+          {quests.map((q, qi) => (
+            <FadeIn key={q.id} index={qi}>
+            <Card>
+              <View style={styles.questHead}>
+                <Text style={styles.questTitle}>{q.title}</Text>
+                <Chip label={`📍 ${q.place}`} color={C.lagoon} />
+              </View>
               <Text style={styles.flavor}>{q.flavor}</Text>
-              <Text style={styles.rewards}>
-                ⏱️ {Math.round(q.durationSec * (1 - transport.reduction))}s · ⚡
-                {q.motivationCost} · 🌽{fmt(q.gold)} · ✨{fmt(q.xp)} XP
-              </Text>
-              <GoldButton
-                small
+              <StatRow
+                style={{ marginBottom: 12 }}
+                items={[
+                  {
+                    icon: '⏱️',
+                    value: formatTime(Math.round(q.durationSec * (1 - transport.reduction))),
+                  },
+                  { icon: '⚡', value: `${q.motivationCost}`, color: C.lagoon },
+                  { icon: '🌽', value: fmt(q.gold), color: C.gold },
+                  { icon: '✨', value: `${fmt(q.xp)} XP`, color: C.mystic },
+                ]}
+              />
+              <Button
+                full
                 label="Partir en quête"
                 onPress={() => startQuest(q)}
                 disabled={motivation < q.motivationCost}
               />
-            </Panel>
+            </Card>
+            </FadeIn>
           ))}
-          <GoldButton small color="#7f8c8d" label="🔄 Autres quêtes" onPress={rerollQuests} />
+
+          <GhostButton
+            icon="🔄"
+            label="Autres quêtes"
+            onPress={rerollQuests}
+            style={{ alignSelf: 'center', marginTop: 6 }}
+          />
         </>
       )}
     </ScrollView>
   );
 }
 
+function formatTime(sec: number): string {
+  if (sec < 60) return `${sec} s`;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return s === 0 ? `${m} min` : `${m} min ${String(s).padStart(2, '0')}`;
+}
+
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
-  motivLabel: { color: COLORS.text, fontWeight: '800', marginBottom: 6 },
-  transport: { color: COLORS.textDim, fontSize: 12, marginTop: 10 },
-  questTitle: { color: COLORS.gold, fontWeight: '900', fontSize: 16 },
-  place: { color: COLORS.text, fontSize: 12, marginTop: 2, fontWeight: '700' },
-  flavor: { color: COLORS.textDim, fontSize: 12, fontStyle: 'italic', marginVertical: 6 },
-  rewards: { color: COLORS.text, fontSize: 12, marginBottom: 8 },
-  outcome: { color: COLORS.text, fontSize: 13, fontWeight: '700', lineHeight: 20 },
+  root: { flex: 1 },
+  content: { padding: 14, paddingBottom: 40 },
+  motivHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  motivValue: { fontFamily: F.black, fontSize: 18, color: C.lagoon, marginBottom: 8 },
+  motivMax: { fontFamily: F.semi, fontSize: 12, color: C.textFaint },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' },
+  transportRow: { flexDirection: 'row', marginTop: 12 },
+  questHead: { gap: 8, alignItems: 'flex-start' },
+  questTitle: { fontFamily: F.black, fontSize: 17, color: C.text },
+  flavor: {
+    fontFamily: F.regular,
+    fontStyle: 'italic',
+    fontSize: 12.5,
+    color: C.textDim,
+    marginVertical: 10,
+    lineHeight: 18,
+  },
+  countdown: {
+    fontFamily: F.black,
+    fontSize: 30,
+    color: C.gold,
+    letterSpacing: 1,
+  },
+  levelUp: { ...T.body, fontFamily: F.black, color: C.gold, marginTop: 8 },
 });

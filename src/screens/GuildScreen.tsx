@@ -1,7 +1,17 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { COLORS, GoldButton, Panel, Subtitle, Title } from '../components/ui';
+import FadeIn from '../components/FadeIn';
+import {
+  Bar,
+  Button,
+  Card,
+  Chip,
+  GhostButton,
+  ScreenTitle,
+  SectionTitle,
+  T,
+} from '../components/ui';
 import { fmt } from '../game/formulas';
 import {
   GUILD_GOLD_BONUS_PER_LEVEL,
@@ -10,6 +20,7 @@ import {
   guildUpgradeCost,
 } from '../game/guilds';
 import { useGame } from '../store/gameStore';
+import { C, F, R } from '../theme';
 
 export default function GuildScreen() {
   const player = useGame((s) => s.player);
@@ -24,81 +35,171 @@ export default function GuildScreen() {
   if (myGuild) {
     const cost = guildUpgradeCost(guildLevel);
     return (
-      <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-        <Title>
-          {myGuild.emblem} {myGuild.name}
-        </Title>
-        <Subtitle>« {myGuild.motto} »</Subtitle>
+      <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+        <View style={styles.crest}>
+          <Text style={styles.crestEmblem}>{myGuild.emblem}</Text>
+        </View>
+        <ScreenTitle title={myGuild.name} sub={`« ${myGuild.motto} »`} />
 
-        <Panel style={{ borderColor: COLORS.gold }}>
-          <Text style={styles.bonusTitle}>Niveau de l'écurie : {guildLevel}</Text>
-          <Text style={styles.bonus}>
-            ✨ Bonus XP : +{guildLevel * GUILD_XP_BONUS_PER_LEVEL}% sur les quêtes
-          </Text>
-          <Text style={styles.bonus}>
-            🌽 Bonus grains : +{guildLevel * GUILD_GOLD_BONUS_PER_LEVEL}% sur les quêtes
-          </Text>
-          <View style={{ marginTop: 10 }}>
-            <GoldButton
-              small
-              label={`Améliorer l'écurie (🌽${fmt(cost)})`}
-              onPress={() => donateGuild(cost)}
-              disabled={player.grains < cost}
-            />
+        <Card glow={C.gold}>
+          <SectionTitle icon="⭐">Niveau de l'écurie</SectionTitle>
+          <View style={styles.levelRow}>
+            <Text style={styles.guildLevel}>{guildLevel}</Text>
+            <View style={{ flex: 1, gap: 8 }}>
+              <BonusLine
+                icon="✨"
+                label="Bonus XP en quête"
+                value={`+${guildLevel * GUILD_XP_BONUS_PER_LEVEL}%`}
+                color={C.mystic}
+                pct={Math.min(1, (guildLevel * GUILD_XP_BONUS_PER_LEVEL) / 100)}
+                variant="mystic"
+              />
+              <BonusLine
+                icon="🌽"
+                label="Bonus grains en quête"
+                value={`+${guildLevel * GUILD_GOLD_BONUS_PER_LEVEL}%`}
+                color={C.gold}
+                pct={Math.min(1, (guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / 100)}
+                variant="gold"
+              />
+            </View>
           </View>
-        </Panel>
+          <Button
+            full
+            style={{ marginTop: 14 }}
+            icon="🔨"
+            label={`Améliorer l'écurie · 🌽${fmt(cost)}`}
+            onPress={() => donateGuild(cost)}
+            disabled={player.grains < cost}
+          />
+        </Card>
 
-        <Panel>
-          <Text style={styles.bonusTitle}>Membres</Text>
-          <View style={styles.memberRow}>
-            <Text style={styles.memberMe}>🐓 {player.name} (ou !)</Text>
+        <Card>
+          <SectionTitle icon="🐓">Membres</SectionTitle>
+          <View style={[styles.memberRow, styles.meRow]}>
+            <Text style={styles.memberMe}>🐓 {player.name}</Text>
+            <Chip label="ou !" color={C.gold} active />
           </View>
           {myGuild.members.map((m) => (
             <View key={m} style={styles.memberRow}>
               <Text style={styles.member}>🐔 {m}</Text>
             </View>
           ))}
-        </Panel>
+        </Card>
 
-        <GoldButton small color="#7f8c8d" label="Quitter l'écurie" onPress={leaveGuild} />
+        <GhostButton
+          label="Quitter l'écurie"
+          onPress={leaveGuild}
+          style={{ alignSelf: 'center', marginTop: 6 }}
+        />
       </ScrollView>
     );
   }
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Title>Les Écuries</Title>
-      <Subtitle>
-        Rejoins in n'écurie de koks pou gagner des bonus XP et grains !
-      </Subtitle>
-      {GUILDS.map((g) => (
-        <Panel key={g.id}>
-          <Text style={styles.guildName}>
-            {g.emblem} {g.name}
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <ScreenTitle
+        title="Les Écuries"
+        sub="Rejoins in n'écurie pou gagner des bonus XP et grains !"
+      />
+      {GUILDS.map((g, gi) => (
+        <FadeIn key={g.id} index={gi}>
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={styles.emblemBox}>
+              <Text style={{ fontSize: 26 }}>{g.emblem}</Text>
+            </View>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={styles.guildName}>{g.name}</Text>
+              <Text style={styles.motto}>« {g.motto} »</Text>
+              <Chip
+                label={`${g.members.length + 1} membres`}
+                color={C.lagoon}
+                style={{ alignSelf: 'flex-start' }}
+              />
+            </View>
+          </View>
+          <Text style={styles.members} numberOfLines={1}>
+            {g.members.slice(0, 3).join(' · ')}…
           </Text>
-          <Text style={styles.motto}>« {g.motto} »</Text>
-          <Text style={styles.members}>
-            {g.members.length + 1} membres · {g.members.slice(0, 3).join(', ')}...
-          </Text>
-          <GoldButton small label="Rejoindre" onPress={() => joinGuild(g.id)} />
-        </Panel>
+          <Button full label="Rejoindre" onPress={() => joinGuild(g.id)} />
+        </Card>
+        </FadeIn>
       ))}
     </ScrollView>
   );
 }
 
+function BonusLine({
+  icon,
+  label,
+  value,
+  color,
+  pct,
+  variant,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  color: string;
+  pct: number;
+  variant: 'gold' | 'mystic';
+}) {
+  return (
+    <View style={{ gap: 4 }}>
+      <View style={styles.bonusHead}>
+        <Text style={styles.bonusLabel}>
+          {icon} {label}
+        </Text>
+        <Text style={[styles.bonusValue, { color }]}>{value}</Text>
+      </View>
+      <Bar value={pct} max={1} variant={variant} height={7} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
-  guildName: { color: COLORS.gold, fontWeight: '900', fontSize: 17 },
-  motto: { color: COLORS.textDim, fontStyle: 'italic', fontSize: 12, marginVertical: 4 },
-  members: { color: COLORS.text, fontSize: 12, marginBottom: 8 },
-  bonusTitle: { color: COLORS.gold, fontWeight: '900', fontSize: 15, marginBottom: 6 },
-  bonus: { color: COLORS.text, fontSize: 13, marginTop: 3 },
-  memberRow: {
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.07)',
+  root: { flex: 1 },
+  content: { padding: 14, paddingBottom: 40 },
+  crest: { alignItems: 'center', marginTop: 6 },
+  crestEmblem: {
+    fontSize: 46,
+    textShadowColor: 'rgba(255,201,60,0.5)',
+    textShadowRadius: 20,
   },
-  member: { color: COLORS.text, fontSize: 13 },
-  memberMe: { color: COLORS.gold, fontSize: 13, fontWeight: '800' },
+  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  guildLevel: {
+    fontFamily: F.black,
+    fontSize: 44,
+    color: C.gold,
+    textShadowColor: 'rgba(255,201,60,0.45)',
+    textShadowRadius: 16,
+  },
+  bonusHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  bonusLabel: { fontFamily: F.semi, fontSize: 12, color: C.textDim },
+  bonusValue: { fontFamily: F.black, fontSize: 14 },
+  emblemBox: {
+    width: 54,
+    height: 54,
+    borderRadius: R.md,
+    borderWidth: 1,
+    borderColor: C.hairline,
+    backgroundColor: 'rgba(6,3,12,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guildName: { fontFamily: F.black, fontSize: 17, color: C.text },
+  motto: { fontFamily: F.regular, fontStyle: 'italic', fontSize: 12, color: C.textDim },
+  members: { ...T.tiny, color: C.textFaint, marginVertical: 10 },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: C.hairlineSoft,
+  },
+  meRow: { borderBottomColor: 'transparent' },
+  member: { fontFamily: F.semi, fontSize: 13, color: C.textDim },
+  memberMe: { fontFamily: F.black, fontSize: 13.5, color: C.gold },
 });

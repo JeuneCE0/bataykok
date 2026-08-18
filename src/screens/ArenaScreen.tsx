@@ -1,16 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Animated,
+  Easing,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
+import AdButton from '../components/AdButton';
+import FadeIn from '../components/FadeIn';
 import Rooster from '../components/Rooster';
-import { Bar, COLORS, GoldButton, Panel, Subtitle, Title } from '../components/ui';
+import {
+  Button,
+  Card,
+  Chip,
+  GhostButton,
+  ScreenTitle,
+  T,
+  Well,
+} from '../components/ui';
 import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { simulateCombat } from '../game/combat';
 import { fmt, maxHp, playerToFighter } from '../game/formulas';
-import { Bot, CombatResult, Fighter } from '../game/types';
+import { Bot, CombatResult, CombatRound, Fighter } from '../game/types';
 import { useGame } from '../store/gameStore';
+import { C, F, G, R, SHADOW } from '../theme';
 
 const LADDER = generateLadder();
+const ROUND_MS = 720;
 
 export default function ArenaScreen() {
   const player = useGame((s) => s.player);
@@ -26,7 +46,7 @@ export default function ArenaScreen() {
     opId: string;
     result: CombatResult;
   } | null>(null);
-  const [rewardText, setRewardText] = useState<string | null>(null);
+  const [reward, setReward] = useState<{ won: boolean; text: string } | null>(null);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 500);
@@ -44,13 +64,12 @@ export default function ArenaScreen() {
         onDone={() => {
           const won = fight.result.winner === 0;
           const r = applyArenaResult(won, fight.opId);
-          setRewardText(
-            won
-              ? `🏆 VIKTOIR ! +🌽${fmt(r.gold)} · +${fmt(r.xp)} XP${
-                  r.levels > 0 ? ' · 🎉 NIVEAU SUP !' : ''
-                }`
-              : '💀 Défèt... Ton kok i sar rouler dann poussière. Antrèn a li !'
-          );
+          setReward({
+            won,
+            text: won
+              ? `+🌽${fmt(r.gold)} · +${fmt(r.xp)} XP${r.levels > 0 ? ' · 🎉 NIVEAU SUP !' : ''}`
+              : 'Ton kok i sar rouler dann poussière. Antrèn a li !',
+          });
           setFight(null);
         }}
       />
@@ -60,7 +79,6 @@ export default function ArenaScreen() {
   const cooldown = Math.max(0, Math.ceil((arenaNextAt - now) / 1000));
   const myIdx = ladderOrder.indexOf('me');
   const botById = new Map(LADDER.map((b) => [b.id, b]));
-  // 3 adversaires : juste au-dessus de nous
   const targets: Bot[] = [];
   for (let i = myIdx - 1; i >= 0 && targets.length < 3; i--) {
     const b = botById.get(ladderOrder[i]);
@@ -70,57 +88,89 @@ export default function ArenaScreen() {
   const launch = (bot: Bot) => {
     const me = playerToFighter(player);
     const op = botToFighter(bot);
-    const result = simulateCombat(me, op);
-    setRewardText(null);
-    setFight({ me, op, opId: bot.id, result });
+    setReward(null);
+    setFight({ me, op, opId: bot.id, result: simulateCombat(me, op) });
   };
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Title>Le Rond</Title>
-      <Subtitle>Le gallodrome où les légendes i naît. Rang actuel : #{myIdx + 1}</Subtitle>
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <ScreenTitle
+        title="Le Rond"
+        sub="Le gallodrome où les légendes i naît"
+        accent={C.ember}
+      />
 
-      {rewardText && (
-        <Panel style={{ borderColor: rewardText.startsWith('🏆') ? COLORS.green : COLORS.red }}>
-          <Text style={styles.reward}>{rewardText}</Text>
-        </Panel>
+      <View style={styles.rankBanner}>
+        <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
+        <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
+      </View>
+
+      {reward && (
+        <Card glow={reward.won ? C.cane : C.piment}>
+          <Text style={[styles.rewardTitle, { color: reward.won ? C.cane : C.piment }]}>
+            {reward.won ? '🏆 VIKTOIR !' : '💀 DÉFÈT…'}
+          </Text>
+          <Text style={T.body}>{reward.text}</Text>
+        </Card>
       )}
 
       {cooldown > 0 ? (
-        <Panel>
-          <Text style={styles.cooldown}>
-            😤 Ton kok i reprend son souffle... {cooldown}s
-          </Text>
-          <GoldButton
-            small
-            label="Passer l'attente (🌶️1)"
-            onPress={skipArenaCooldown}
-            disabled={player.piments < 1}
-          />
-        </Panel>
+        <Card>
+          <Text style={styles.cooldownLabel}>😤 Ton kok i reprend son souffle</Text>
+          <Well style={{ alignItems: 'center' }}>
+            <Text style={styles.cooldownTime}>{cooldown}s</Text>
+          </Well>
+          <View style={{ gap: 8, marginTop: 12 }}>
+            <AdButton kind="arena" full label="Batay tousuit (pub)" />
+            <Button
+              variant="piment"
+              size="sm"
+              icon="⏩"
+              label="Passer l'attente · 🌶️1"
+              onPress={skipArenaCooldown}
+              disabled={player.piments < 1}
+            />
+          </View>
+        </Card>
       ) : targets.length === 0 ? (
-        <Panel>
-          <Text style={styles.reward}>👑 Ou lé NUMÉRO UN ! Le roi du rond sé ou !</Text>
-        </Panel>
+        <Card glow={C.gold}>
+          <Text style={styles.rewardTitle}>👑 Ou lé NUMÉRO UN !</Text>
+          <Text style={T.body}>Le roi du rond sé ou. Personne i pé pi monte.</Text>
+        </Card>
       ) : (
-        targets.map((bot) => {
+        targets.map((bot, bi) => {
           const rank = ladderOrder.indexOf(bot.id) + 1;
           const cls = CLASSES[bot.classId];
           return (
-            <Panel key={bot.id}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Rooster appearance={bot.appearance} size={64} flip />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.botName}>
-                    #{rank} — {bot.name}
-                  </Text>
-                  <Text style={styles.botInfo}>
-                    {cls.emoji} {cls.name} · Niv. {bot.level}
-                  </Text>
+            <FadeIn key={bot.id} index={bi}>
+            <Card compact>
+              <View style={styles.opRow}>
+                <View style={styles.opPortrait}>
+                  <View style={[styles.opHalo, { backgroundColor: cls.color }]} />
+                  <Rooster appearance={bot.appearance} size={78} flip ground={false} />
+                  <View style={styles.rankBadge}>
+                    <Text style={styles.rankBadgeText}>#{rank}</Text>
+                  </View>
                 </View>
-                <GoldButton small label="⚔️ Batay !" onPress={() => launch(bot)} />
+                <View style={{ flex: 1, gap: 5 }}>
+                  <Text style={styles.opName} numberOfLines={1}>
+                    {bot.name}
+                  </Text>
+                  <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                    <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
+                    <Chip label={`Niv. ${bot.level}`} color={C.textDim} />
+                  </View>
+                </View>
+                <Button
+                  variant="ember"
+                  size="sm"
+                  icon="⚔️"
+                  label="Batay !"
+                  onPress={() => launch(bot)}
+                />
               </View>
-            </Panel>
+            </Card>
+            </FadeIn>
           );
         })
       )}
@@ -128,7 +178,20 @@ export default function ArenaScreen() {
   );
 }
 
-// ─── Vue de combat animée ────────────────────────────────────────────────
+// ─── Scène de combat ─────────────────────────────────────────────────────
+
+const KIND_STYLE: Record<
+  CombatRound['kind'],
+  { tag: string | null; color: string; big?: boolean }
+> = {
+  hit: { tag: null, color: C.text },
+  crit: { tag: 'KOU KRITIK !', color: C.gold, big: true },
+  block: { tag: 'BLOKÉ !', color: C.lagoon },
+  dodge: { tag: 'ESQUIV !', color: C.cane },
+  comet: { tag: 'BOUL DE FÉ !', color: C.ember, big: true },
+  chain: { tag: 'ANCHÈNMAN !', color: C.piment },
+  melody: { tag: 'SÉGA !', color: C.mystic },
+};
 
 function CombatView({
   me,
@@ -145,119 +208,571 @@ function CombatView({
   const scrollRef = useRef<ScrollView>(null);
   const finished = idx >= result.rounds.length - 1;
 
+  // une paire d'animations par combattant (gauche = 0, droite = 1)
+  const anim = useMemo(
+    () => [0, 1].map(() => ({
+      lunge: new Animated.Value(0),
+      shake: new Animated.Value(0),
+      flash: new Animated.Value(0),
+      squash: new Animated.Value(1),
+    })),
+    []
+  );
+  const dmgY = useRef(new Animated.Value(0)).current;
+  const dmgOp = useRef(new Animated.Value(0)).current;
+  const tagScale = useRef(new Animated.Value(0)).current;
+  const winScale = useRef(new Animated.Value(0)).current;
+  const [burst, setBurst] = useState<{ side: 0 | 1; token: number } | null>(null);
+
   useEffect(() => {
     if (finished) return;
-    const t = setInterval(() => {
-      setIdx((i) => Math.min(i + 1, result.rounds.length - 1));
-    }, 850);
+    const t = setInterval(
+      () => setIdx((i) => Math.min(i + 1, result.rounds.length - 1)),
+      ROUND_MS
+    );
     return () => clearInterval(t);
   }, [finished, result.rounds.length]);
 
+  // Chorégraphie d'un round : bond → impact → recul + dégâts flottants
+  useEffect(() => {
+    if (idx < 0) return;
+    const r = result.rounds[idx];
+    const att = r.attacker;
+    const def: 0 | 1 = att === 0 ? 1 : 0;
+    const dir = att === 0 ? 1 : -1;
+    const hard = r.kind === 'crit' || r.kind === 'comet';
+
+    anim.forEach((a) => {
+      a.lunge.setValue(0);
+      a.shake.setValue(0);
+      a.flash.setValue(0);
+    });
+    dmgY.setValue(0);
+    dmgOp.setValue(0);
+    tagScale.setValue(0);
+
+    const missed = r.kind === 'block' || r.kind === 'dodge';
+
+    Animated.sequence([
+      Animated.timing(anim[att].lunge, {
+        toValue: dir * (hard ? 34 : 24),
+        duration: 130,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.spring(anim[att].lunge, {
+          toValue: 0,
+          friction: 5,
+          tension: 90,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.timing(anim[def].shake, {
+            toValue: dir * (missed ? -14 : hard ? 16 : 10),
+            duration: 70,
+            useNativeDriver: true,
+          }),
+          Animated.spring(anim[def].shake, {
+            toValue: 0,
+            friction: 3.2,
+            tension: 140,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(anim[def].flash, {
+            toValue: missed ? 0 : hard ? 0.85 : 0.5,
+            duration: 60,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim[def].flash, {
+            toValue: 0,
+            duration: 260,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.spring(tagScale, {
+          toValue: 1,
+          friction: 4,
+          tension: 120,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.timing(dmgOp, { toValue: 1, duration: 90, useNativeDriver: true }),
+          Animated.parallel([
+            Animated.timing(dmgY, {
+              toValue: -58,
+              duration: 620,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: true,
+            }),
+            Animated.timing(dmgOp, {
+              toValue: 0,
+              duration: 620,
+              delay: 120,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+      ]),
+    ]).start();
+
+    if (!missed) setBurst({ side: def, token: idx });
+  }, [idx, result.rounds, anim, dmgOp, dmgY, tagScale]);
+
+  useEffect(() => {
+    if (!finished) return;
+    winScale.setValue(0);
+    Animated.spring(winScale, {
+      toValue: 1,
+      friction: 4,
+      tension: 80,
+      useNativeDriver: true,
+    }).start();
+  }, [finished, winScale]);
+
   const hp: [number, number] =
     idx >= 0 ? result.rounds[idx].hpAfter : [maxHp(me), maxHp(op)];
-  const lastRound = idx >= 0 ? result.rounds[idx] : null;
+  const round = idx >= 0 ? result.rounds[idx] : null;
+  const kind = round ? KIND_STYLE[round.kind] : null;
+  const dmgSide = round ? (round.attacker === 0 ? 1 : 0) : 0;
 
   return (
     <View style={styles.combatRoot}>
-      <Title>⚔️ Batay !</Title>
-      <View style={styles.fighters}>
-        <View style={styles.fighterCol}>
-          <Rooster appearance={me.appearance} size={110} />
-          <Text style={styles.fighterName} numberOfLines={1}>
-            {me.name}
-          </Text>
-          <Bar value={hp[0]} max={result.maxHp[0]} color={COLORS.green} label={`${fmt(hp[0])} PV`} />
-        </View>
-        <Text style={styles.vs}>VS</Text>
-        <View style={styles.fighterCol}>
-          <Rooster appearance={op.appearance} size={110} flip />
-          <Text style={styles.fighterName} numberOfLines={1}>
-            {op.name}
-          </Text>
-          <Bar value={hp[1]} max={result.maxHp[1]} color={COLORS.red} label={`${fmt(hp[1])} PV`} />
-        </View>
+      {/* Scène */}
+      <LinearGradient
+        colors={['rgba(255,90,31,0.16)', 'rgba(10,7,19,0)']}
+        style={styles.stageGlow}
+      />
+      <View style={styles.stageHead}>
+        <Text style={styles.stageTitle}>⚔️ BATAY DANN ROND</Text>
+        <Text style={styles.roundCount}>
+          Tour {Math.max(1, idx + 1)} / {result.rounds.length}
+        </Text>
       </View>
 
-      {lastRound && (
-        <Panel
-          style={{
-            borderColor:
-              lastRound.kind === 'crit'
-                ? COLORS.red
-                : lastRound.attacker === 0
-                ? COLORS.green
-                : COLORS.panelBorder,
-          }}
-        >
-          <Text style={styles.roundText}>
-            {lastRound.text}
-            {lastRound.damage > 0 ? `  (−${fmt(lastRound.damage)} PV)` : ''}
-          </Text>
-        </Panel>
-      )}
+      <View style={styles.fighters}>
+        <FighterSide
+          fighter={me}
+          hp={hp[0]}
+          maxHpValue={result.maxHp[0]}
+          anim={anim[0]}
+          burst={burst?.side === 0 ? burst.token : null}
+          side="left"
+          barVariant="cane"
+        />
 
-      <ScrollView
-        ref={scrollRef}
-        style={styles.log}
-        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
-      >
-        {result.rounds.slice(0, idx + 1).map((r, i) => (
-          <Text
-            key={i}
+        <View style={styles.vsWrap}>
+          <LinearGradient colors={G.ember} style={styles.vsBadge}>
+            <Text style={styles.vsText}>VS</Text>
+          </LinearGradient>
+        </View>
+
+        <FighterSide
+          fighter={op}
+          hp={hp[1]}
+          maxHpValue={result.maxHp[1]}
+          anim={anim[1]}
+          burst={burst?.side === 1 ? burst.token : null}
+          side="right"
+          barVariant="piment"
+        />
+
+        {/* dégâts flottants au-dessus du défenseur */}
+        {round && round.damage > 0 && (
+          <Animated.Text
             style={[
-              styles.logLine,
-              { color: r.attacker === 0 ? COLORS.green : COLORS.textDim },
+              styles.floatDmg,
+              dmgSide === 0 ? { left: '12%' } : { right: '12%' },
+              {
+                color: round.kind === 'crit' ? C.gold : '#FFF',
+                fontSize: round.kind === 'crit' ? 34 : 26,
+                opacity: dmgOp,
+                transform: [{ translateY: dmgY }],
+              },
             ]}
           >
-            {r.text}
+            −{fmt(round.damage)}
+          </Animated.Text>
+        )}
+      </View>
+
+      {/* Bannière du coup */}
+      <View style={styles.bannerZone}>
+        {kind?.tag && (
+          <Animated.Text
+            style={[
+              styles.kindTag,
+              {
+                color: kind.color,
+                fontSize: kind.big ? 26 : 20,
+                textShadowColor: kind.color,
+                transform: [{ scale: tagScale }],
+              },
+            ]}
+          >
+            {kind.tag}
+          </Animated.Text>
+        )}
+        {round && (
+          <Text style={styles.roundText} numberOfLines={2}>
+            {round.text}
           </Text>
-        ))}
-      </ScrollView>
+        )}
+      </View>
+
+      {/* Journal */}
+      <Well style={{ flex: 1, marginBottom: 10 }}>
+        <ScrollView
+          ref={scrollRef}
+          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+        >
+          {result.rounds.slice(0, idx + 1).map((r, i) => (
+            <Text
+              key={i}
+              style={[
+                styles.logLine,
+                { color: r.attacker === 0 ? C.cane : C.textDim },
+              ]}
+            >
+              {r.text}
+              {r.damage > 0 ? `  (−${fmt(r.damage)})` : ''}
+            </Text>
+          ))}
+        </ScrollView>
+      </Well>
 
       {finished ? (
-        <>
-          <Text style={styles.resultText}>
-            {result.winner === 0 ? '🏆 VIKTOIR POU OU !' : '💀 DÉFÈT...'}
-          </Text>
-          <GoldButton label="Retour au rond" onPress={onDone} />
-        </>
+        <View style={{ gap: 10, alignItems: 'center' }}>
+          <Animated.View style={{ transform: [{ scale: winScale }] }}>
+            <LinearGradient
+              colors={result.winner === 0 ? G.gold : G.slate}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[
+                styles.winBanner,
+                result.winner === 0 ? SHADOW.glowGold : SHADOW.card,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.winText,
+                  { color: result.winner === 0 ? C.ink : C.text },
+                ]}
+              >
+                {result.winner === 0 ? '🏆 VIKTOIR POU OU !' : '💀 DÉFÈT…'}
+              </Text>
+            </LinearGradient>
+          </Animated.View>
+          <Button
+            full
+            size="lg"
+            variant={result.winner === 0 ? 'gold' : 'slate'}
+            label="Retour au rond"
+            onPress={onDone}
+          />
+        </View>
       ) : (
-        <GoldButton
-          small
-          color="#7f8c8d"
-          label="⏩ Passer l'animation"
+        <GhostButton
+          icon="⏩"
+          label="Passer l'animation"
           onPress={() => setIdx(result.rounds.length - 1)}
+          style={{ alignSelf: 'center' }}
         />
       )}
     </View>
   );
 }
 
+function FighterSide({
+  fighter,
+  hp,
+  maxHpValue,
+  anim,
+  burst,
+  side,
+  barVariant,
+}: {
+  fighter: Fighter;
+  hp: number;
+  maxHpValue: number;
+  anim: {
+    lunge: Animated.Value;
+    shake: Animated.Value;
+    flash: Animated.Value;
+    squash: Animated.Value;
+  };
+  burst: number | null;
+  side: 'left' | 'right';
+  barVariant: 'cane' | 'piment';
+}) {
+  const pct = Math.max(0, Math.min(1, maxHpValue > 0 ? hp / maxHpValue : 0));
+  const width = useRef(new Animated.Value(pct)).current;
+  const cls = CLASSES[fighter.classId];
+
+  useEffect(() => {
+    Animated.timing(width, {
+      toValue: pct,
+      duration: 320,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [pct, width]);
+
+  return (
+    <View style={styles.fighterCol}>
+      <Animated.View
+        style={{
+          transform: [
+            { translateX: Animated.add(anim.lunge, anim.shake) },
+            { scale: anim.squash },
+          ],
+        }}
+      >
+        <View style={[styles.fighterHalo, { backgroundColor: cls.color }]} />
+        <Rooster
+          appearance={fighter.appearance}
+          size={116}
+          flip={side === 'right'}
+          alive
+        />
+        {/* flash d'impact */}
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.flash, { opacity: anim.flash }]}
+        />
+        {burst !== null && <Burst key={burst} />}
+      </Animated.View>
+
+      <Text style={styles.fighterName} numberOfLines={1}>
+        {fighter.name}
+      </Text>
+
+      <View style={styles.hpTrack}>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              width: width.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={G[barVariant]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ flex: 1, borderRadius: 7 }}
+          />
+        </Animated.View>
+        <Text style={styles.hpText}>{fmt(Math.max(0, Math.round(hp)))} PV</Text>
+      </View>
+    </View>
+  );
+}
+
+/** Gerbe de plumes/étincelles à l'impact. */
+function Burst() {
+  const p = useMemo(
+    () => PARTICLES.map(() => new Animated.Value(0)),
+    []
+  );
+
+  useEffect(() => {
+    Animated.stagger(
+      18,
+      p.map((v) =>
+        Animated.timing(v, {
+          toValue: 1,
+          duration: 480,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        })
+      )
+    ).start();
+  }, [p]);
+
+  return (
+    <View pointerEvents="none" style={styles.burst}>
+      {PARTICLES.map((part, i) => (
+        <Animated.Text
+          key={i}
+          style={{
+            position: 'absolute',
+            fontSize: part.size,
+            opacity: p[i].interpolate({
+              inputRange: [0, 0.65, 1],
+              outputRange: [1, 0.9, 0],
+            }),
+            transform: [
+              {
+                translateX: p[i].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, part.x],
+                }),
+              },
+              {
+                translateY: p[i].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, part.y],
+                }),
+              },
+              {
+                rotate: p[i].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', `${part.rot}deg`],
+                }),
+              },
+            ],
+          }}
+        >
+          {part.char}
+        </Animated.Text>
+      ))}
+    </View>
+  );
+}
+
+const PARTICLES = [
+  { char: '✦', x: -34, y: -30, rot: 160, size: 14 },
+  { char: '🪶', x: 30, y: -26, rot: -140, size: 13 },
+  { char: '✦', x: 40, y: 14, rot: 200, size: 11 },
+  { char: '🪶', x: -40, y: 10, rot: 120, size: 12 },
+  { char: '✧', x: 6, y: -44, rot: 90, size: 15 },
+  { char: '✦', x: -14, y: 34, rot: -90, size: 12 },
+];
+
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
-  combatRoot: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
-  reward: { color: COLORS.text, fontWeight: '800', fontSize: 14, lineHeight: 20 },
-  cooldown: { color: COLORS.text, fontSize: 14, marginBottom: 10, fontWeight: '700' },
-  botName: { color: COLORS.gold, fontWeight: '900', fontSize: 14 },
-  botInfo: { color: COLORS.textDim, fontSize: 12, marginTop: 2 },
-  fighters: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  fighterCol: { flex: 1, alignItems: 'center', gap: 4 },
-  fighterName: { color: COLORS.text, fontWeight: '800', fontSize: 13 },
-  vs: { color: COLORS.gold, fontWeight: '900', fontSize: 22, marginHorizontal: 8 },
-  roundText: { color: COLORS.text, fontWeight: '700', fontSize: 14, lineHeight: 20 },
-  log: {
-    flex: 1,
-    marginVertical: 8,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 10,
-    padding: 10,
+  root: { flex: 1 },
+  content: { padding: 14, paddingBottom: 40 },
+  rankBanner: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 6 },
+  rewardTitle: { fontFamily: F.black, fontSize: 18, color: C.gold, marginBottom: 4 },
+  cooldownLabel: { fontFamily: F.bold, fontSize: 14, color: C.text, marginBottom: 10 },
+  cooldownTime: { fontFamily: F.black, fontSize: 32, color: C.ember },
+  opRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  opPortrait: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
+  opHalo: {
+    position: 'absolute',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    opacity: 0.16,
   },
-  logLine: { fontSize: 11, marginBottom: 4, lineHeight: 15 },
-  resultText: {
-    color: COLORS.gold,
-    fontWeight: '900',
-    fontSize: 20,
+  rankBadge: {
+    position: 'absolute',
+    bottom: -2,
+    left: -2,
+    backgroundColor: 'rgba(6,3,12,0.9)',
+    borderRadius: R.pill,
+    borderWidth: 1,
+    borderColor: C.hairline,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+  },
+  rankBadgeText: { fontFamily: F.black, fontSize: 10, color: C.gold },
+  opName: { fontFamily: F.black, fontSize: 15, color: C.text },
+
+  combatRoot: { flex: 1, padding: 14 },
+  stageGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: 220 },
+  stageHead: { alignItems: 'center', marginBottom: 6 },
+  stageTitle: { fontFamily: F.black, fontSize: 19, color: C.ember, letterSpacing: 1 },
+  roundCount: { fontFamily: F.semi, fontSize: 11, color: C.textFaint },
+  fighters: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  fighterCol: { flex: 1, alignItems: 'center', gap: 6 },
+  fighterHalo: {
+    position: 'absolute',
+    alignSelf: 'center',
+    top: 14,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    opacity: 0.13,
+  },
+  flash: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FF3B5C',
+    borderRadius: 60,
+  },
+  burst: {
+    position: 'absolute',
+    top: '45%',
+    left: '45%',
+    width: 1,
+    height: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fighterName: { fontFamily: F.black, fontSize: 13, color: C.text },
+  hpTrack: {
+    width: '92%',
+    height: 15,
+    borderRadius: 8,
+    backgroundColor: 'rgba(6,3,12,0.65)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.6)',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  hpText: {
+    fontFamily: F.black,
+    fontSize: 10,
+    color: '#fff',
     textAlign: 'center',
-    marginVertical: 8,
+    textShadowColor: 'rgba(0,0,0,0.9)',
+    textShadowRadius: 3,
   },
+  vsWrap: { paddingTop: 44 },
+  vsBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    ...SHADOW.glowEmber,
+  },
+  vsText: { fontFamily: F.black, fontSize: 14, color: '#FFF8F0' },
+  floatDmg: {
+    position: 'absolute',
+    top: 26,
+    fontFamily: F.black,
+    textShadowColor: 'rgba(0,0,0,0.9)',
+    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 2 },
+  },
+  bannerZone: { minHeight: 64, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  kindTag: {
+    fontFamily: F.black,
+    letterSpacing: 1,
+    textShadowRadius: 14,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+  roundText: {
+    fontFamily: F.semi,
+    fontSize: 13,
+    color: C.text,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  logLine: { fontFamily: F.regular, fontSize: 11.5, marginBottom: 3, lineHeight: 16 },
+  winBanner: {
+    paddingHorizontal: 26,
+    paddingVertical: 12,
+    borderRadius: R.pill,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  winText: { fontFamily: F.black, fontSize: 20, letterSpacing: 0.5 },
 });

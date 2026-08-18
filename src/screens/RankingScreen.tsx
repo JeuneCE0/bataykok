@@ -1,13 +1,15 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { COLORS, Panel, Subtitle, Title } from '../components/ui';
+import { Card, Chip, ScreenTitle } from '../components/ui';
 import { generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { useGame } from '../store/gameStore';
+import { C, F, R } from '../theme';
 
 const LADDER = generateLadder();
 const botById = new Map(LADDER.map((b) => [b.id, b]));
+const MEDALS = ['🥇', '🥈', '🥉'];
 
 export default function RankingScreen() {
   const player = useGame((s) => s.player);
@@ -17,12 +19,17 @@ export default function RankingScreen() {
   const myIdx = ladderOrder.indexOf('me');
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Title>Palmarès du Rond</Title>
-      <Subtitle>
-        Les meilleurs koks batayeurs de l'île · Honneur : {player.honor}
-      </Subtitle>
-      <Panel>
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <ScreenTitle
+        title="Palmarès"
+        sub="Les meilleurs koks batayeurs de l'île"
+      />
+      <View style={styles.badges}>
+        <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
+        <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
+      </View>
+
+      <Card>
         {ladderOrder.map((id, i) => {
           const isMe = id === 'me';
           const bot = botById.get(id);
@@ -30,7 +37,8 @@ export default function RankingScreen() {
           const name = isMe ? player.name : bot!.name;
           const level = isMe ? player.level : bot!.level;
           const cls = CLASSES[isMe ? player.classId : bot!.classId];
-          // n'affiche que le top 15 + la zone autour du joueur
+
+          // top 15 + la zone autour du joueur
           if (i > 14 && Math.abs(i - myIdx) > 3 && i < ladderOrder.length - 1) {
             if (i === 15 && myIdx > 18) {
               return (
@@ -41,45 +49,68 @@ export default function RankingScreen() {
             }
             return null;
           }
+
           return (
             <View key={id} style={[styles.row, isMe && styles.meRow]}>
-              <Text style={[styles.rank, i < 3 && { color: COLORS.gold }]}>
-                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
-              </Text>
+              <View
+                style={[
+                  styles.rankBox,
+                  i < 3 && { borderColor: C.gold, backgroundColor: 'rgba(255,201,60,0.12)' },
+                  isMe && { borderColor: C.gold },
+                ]}
+              >
+                <Text style={[styles.rank, i < 3 && { color: C.gold, fontSize: 15 }]}>
+                  {i < 3 ? MEDALS[i] : `${i + 1}`}
+                </Text>
+              </View>
               <Text
-                style={[styles.name, isMe && { color: COLORS.gold }]}
+                style={[styles.name, isMe && { color: C.gold }]}
                 numberOfLines={1}
               >
-                {name} {isMe ? '(ou !)' : ''}
+                {name}
+                {isMe ? ' (ou !)' : ''}
               </Text>
-              <Text style={styles.cls}>{cls.emoji}</Text>
+              <Text style={[styles.cls, { color: cls.color }]}>{cls.emoji}</Text>
               <Text style={styles.level}>niv. {level}</Text>
             </View>
           );
         })}
-      </Panel>
+      </Card>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, padding: 14 },
+  root: { flex: 1 },
+  content: { padding: 14, paddingBottom: 40 },
+  badges: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 6 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 7,
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
-    gap: 8,
+    borderBottomColor: C.hairlineSoft,
+    gap: 10,
   },
   meRow: {
-    backgroundColor: 'rgba(244,196,48,0.12)',
-    borderRadius: 8,
-    paddingHorizontal: 6,
+    backgroundColor: 'rgba(255,201,60,0.10)',
+    borderRadius: R.sm,
+    borderBottomColor: 'transparent',
   },
-  rank: { color: COLORS.textDim, fontWeight: '900', width: 44, fontSize: 13 },
-  name: { color: COLORS.text, fontWeight: '700', flex: 1, fontSize: 13 },
-  cls: { fontSize: 14 },
-  level: { color: COLORS.textDim, fontSize: 12, width: 50, textAlign: 'right' },
-  dots: { color: COLORS.textDim, textAlign: 'center', fontSize: 16, paddingVertical: 4 },
+  rankBox: {
+    width: 32,
+    height: 28,
+    borderRadius: R.sm,
+    borderWidth: 1,
+    borderColor: C.hairlineSoft,
+    backgroundColor: 'rgba(6,3,12,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rank: { fontFamily: F.black, fontSize: 12, color: C.textDim },
+  name: { fontFamily: F.bold, fontSize: 13.5, color: C.text, flex: 1 },
+  cls: { fontSize: 15 },
+  level: { fontFamily: F.semi, fontSize: 11.5, color: C.textFaint, width: 48, textAlign: 'right' },
+  dots: { color: C.textFaint, textAlign: 'center', fontSize: 18, paddingVertical: 6 },
 });
