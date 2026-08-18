@@ -16,24 +16,45 @@ suppose qu'une session existe.
 | `src/lib/useOnlineSync.ts` | Publie le snapshot quand le kok change |
 | `src/screens/ArenaScreen.tsx` | Section « Batay en lign », rendue seulement si des joueurs réels existent |
 
-## Activation (4 étapes)
+## État de l'activation
 
-1. **Créer le projet** Supabase (région `eu-west-3` pour La Réunion).
-2. **Appliquer la migration** :
-   ```bash
-   supabase link --project-ref <ref>
-   supabase db push
-   ```
-3. **Activer les connexions anonymes** : Authentication → Providers → Anonymous
-   sign-ins. Personne ne doit créer de compte pour jouer.
-4. **Poser les variables** dans `.env.local` (dev) puis dans les variables EAS
-   (build) :
-   ```
-   EXPO_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=<clé publishable>
-   ```
-   ⚠️ Sans elles dans les variables EAS, l'app buildée démarre en mode local
-   sans le dire.
+Projet **`bataykok`** (`pwxyezofejjvwochqycy`, eu-west-3) — créé le 2026-08-18.
+
+| Étape | État |
+| --- | --- |
+| Projet Supabase créé | ✅ |
+| Migration appliquée (tables, RLS, RPC, vue `ladder`) | ✅ |
+| `.env.local` renseigné (URL + clé publishable) | ✅ |
+| **Connexions anonymes activées** | ❌ **à faire à la main** |
+| Variables posées dans EAS | ❌ à faire avant le premier build |
+
+### L'étape qui reste
+
+Les connexions anonymes ne s'activent pas par API — il faut passer par le
+tableau de bord :
+
+**[Authentication → Sign In / Providers](https://supabase.com/dashboard/project/pwxyezofejjvwochqycy/auth/providers)**
+→ *Anonymous sign-ins* → activer.
+
+Vérification en une commande :
+
+```bash
+curl -s -X POST "https://pwxyezofejjvwochqycy.supabase.co/auth/v1/signup" \
+  -H "apikey: $EXPO_PUBLIC_SUPABASE_ANON_KEY" \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+Tant que la réponse contient `anonymous_provider_disabled`, l'app reste en
+mode local : `ensureSession()` renvoie `null`, aucun snapshot n'est publié, la
+section « Batay en lign » ne s'affiche pas. **Aucune erreur visible côté
+joueur** — c'est voulu, mais ça veut dire que le multijoueur peut rester muet
+sans qu'on s'en rende compte.
+
+### Avant le premier build
+
+Poser les deux variables dans les variables d'environnement EAS. Sans elles,
+l'app buildée démarre en mode local sans le dire (même piège que sur les autres
+apps Expo).
 
 ## Limite assumée de la V1
 
