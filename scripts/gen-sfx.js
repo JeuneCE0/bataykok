@@ -1,5 +1,11 @@
 // Génère les effets sonores du jeu par synthèse (WAV 44,1 kHz mono 16 bits).
 // Pas de dépendance, pas de fichier à licencier : le son est calculé.
+//
+//   node scripts/gen-sfx.js assets/sfx
+//
+// Puis compresser (2 Mo de WAV → 340 Ko d'AAC), l'app ne charge que du .m4a :
+//   cd assets/sfx && for f in *.wav; do
+//     afconvert -f m4af -d aac -b 64000 "$f" "${f%.wav}.m4a"; done && rm *.wav
 const fs = require('fs');
 const path = require('path');
 

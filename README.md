@@ -44,6 +44,37 @@ Ou scanne le QR code avec l'app **Expo Go** sur un vrai téléphone (iOS ou Andr
 - **Économie double** : 🌽 grains (or) + 🌶️ piments (premium), reset quotidien de la motivation et de la boutique.
 - **Sauvegarde automatique** (AsyncStorage) — ferme l'app, tout est conservé.
 
+## Multijoueur
+
+Modèle Shakes & Fidget : on n'affronte jamais quelqu'un en direct, mais un
+**snapshot** de ses statistiques. Aucun temps réel, donc aucun serveur de jeu —
+Postgres suffit.
+
+- **Batay en lign** : les koks juste au-dessus de soi au classement
+- **Défense hors ligne** : le snapshot se bat tout seul pendant l'absence, et
+  un rapport détaillé attend au retour (avec les grains dus)
+- **Hôtel des ventes** entre joueurs, avec cote du marché
+- **Parrainage** : code court, récompenses des deux côtés
+- Session **anonyme** : personne ne crée de compte pour jouer
+
+Sans `EXPO_PUBLIC_SUPABASE_*`, tout cela disparaît et le jeu tourne en local
+avec ses adversaires simulés. Voir `docs/BACKEND.md`.
+
+## Son
+
+Tout est **synthétisé** (`scripts/gen-sfx.js`) : aucune licence, 340 Ko d'AAC,
+régénérable à volonté. 12 effets (coups, critique, esquive, KO, pièces,
+victoire, défaite, niveau, coffre) et une boucle de fond façon séga. Réglages
+Son / Mizik dans La Kaz.
+
+## Tableau de bord produit
+
+`web/` — Next.js déployé sur Vercel, 9 sections avec navigation latérale :
+vue d'ensemble, trafic & rétention, annuaire des joueurs, progression,
+combats, économie, hôtel des ventes, monétisation, technique. Lecture directe
+de Supabase avec la clé de service, côté serveur uniquement, derrière Basic
+Auth fail-closed. Voir `web/README.md`.
+
 ## Contenu de jeu
 
 - **La Route des Cirques** (onglet Donjon) : 13 gardiens sur des lieux réels de
@@ -118,11 +149,17 @@ src/
     guilds.ts      # écuries et bonus
     transport.ts   # montures péi (bisiklet → pick-up)
     names.ts       # générateur de noms créoles
+    rewards.ts     # récompenses de batay (défaite comprise), bonus, consolation
+    day.ts         # jour de jeu en heure locale
   store/
     gameStore.ts   # état global zustand + persistance
     alerts.ts      # pastilles d'appel à l'action par onglet
   lib/
     notifications.ts # rappels locaux (fin de quête, rond disponible)
+    supabase.ts / online.ts / useOnlineSync.ts  # multijoueur (inerte sans conf)
+    market.ts / referral.ts   # hôtel des ventes, parrainage
+    analytics.ts   # collecte produit par paquets
+    sound.ts       # effets et musique
   components/
     CombatView.tsx # scène de combat animée (rond et donjons)
     Rooster.tsx    # coq cartoon SVG paramétrique (respiration, clignement)

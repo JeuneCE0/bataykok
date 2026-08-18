@@ -26,21 +26,21 @@ export type Sfx =
   | 'chest';
 
 const FILES: Record<Sfx, number> = {
-  tap: require('../../assets/sfx/tap.wav'),
-  confirm: require('../../assets/sfx/confirm.wav'),
-  deny: require('../../assets/sfx/deny.wav'),
-  hit: require('../../assets/sfx/hit.wav'),
-  crit: require('../../assets/sfx/crit.wav'),
-  dodge: require('../../assets/sfx/dodge.wav'),
-  ko: require('../../assets/sfx/ko.wav'),
-  coin: require('../../assets/sfx/coin.wav'),
-  victory: require('../../assets/sfx/victory.wav'),
-  defeat: require('../../assets/sfx/defeat.wav'),
-  levelup: require('../../assets/sfx/levelup.wav'),
-  chest: require('../../assets/sfx/chest.wav'),
+  tap: require('../../assets/sfx/tap.m4a'),
+  confirm: require('../../assets/sfx/confirm.m4a'),
+  deny: require('../../assets/sfx/deny.m4a'),
+  hit: require('../../assets/sfx/hit.m4a'),
+  crit: require('../../assets/sfx/crit.m4a'),
+  dodge: require('../../assets/sfx/dodge.m4a'),
+  ko: require('../../assets/sfx/ko.m4a'),
+  coin: require('../../assets/sfx/coin.m4a'),
+  victory: require('../../assets/sfx/victory.m4a'),
+  defeat: require('../../assets/sfx/defeat.m4a'),
+  levelup: require('../../assets/sfx/levelup.m4a'),
+  chest: require('../../assets/sfx/chest.m4a'),
 };
 
-const THEME = require('../../assets/sfx/theme.wav');
+const THEME = require('../../assets/sfx/theme.m4a');
 
 const KEY_SFX = 'bk.sound.sfx';
 const KEY_MUSIC = 'bk.sound.music';
