@@ -24,18 +24,45 @@ export interface OnlineKok {
   rank: number;
 }
 
-/** Session anonyme : personne ne crée de compte pour jouer à un jeu de coqs. */
-export async function ensureSession(): Promise<string | null> {
+/**
+ * Session anonyme : personne ne crée de compte pour jouer à un jeu de coqs.
+ *
+ * Deux pièges, tous deux payés en comptes fantômes (un kok orphelin de plus
+ * dans le classement à chaque fois) :
+ *  - supabase-js restaure la session depuis AsyncStorage de façon asynchrone,
+ *    donc un `getSession()` trop précoce renvoie null ;
+ *  - deux appelants simultanés (le hook de sync et l'écran du rond) créeraient
+ *    chacun leur compte.
+ * D'où la relance courte et la promesse partagée.
+ */
+let sessionPromise: Promise<string | null> | null = null;
+
+async function resolveSession(): Promise<string | null> {
   if (!supabase) return null;
   try {
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.user.id) return data.session.user.id;
+    for (let i = 0; i < 3; i++) {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user.id) return data.session.user.id;
+      if (i < 2) await new Promise((r) => setTimeout(r, 250));
+    }
     const { data: signed, error } = await supabase.auth.signInAnonymously();
     if (error) return null;
     return signed.user?.id ?? null;
   } catch {
     return null;
   }
+}
+
+export async function ensureSession(): Promise<string | null> {
+  if (!supabase) return null;
+  if (!sessionPromise) {
+    sessionPromise = resolveSession().then((id) => {
+      // un échec ne doit pas condamner les tentatives suivantes
+      if (!id) sessionPromise = null;
+      return id;
+    });
+  }
+  return sessionPromise;
 }
 
 /** Publie l'état du kok. Silencieux en cas d'échec : le jeu prime. */

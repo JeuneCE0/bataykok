@@ -25,18 +25,15 @@ Projet **`bataykok`** (`pwxyezofejjvwochqycy`, eu-west-3) — créé le 2026-08-
 | Projet Supabase créé | ✅ |
 | Migration appliquée (tables, RLS, RPC, vue `ladder`) | ✅ |
 | `.env.local` renseigné (URL + clé publishable) | ✅ |
-| **Connexions anonymes activées** | ❌ **à faire à la main** |
+| Connexions anonymes activées | ✅ (2026-08-18) |
+| Multijoueur vérifié bout en bout | ✅ lecture du classement depuis l'app |
 | Variables posées dans EAS | ❌ à faire avant le premier build |
 
-### L'étape qui reste
+### Vérifier que les connexions anonymes répondent
 
-Les connexions anonymes ne s'activent pas par API — il faut passer par le
-tableau de bord :
-
-**[Authentication → Sign In / Providers](https://supabase.com/dashboard/project/pwxyezofejjvwochqycy/auth/providers)**
-→ *Anonymous sign-ins* → activer.
-
-Vérification en une commande :
+Elles ne s'activent que depuis le tableau de bord
+([Authentication → Sign In / Providers](https://supabase.com/dashboard/project/pwxyezofejjvwochqycy/auth/providers)
+→ *Anonymous sign-ins*). Pour contrôler :
 
 ```bash
 curl -s -X POST "https://pwxyezofejjvwochqycy.supabase.co/auth/v1/signup" \
@@ -49,6 +46,23 @@ mode local : `ensureSession()` renvoie `null`, aucun snapshot n'est publié, la
 section « Batay en lign » ne s'affiche pas. **Aucune erreur visible côté
 joueur** — c'est voulu, mais ça veut dire que le multijoueur peut rester muet
 sans qu'on s'en rende compte.
+
+### Piège corrigé : les comptes anonymes en double
+
+`supabase-js` restaure la session depuis AsyncStorage de façon **asynchrone**.
+Un `getSession()` trop précoce renvoie `null`, et le code créait alors un
+second compte anonyme — donc un kok fantôme de plus dans le classement à
+chaque lancement, le joueur finissant par s'affronter lui-même. `ensureSession`
+relance donc la lecture trois fois avant de créer un compte, et partage une
+promesse unique entre appelants concurrents (le hook de sync et l'écran du
+rond appelaient chacun le leur).
+
+Surveiller après une session de test :
+
+```sql
+select count(*) from auth.users u
+ where not exists (select 1 from public.koks k where k.id = u.id);
+```
 
 ### Avant le premier build
 
