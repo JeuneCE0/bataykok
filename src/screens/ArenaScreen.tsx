@@ -26,11 +26,13 @@ import { CLASSES } from '../game/classes';
 import { simulateCombat } from '../game/combat';
 import { fmt, maxHp, playerToFighter } from '../game/formulas';
 import { Bot, CombatResult, CombatRound, Fighter } from '../game/types';
+import { scheduleArenaReady } from '../lib/notifications';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
 const LADDER = generateLadder();
 const ROUND_MS = 720;
+const ARENA_COOLDOWN_SEC = 120;
 
 export default function ArenaScreen() {
   const player = useGame((s) => s.player);
@@ -64,6 +66,7 @@ export default function ArenaScreen() {
         onDone={() => {
           const won = fight.result.winner === 0;
           const r = applyArenaResult(won, fight.opId);
+          scheduleArenaReady(ARENA_COOLDOWN_SEC);
           setReward({
             won,
             text: won
@@ -207,6 +210,12 @@ function CombatView({
   const [idx, setIdx] = useState(-1);
   const scrollRef = useRef<ScrollView>(null);
   const finished = idx >= result.rounds.length - 1;
+  const setCombatActive = useGame((s) => s.setCombatActive);
+
+  useEffect(() => {
+    setCombatActive(true);
+    return () => setCombatActive(false);
+  }, [setCombatActive]);
 
   // une paire d'animations par combattant (gauche = 0, droite = 1)
   const anim = useMemo(
@@ -345,6 +354,7 @@ function CombatView({
         colors={['rgba(255,90,31,0.16)', 'rgba(10,7,19,0)']}
         style={styles.stageGlow}
       />
+      <View style={styles.scene}>
       <View style={styles.stageHead}>
         <Text style={styles.stageTitle}>⚔️ BATAY DANN ROND</Text>
         <Text style={styles.roundCount}>
@@ -352,6 +362,12 @@ function CombatView({
         </Text>
       </View>
 
+      <View style={styles.fightersWrap}>
+      <LinearGradient
+        colors={['rgba(255,138,61,0.26)', 'rgba(255,138,61,0.06)', 'transparent']}
+        style={styles.ringFloor}
+        pointerEvents="none"
+      />
       <View style={styles.fighters}>
         <FighterSide
           fighter={me}
@@ -397,6 +413,7 @@ function CombatView({
           </Animated.Text>
         )}
       </View>
+      </View>
 
       {/* Bannière du coup */}
       <View style={styles.bannerZone}>
@@ -421,9 +438,10 @@ function CombatView({
           </Text>
         )}
       </View>
+      </View>
 
       {/* Journal */}
-      <Well style={{ flex: 1, marginBottom: 10 }}>
+      <Well style={{ flex: 1, minHeight: 130, maxHeight: 230, marginBottom: 12 }}>
         <ScrollView
           ref={scrollRef}
           onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
@@ -510,6 +528,8 @@ function FighterSide({
   const pct = Math.max(0, Math.min(1, maxHpValue > 0 ? hp / maxHpValue : 0));
   const width = useRef(new Animated.Value(pct)).current;
   const cls = CLASSES[fighter.classId];
+  const ko = hp <= 0;
+  const koAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(width, {
@@ -520,13 +540,39 @@ function FighterSide({
     }).start();
   }, [pct, width]);
 
+  useEffect(() => {
+    if (!ko) return;
+    Animated.spring(koAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 60,
+      useNativeDriver: true,
+    }).start();
+  }, [ko, koAnim]);
+
   return (
     <View style={styles.fighterCol}>
       <Animated.View
         style={{
+          opacity: koAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 0.55],
+          }),
           transform: [
             { translateX: Animated.add(anim.lunge, anim.shake) },
             { scale: anim.squash },
+            {
+              rotate: koAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', side === 'right' ? '-72deg' : '72deg'],
+              }),
+            },
+            {
+              translateY: koAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 16],
+              }),
+            },
           ],
         }}
       >
@@ -544,6 +590,22 @@ function FighterSide({
         />
         {burst !== null && <Burst key={burst} />}
       </Animated.View>
+
+      {ko && (
+        <Animated.Text
+          style={[
+            styles.koStars,
+            {
+              opacity: koAnim,
+              transform: [
+                { scale: koAnim.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) },
+              ],
+            },
+          ]}
+        >
+          💫 KO
+        </Animated.Text>
+      )}
 
       <Text style={styles.fighterName} numberOfLines={1}>
         {fighter.name}
@@ -675,7 +737,18 @@ const styles = StyleSheet.create({
   rankBadgeText: { fontFamily: F.black, fontSize: 10, color: C.gold },
   opName: { fontFamily: F.black, fontSize: 15, color: C.text },
 
-  combatRoot: { flex: 1, padding: 14 },
+  combatRoot: { flex: 1, padding: 14, paddingTop: 20 },
+  scene: { flex: 1, justifyContent: 'center', gap: 4 },
+  fightersWrap: { justifyContent: 'flex-end' },
+  ringFloor: {
+    position: 'absolute',
+    left: '2%',
+    right: '2%',
+    bottom: 34,
+    height: 130,
+    borderRadius: 300,
+    transform: [{ scaleY: 0.38 }],
+  },
   stageGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: 220 },
   stageHead: { alignItems: 'center', marginBottom: 6 },
   stageTitle: { fontFamily: F.black, fontSize: 19, color: C.ember, letterSpacing: 1 },
@@ -714,6 +787,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fighterName: { fontFamily: F.black, fontSize: 13, color: C.text },
+  koStars: {
+    position: 'absolute',
+    top: 6,
+    fontFamily: F.black,
+    fontSize: 20,
+    color: C.gold,
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowRadius: 6,
+  },
   hpTrack: {
     width: '92%',
     height: 15,

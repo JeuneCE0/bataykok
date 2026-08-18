@@ -18,6 +18,11 @@ import {
 import { fmt } from '../game/formulas';
 import { MAX_DODOS_PER_DAY, MAX_MOTIVATION } from '../game/quests';
 import { TRANSPORTS } from '../game/transport';
+import {
+  askNotificationPermission,
+  cancelQuestReminder,
+  scheduleQuestDone,
+} from '../lib/notifications';
 import { useGame } from '../store/gameStore';
 import { C, F } from '../theme';
 
@@ -116,7 +121,10 @@ export default function QuestScreen() {
               </Well>
               <GhostButton
                 label="Abandonner"
-                onPress={cancelQuest}
+                onPress={() => {
+                  cancelQuest();
+                  cancelQuestReminder();
+                }}
                 style={{ marginTop: 10 }}
               />
             </>
@@ -127,7 +135,10 @@ export default function QuestScreen() {
               variant="cane"
               icon="🎁"
               label="Récupérer la récompense !"
-              onPress={() => collectQuest()}
+              onPress={() => {
+                collectQuest();
+                cancelQuestReminder();
+              }}
               style={{ marginTop: 6 }}
             />
           )}
@@ -187,7 +198,14 @@ export default function QuestScreen() {
               <Button
                 full
                 label="Partir en quête"
-                onPress={() => startQuest(q)}
+                onPress={async () => {
+                  startQuest(q);
+                  await askNotificationPermission();
+                  scheduleQuestDone(
+                    Math.round(q.durationSec * (1 - transport.reduction)),
+                    q.title
+                  );
+                }}
                 disabled={motivation < q.motivationCost}
               />
             </Card>

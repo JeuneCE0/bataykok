@@ -14,6 +14,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Backdrop from './src/components/Backdrop';
 import DailyModal from './src/components/DailyModal';
 import Hud from './src/components/Hud';
+import LevelUpOverlay from './src/components/LevelUpOverlay';
 import Rooster from './src/components/Rooster';
 import StepBanner from './src/components/StepBanner';
 import { BODY_COLORS, COMB_COLORS } from './src/game/bots';
@@ -41,6 +42,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 
 export default function App() {
   const player = useGame((s) => s.player);
+  const combatActive = useGame((s) => s.combatActive);
   const ensureDaily = useGame((s) => s.ensureDaily);
   const [tab, setTab] = useState<Tab>('kok');
   const [now, setNow] = useState(Date.now());
@@ -74,8 +76,8 @@ export default function App() {
               <CreationScreen />
             ) : (
               <View style={{ flex: 1 }}>
-                <Hud />
-                <StepBanner onGo={setTab} />
+                {!combatActive && <Hud />}
+                {!combatActive && <StepBanner onGo={setTab} />}
                 <View style={{ flex: 1 }}>
                   {tab === 'kok' && <CharacterScreen />}
                   {tab === 'quetes' && <QuestScreen />}
@@ -84,8 +86,11 @@ export default function App() {
                   {tab === 'ecurie' && <GuildScreen />}
                   {tab === 'bazar' && <ShopScreen />}
                 </View>
-                <TabBar active={tab} onChange={setTab} now={now} />
+                {!combatActive && (
+                  <TabBar active={tab} onChange={setTab} now={now} />
+                )}
                 <DailyModal />
+                <LevelUpOverlay />
               </View>
             )}
           </SafeAreaView>

@@ -94,6 +94,8 @@ interface GameState {
   adsToday: number;
   adNextAt: number;
   starterPackBought: boolean;
+  /** vrai pendant l'animation d'un combat : l'UI passe en mode scène */
+  combatActive: boolean;
 
   // actions
   createPlayer: (name: string, classId: ClassId, appearance: Appearance) => void;
@@ -127,6 +129,7 @@ interface GameState {
   claimStreak: () => { grains: number; piments: number } | null;
   watchAd: (kind: AdKind) => boolean;
   buyStarterPack: () => void;
+  setCombatActive: (v: boolean) => void;
 }
 
 function today(): string {
@@ -218,6 +221,7 @@ export const useGame = create<GameState>()(
         adsToday: 0,
         adNextAt: 0,
         starterPackBought: false,
+        combatActive: false,
 
         createPlayer: (name, classId, appearance) => {
           const ladder = generateLadder().map((b) => b.id);
@@ -695,6 +699,8 @@ export const useGame = create<GameState>()(
           return true;
         },
 
+        setCombatActive: (v) => set({ combatActive: v }),
+
         buyStarterPack: () => {
           const s = get();
           if (!s.player || s.starterPackBought) return;
@@ -716,6 +722,7 @@ export const useGame = create<GameState>()(
       // les sauvegardes d'avant la progression restent valides : le merge
       // shallow de zustand complète les nouveaux champs avec leurs défauts.
       migrate: (persisted) => persisted as GameState,
+      partialize: ({ combatActive, ...rest }) => rest as GameState,
     }
   )
 );

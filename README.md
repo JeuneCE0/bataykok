@@ -14,6 +14,9 @@ npx expo start --ios
 
 `npx expo start --ios` ouvre automatiquement l'app dans le simulateur iOS via **Expo Go** (téléchargé automatiquement la première fois). Sinon, lance `npx expo start` puis appuie sur `i`.
 
+> Si le port 8081 est déjà pris : `npx expo start --ios --port 8082`.
+> Expo Go affiche un avertissement sur `expo-notifications` (les push **distantes** n'y sont plus supportées) : les rappels **locaux** du jeu, eux, fonctionnent.
+
 ## Lancer sur Android
 
 ```bash
@@ -41,16 +44,48 @@ Ou scanne le QR code avec l'app **Expo Go** sur un vrai téléphone (iOS ou Andr
 - **Économie double** : 🌽 grains (or) + 🌶️ piments (premium), reset quotidien de la motivation et de la boutique.
 - **Sauvegarde automatique** (AsyncStorage) — ferme l'app, tout est conservé.
 
+## Progression, fidélité, monétisation
+
+- **Comparaison d'équipement** : chaque objet du Bazar et du sak affiche un verdict
+  **MIEUX / MOINS BON** et le détail des écarts (`Dégâts ▲ +3`, `Armure ▼ −2`…) face à la
+  pièce portée. Le score est pondéré par la classe — l'attribut principal pèse plus lourd.
+  Le sak est trié par gain, et la fiche affiche une note de **Puissance**.
+- **Chemin du ti kok** : 11 étapes d'onboarding (équiper, première quête, premier combat,
+  écurie, niveau 5, objet Mitik…). Un bandeau permanent montre la prochaine action, emmène
+  sur le bon onglet d'un tap, puis se transforme en récompense à encaisser.
+- **Défis du jour** : 3 objectifs tirés chaque jour (tirage stable) + coffre bonus quand
+  les trois tombent.
+- **Série de connexions** : récompense croissante J1 → J7, présentée à l'ouverture.
+- **Pubs récompensées** (simulation du SDK, à brancher sur AdMob/RevenueCat en prod) :
+  Dodo offerte, sac de grains, **doublement** de la récompense de quête, batay immédiate.
+  6 par jour, avec cooldown.
+- **Offre de bienvenue** « Pak Ti Batayeur » (une seule fois) et packs de piments avec
+  bonus affiché.
+- **Rappels locaux** : notification à la fin d'une quête et quand le rond redevient
+  disponible (`expo-notifications`, 100 % local, aucun serveur).
+- **Pastilles d'appel à l'action** sur la barre d'onglets : une amélioration dans le sak,
+  une bonne affaire au Bazar, une quête terminée, un défi à encaisser.
+
+## Direction artistique — « Kabar Volcan »
+
+Nuit tropicale profonde, braise du volcan, or de fête foraine. Tokens dans `src/theme.ts`,
+police **Baloo 2**, surfaces en dégradés avec liseré lumineux, boutons à relief, fond SVG
+(halo de lave + poussière). Le coq respire et cligne des yeux ; les combats sont mis en
+scène (bond, secousse, flash d'impact, dégâts flottants, gerbe de plumes, KO renversé).
+
 ## Structure du code
 
 ```
 src/
-  game/        # moteur pur TypeScript (testable hors React)
+  theme.ts       # tokens de direction artistique (couleurs, dégradés, typo, ombres)
+  game/          # moteur pur TypeScript (testable hors React)
     types.ts       # modèles de données
     classes.ts     # 6 classes + capacités
     formulas.ts    # XP, coûts, PV, économie (formules type S&F)
     combat.ts      # simulation de combat tour par tour
     items.ts       # génération d'objets (raretés, bonus)
+    power.ts       # score de puissance + comparaison d'équipement
+    progress.ts    # étapes d'onboarding, défis du jour, série, offres de pub
     quests.ts      # quêtes (lieux de La Réunion)
     bots.ts        # 60 adversaires déterministes + apparences
     guilds.ts      # écuries et bonus
@@ -58,10 +93,16 @@ src/
     names.ts       # générateur de noms créoles
   store/
     gameStore.ts   # état global zustand + persistance
+    alerts.ts      # pastilles d'appel à l'action par onglet
+  lib/
+    notifications.ts # rappels locaux (fin de quête, rond disponible)
   components/
-    Rooster.tsx    # coq cartoon SVG paramétrique
-    Hud.tsx        # barre du haut (nom, niveau, XP, monnaies)
-    ui.tsx         # thème + composants partagés
+    Rooster.tsx    # coq cartoon SVG paramétrique (respiration, clignement)
+    Backdrop.tsx   # fond de nuit volcanique
+    Hud.tsx        # barre du haut (portrait, niveau, XP, monnaies)
+    ui.tsx         # kit d'interface (Card, Button, Bar, Chip, Well…)
+    ItemCompare.tsx / AdButton.tsx / StepBanner.tsx / DailyModal.tsx
+    DailyMissions.tsx / LevelUpOverlay.tsx / FadeIn.tsx / Counter.tsx
   screens/         # les 7 écrans du jeu
 ```
 
@@ -70,8 +111,10 @@ src/
 Le prototype simule le multijoueur en local. Pour la version store :
 
 1. **Backend** : Supabase ou Firebase (comptes, classement réel, guildes, combats asynchrones — l'adversaire est un *snapshot* de stats, comme dans S&F : aucun temps réel nécessaire).
-2. **IAP réels** : `expo-in-app-purchases` / RevenueCat pour les packs de piments.
-3. **Notifications push** : fin de quête, attaques reçues (expo-notifications).
+2. **IAP réels** : RevenueCat pour les packs de piments (l'UI et les offres sont déjà en
+   place, seul l'achat est simulé) + **AdMob** derrière les pubs récompensées.
+3. **Notifications push distantes** : attaques reçues, fin de saison (les rappels locaux
+   sont déjà branchés ; il faut un development build, pas Expo Go).
 4. **Art final** : remplacer/compléter le coq SVG par des illustrations d'artiste (le SVG paramétrique reste idéal pour la personnalisation).
 5. **Build stores** : `eas build` (profils iOS + Android) puis `eas submit`.
 
