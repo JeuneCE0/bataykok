@@ -15,9 +15,11 @@ import {
 import { fmt } from '../game/formulas';
 import { CLASSES } from '../game/classes';
 import {
+  GUILDS,
+  GUILD_BONUS_SCALE,
   GUILD_GOLD_BONUS_PER_LEVEL,
   GUILD_XP_BONUS_PER_LEVEL,
-  GUILDS,
+  donationTiers,
 } from '../game/guilds';
 import {
   GuildBoardRow,
@@ -88,7 +90,7 @@ export default function GuildScreen() {
                 label={t('guild.xpBonus')}
                 value={`+${guildLevel * GUILD_XP_BONUS_PER_LEVEL}%`}
                 color={C.mystic}
-                pct={Math.min(1, (guildLevel * GUILD_XP_BONUS_PER_LEVEL) / 100)}
+                pct={Math.min(1, (guildLevel * GUILD_XP_BONUS_PER_LEVEL) / GUILD_BONUS_SCALE)}
                 variant="mystic"
               />
               <BonusLine
@@ -96,7 +98,7 @@ export default function GuildScreen() {
                 label={t('guild.goldBonus')}
                 value={`+${guildLevel * GUILD_GOLD_BONUS_PER_LEVEL}%`}
                 color={C.gold}
-                pct={Math.min(1, (guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / 100)}
+                pct={Math.min(1, (guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / GUILD_BONUS_SCALE)}
                 variant="gold"
               />
             </View>
@@ -116,7 +118,7 @@ export default function GuildScreen() {
                 label={`${fmt(mine.pot)} / ${fmt(mine.threshold)}`}
               />
               <View style={styles.donateRow}>
-                {[500, 2000, 10000].map((montant) => (
+                {donationTiers(player.grains).map((montant) => (
                   <Button
                     key={montant}
                     style={styles.donateBtn}

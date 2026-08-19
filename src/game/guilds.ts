@@ -41,3 +41,31 @@ export const GUILDS: GuildDef[] = [
  */
 export const GUILD_XP_BONUS_PER_LEVEL = 2; // % XP
 export const GUILD_GOLD_BONUS_PER_LEVEL = 2; // % grains
+
+/**
+ * Plafond des barres de bonus à l'écran.
+ *
+ * Elles étaient graduées sur 100 % : au niveau 1, un bonus de 2 % donnait une
+ * barre vide et l'écurie paraissait ne rien apporter. 30 % correspond au
+ * niveau 15 — une cible qu'une écurie active atteint en quelques semaines.
+ */
+export const GUILD_BONUS_SCALE = 30;
+
+/**
+ * Trois montants de don calés sur la bourse du joueur.
+ *
+ * Des paliers fixes (500 / 2 000 / 10 000) laissaient un joueur à 437 grains
+ * devant trois boutons éteints : la caisse commune ne s'ouvrait qu'aux riches.
+ * Ici il y a toujours au moins une somme à portée, et l'échelle suit celui qui
+ * a de quoi donner.
+ */
+export function donationTiers(grains: number): number[] {
+  const arrondi = (n: number) => {
+    if (n < 100) return Math.max(10, Math.round(n / 10) * 10);
+    if (n < 1000) return Math.round(n / 50) * 50;
+    return Math.round(n / 500) * 500;
+  };
+  const brut = [grains * 0.1, grains * 0.3, grains * 0.6].map(arrondi);
+  // dédoublonner : mieux vaut deux boutons distincts que trois identiques
+  return [...new Set(brut)].filter((n) => n >= 10 && n <= grains);
+}
