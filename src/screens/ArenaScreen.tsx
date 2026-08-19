@@ -49,10 +49,10 @@ function formatSec(sec: number): string {
 /** Lecture immédiate du rapport de force, pour choisir sa cible. */
 function odds(mine: number, theirs: number) {
   const r = theirs > 0 ? mine / theirs : 2;
-  if (r >= 1.25) return { label: 'FASIL', color: C.cane };
+  if (r >= 1.25) return { label: 'FACILE', color: C.cane };
   if (r >= 0.95) return { label: 'SERRÉ', color: C.gold };
-  if (r >= 0.75) return { label: 'DIR', color: C.ember };
-  return { label: 'TRÈ DIR', color: C.piment };
+  if (r >= 0.75) return { label: 'DUR', color: C.ember };
+  return { label: 'TRÈS DUR', color: C.piment };
 }
 
 export default function ArenaScreen() {
@@ -135,9 +135,9 @@ export default function ArenaScreen() {
             itemColor: r.item ? RARITY_COLORS[r.item.rarity] : undefined,
             note: won
               ? r.streak >= 2
-                ? `🔥 ${r.streak} viktoir d'affilé`
+                ? `🔥 ${r.streak} victoires d’affilée`
                 : null
-              : 'Ton kok la pri in kou, mé li la apri. Antrèn a li !',
+              : 'Ton kok a pris un coup, mais il a appris. Entraîne-le !',
           });
           setFight(null);
         }}
@@ -243,15 +243,15 @@ export default function ArenaScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.ticketTitle}>
               {arenaTickets > 0
-                ? `${arenaTickets} batay dispo`
-                : 'Pu de batay pou lo moman'}
+                ? `${arenaTickets} combats disponibles`
+                : 'Plus de combat pour le moment'}
             </Text>
             <Text style={styles.ticketSub}>
               {arenaTickets >= maxTickets
-                ? 'Jetons o max — anon !'
+                ? 'Jetons au maximum — allons-y !'
                 : arenaTickets === 0
-                  ? `Prochain jeton dan ${formatSec(refill)} · ou in pub / 🌶️1`
-                  : `Prochain jeton dan ${formatSec(refill)}`}
+                  ? `Prochain jeton dans ${formatSec(refill)} · ou une pub / 🌶️1`
+                  : `Prochain jeton dans ${formatSec(refill)}`}
             </Text>
           </View>
         </View>
@@ -264,12 +264,12 @@ export default function ArenaScreen() {
             <Text style={styles.cooldownTime}>{formatSec(refill)}</Text>
           </Well>
           <View style={{ gap: 8, marginTop: 12 }}>
-            <AdButton kind="arena" full label="In batay tousuit (pub)" />
+            <AdButton kind="arena" full label="Un combat tout de suite (pub)" />
             <Button
               variant="piment"
               size="sm"
               icon="⏩"
-              label="Jeton tousuit · 🌶️1"
+              label="Jeton immédiat · 🌶️1"
               onPress={buyArenaTicket}
               disabled={player.piments < 1}
             />

@@ -43,10 +43,10 @@ import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
 
 const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
-  off: '📴 Zwé en lokal',
-  sync: '🔄 Sinkronizasyon…',
-  ok: '🌐 En lign',
-  error: '⚠️ Sinkro inposib',
+  off: '📴 Hors ligne',
+  sync: '🔄 Synchronisation…',
+  ok: '🌐 En ligne',
+  error: '⚠️ Synchro impossible',
 };
 
 const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
@@ -117,7 +117,7 @@ export default function CharacterScreen() {
       <View style={{ flex: 1 }}>
         {switcher}
         <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-          <ScreenTitle title="La Kaz" sub="Out rendé-vou du jour" />
+          <ScreenTitle title="La Kaz" sub="Tes rendez-vous du jour" />
           <View style={{ alignItems: 'center', marginBottom: 10 }}>
             <Chip
               label={ONLINE_LABEL[onlineState]}
@@ -260,7 +260,7 @@ export default function CharacterScreen() {
           <Button
             size="sm"
             variant="cane"
-            label="Ékip lo mèy"
+            label="Équiper le meilleur"
             onPress={() => {
               const n = equipBest();
               say(
@@ -305,7 +305,7 @@ export default function CharacterScreen() {
         <View style={styles.sectionHead}>
           <SectionTitle icon="🎒">Sak — {player.inventory.length}/24</SectionTitle>
           <GhostButton
-            label="Vann lo rest"
+            label="Vendre le surplus"
             onPress={() => {
               const r = sellJunk();
               say(

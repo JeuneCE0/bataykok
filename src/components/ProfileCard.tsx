@@ -45,10 +45,10 @@ export default function ProfileCard({
             {cls.emoji} {cls.name} · niv. {player.level}
           </Text>
           <View style={styles.stats}>
-            <Stat icon="⚡" label="Puissans" value={fmt(kokPower(player))} />
+            <Stat icon="⚡" label="Puissance" value={fmt(kokPower(player))} />
             <Stat icon="❤️" label="PV" value={fmt(maxHp(f))} />
             <Stat icon="🗡️" label="Dégâts" value={`${w.min}–${w.max}`} />
-            <Stat icon="🛡️" label="Armur" value={`${playerArmor(player)}`} />
+            <Stat icon="🛡️" label="Armure" value={`${playerArmor(player)}`} />
           </View>
         </View>
       </View>
@@ -62,10 +62,10 @@ export default function ProfileCard({
 
       {code && (
         <View style={styles.codeBox}>
-          <Text style={styles.codeLabel}>KOD PARRAINAZ</Text>
+          <Text style={styles.codeLabel}>CODE DE PARRAINAGE</Text>
           <Text style={styles.code}>{code}</Text>
           <Text style={styles.codeHint}>
-            Rentre sé kod-là : ou gagne 🌶️40 + 🌽500
+            Rentre sé kod-là : tu reçois 🌶️40 + 🌽500
           </Text>
         </View>
       )}

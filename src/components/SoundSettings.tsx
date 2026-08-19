@@ -20,8 +20,8 @@ export default function SoundSettings() {
       <SectionTitle icon="🔊">Son</SectionTitle>
 
       <Row
-        label="Brui du zé"
-        hint="Kou, piès, kofr, viktoir"
+        label="Bruitages"
+        hint="Coups, pièces, coffre, victoire"
         value={sfxOn}
         onChange={(v) => {
           setSfxOn(v);
@@ -29,8 +29,8 @@ export default function SoundSettings() {
         }}
       />
       <Row
-        label="Mizik"
-        hint="Boukl séga en fon"
+        label="Musique"
+        hint="Boucle séga en fond"
         value={musicOn}
         onChange={(v) => {
           setMusicOn(v);
@@ -42,7 +42,7 @@ export default function SoundSettings() {
         full
         variant={allOff ? 'cane' : 'slate'}
         icon={allOff ? '🔊' : '🔇'}
-        label={allOff ? 'Rémèt le son' : 'Koup tout le son'}
+        label={allOff ? 'Remettre le son' : 'Couper tout le son'}
         onPress={() => {
           const on = toggleMute();
           syncMusic();
@@ -51,7 +51,7 @@ export default function SoundSettings() {
         style={{ marginTop: 12 }}
       />
       <Text style={styles.hintAll}>
-        Lo mèm bouton lé dan la bar du ho, pou koupé vitman.
+        Le même bouton est en haut de l’écran, pour couper vite.
       </Text>
     </Card>
   );

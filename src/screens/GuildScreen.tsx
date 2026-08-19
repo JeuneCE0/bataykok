@@ -100,7 +100,7 @@ export default function GuildScreen() {
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
         title="Les Écuries"
-        sub="Rejoins in n'écurie pou gagner des bonus XP et grains !"
+        sub="Rejoins in n'écurie ptu reçoisr des bonus XP et grains !"
       />
       {GUILDS.map((g, gi) => (
         <FadeIn key={g.id} index={gi}>

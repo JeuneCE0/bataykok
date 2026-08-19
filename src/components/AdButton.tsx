@@ -112,10 +112,10 @@ export default function AdButton({
               </Text>
               <Text style={[styles.sub, disabled && { color: C.textDim }]}>
                 {outOfAds
-                  ? 'Pu de pub pou ojourdi — revien demin'
+                  ? 'Plus de pub aujourd’hui — reviens demain'
                   : waiting > 0
-                    ? `Disponib dan ${waiting} s`
-                    : `${offer.icon} ${offer.reward} · gratui`}
+                    ? `Disponible dans ${waiting} s`
+                    : `${offer.icon} ${offer.reward} · gratuit`}
               </Text>
             </View>
             <View style={[styles.counter, disabled && styles.counterOff]}>

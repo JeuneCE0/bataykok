@@ -190,7 +190,7 @@ export default function RewardOverlay({
                 ]}
               >
                 🎖️ {reward.honor > 0 ? '+' : ''}
-                {reward.honor} honnèr
+                {reward.honor} honneur
               </Text>
             )}
 
@@ -207,7 +207,7 @@ export default function RewardOverlay({
             )}
 
             {reward.levels ? (
-              <Text style={styles.levelUp}>🎉 NIVO SUPÉRIÈR !</Text>
+              <Text style={styles.levelUp}>🎉 NIVEAU SUPÉRIEUR !</Text>
             ) : null}
             {reward.note ? <Text style={styles.note}>{reward.note}</Text> : null}
 
@@ -215,7 +215,7 @@ export default function RewardOverlay({
               full
               size="lg"
               variant={reward.won ? 'gold' : 'slate'}
-              label="Kontinué"
+              label="Continuer"
               onPress={onClose}
               style={{ marginTop: 16 }}
             />

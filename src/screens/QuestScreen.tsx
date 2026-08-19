@@ -78,8 +78,8 @@ export default function QuestScreen() {
               {motivation === 0 ? '😮‍💨 Pu d’énerzi' : '⚠️ Énerzi ba'}
             </Text>
             <Text style={styles.emptyText}>
-              Rechargé o komplé dan {formatUntil(nextDailyReset() - now)} (minui).
-              An atandan : in Dodo, in plin, ou in pub.
+              Rechargée à fond dans {formatUntil(nextDailyReset() - now)} (minuit).
+              En attendant : une Dodo, un plein, ou une pub.
             </Text>
           </View>
         )}
@@ -90,8 +90,8 @@ export default function QuestScreen() {
             icon="🍺"
             label={
               dodosToday >= MAX_DODOS_PER_DAY
-                ? 'Dodo — pu ryink ojourdi'
-                : `Dodo fraîche 🌶️1 · ${MAX_DODOS_PER_DAY - dodosToday} rèstan`
+                ? 'Dodo — plus rien aujourd’hui'
+                : `Dodo fraîche 🌶️1 · ${MAX_DODOS_PER_DAY - dodosToday} restantes`
             }
             onPress={drinkDodo}
             disabled={dodosToday >= MAX_DODOS_PER_DAY || player.piments < 1}

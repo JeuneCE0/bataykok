@@ -134,7 +134,7 @@ export default function ShopScreen() {
                 {open === it.id ? (
                   <CompareLines cmp={cmp} />
                 ) : (
-                  <Text style={styles.more}>Toucher pou compare en détay</Text>
+                  <Text style={styles.more}>Toucher pour comparer en détail</Text>
                 )}
               </Pressable>
               <Button
@@ -238,7 +238,7 @@ export default function ShopScreen() {
         <View style={{ gap: 5, marginBottom: 12 }}>
           <Text style={styles.passLine}>🌶️ 20 piments chaque jour</Text>
           <Text style={styles.passLine}>✨ +10 % d'XP su tout</Text>
-          <Text style={styles.passLine}>🧧 Kofr gratui prioritèr</Text>
+          <Text style={styles.passLine}>🧧 Coffre gratuit prioritèr</Text>
         </View>
         {passUntil > Date.now() ? (
           <>

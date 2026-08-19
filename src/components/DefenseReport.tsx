@@ -49,16 +49,16 @@ export default function DefenseReport() {
           }}
         >
           <LinearGradient colors={['#2A1A3D', '#0E0818']} style={styles.card}>
-            <Text style={styles.kicker}>PANDAN OUT ABSANS</Text>
+            <Text style={styles.kicker}>PENDANT TON ABSENCE</Text>
             <Text style={styles.title}>
-              {defenses.length} batay su out kok
+              {defenses.length} combats sur ton kok
             </Text>
             <Text style={styles.sub}>
               {won === defenses.length
-                ? 'Out kok la tout repoussé. Bèl travay !'
+                ? 'Ton kok a tout repoussé. Beau travail !'
                 : won === 0
-                  ? "Personn la pa tienbo. Faut renforsi out kok."
-                  : `${won} défans gagné su ${defenses.length}.`}
+                  ? "Personne n’a été repoussé. Il faut renforcer ton kok."
+                  : `${won} défenses gagnées sur ${defenses.length}.`}
             </Text>
 
             <View style={styles.totals}>
@@ -100,7 +100,7 @@ export default function DefenseReport() {
                       <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                         <Chip label={`${cls.emoji} niv. ${d.attackerLevel}`} color={cls.color} />
                         <Chip
-                          label={d.defended ? 'Repoussé' : 'Batu'}
+                          label={d.defended ? 'Repoussé' : 'Battu'}
                           color={d.defended ? C.cane : C.piment}
                         />
                       </View>
@@ -120,7 +120,7 @@ export default function DefenseReport() {
             <Button
               full
               size="lg"
-              label="Bien resu"
+              label="Bien reçu"
               onPress={clearDefenses}
               style={{ marginTop: 14 }}
             />

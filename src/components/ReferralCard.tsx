@@ -42,7 +42,7 @@ export default function ReferralCard() {
         piments: REFERRER_BONUS.piments * kids.length,
       });
       setMsg(
-        `🎉 ${kids.length} nouvo fiyel ! +🌶️${REFERRER_BONUS.piments * kids.length}`
+        `🎉 ${kids.length} nouveaux filleuls ! +🌶️${REFERRER_BONUS.piments * kids.length}`
       );
     });
     return () => {
@@ -53,9 +53,9 @@ export default function ReferralCard() {
   if (!player) return null;
 
   const shareText = (code: string | null) =>
-    `Vien batay ek mwin su Batay Kok ! 🐓⚔️\n` +
+    `Viens te battre avec moi sur Batay Kok ! 🐓⚔️\n` +
     `Mon kok : ${player.name}, niv. ${player.level}.\n` +
-    (code ? `Rentre mon kod parrainaz ${code} : ou gagne 🌶️${REFEREE_BONUS.piments} + 🌽${REFEREE_BONUS.grains} pou démaré.` : '');
+    (code ? `Entre mon code de parrainage ${code} : tu reçois 🌶️${REFEREE_BONUS.piments} + 🌽${REFEREE_BONUS.grains} pour démarrer.` : '');
 
   const shareImage = async () => {
     try {
@@ -69,7 +69,7 @@ export default function ReferralCard() {
         await Share.share({ message: shareText(state?.code ?? null) });
       }
     } catch {
-      setMsg('Partaz inposib su sé téléfone-là.');
+      setMsg('Partage impossible sur cet appareil.');
     }
   };
 
@@ -83,24 +83,24 @@ export default function ReferralCard() {
       </View>
 
       <Card glow={state?.code ? C.gold : undefined}>
-        <SectionTitle icon="🤝">Parrainaz</SectionTitle>
+        <SectionTitle icon="🤝">Parrainage</SectionTitle>
 
         {onlineState !== 'ok' ? (
           <Text style={styles.offline}>
-            Faut ète en lign pou parrainn. Out kod i arrive dès ke la konèksyon
-            i mars.
+            Il faut être en ligne pour parrainer. Ton code arrive dès que la
+            connexion revient.
           </Text>
         ) : (
           <>
             <Text style={styles.intro}>
-              Chak fiyel i rapport 🌶️{REFERRER_BONUS.piments}. Li, li gagne
+              Chaque filleul rapporte 🌶️{REFERRER_BONUS.piments}. Lui, il reçoit
               🌶️{REFEREE_BONUS.piments} + 🌽{REFEREE_BONUS.grains}.
             </Text>
 
             {state?.code && (
               <View style={styles.codeRow}>
                 <View style={styles.codeBox}>
-                  <Text style={styles.codeLabel}>OUT KOD</Text>
+                  <Text style={styles.codeLabel}>TON CODE</Text>
                   <Text style={styles.code}>{state.code}</Text>
                 </View>
                 <View style={{ flex: 1, gap: 6 }}>
@@ -108,7 +108,7 @@ export default function ReferralCard() {
                     full
                     size="sm"
                     icon="📤"
-                    label="Envoy lo kod"
+                    label="Envoyer le code"
                     onPress={() => Share.share({ message: shareText(state.code) })}
                   />
                   <Button
@@ -116,7 +116,7 @@ export default function ReferralCard() {
                     size="sm"
                     variant="mystic"
                     icon="🖼️"
-                    label="Partaz out kok"
+                    label="Partager mon kok"
                     onPress={shareImage}
                   />
                 </View>
@@ -125,12 +125,12 @@ export default function ReferralCard() {
 
             <View style={styles.chips}>
               <Chip
-                label={`${state?.godchildren ?? 0} fiyel`}
+                label={`${state?.godchildren ?? 0} filleuls`}
                 color={C.cane}
                 active={(state?.godchildren ?? 0) > 0}
               />
               {state?.referredBy && (
-                <Chip label={`Parin : ${state.referredBy}`} color={C.mystic} />
+                <Chip label={`Parrain : ${state.referredBy}`} color={C.mystic} />
               )}
             </View>
 
@@ -140,14 +140,14 @@ export default function ReferralCard() {
                   style={styles.input}
                   value={input}
                   onChangeText={(t) => setInput(t.toUpperCase())}
-                  placeholder="KOD PARIN"
+                  placeholder="CODE PARRAIN"
                   placeholderTextColor={C.textFaint}
                   autoCapitalize="characters"
                   maxLength={6}
                 />
                 <Button
                   size="sm"
-                  label="Valid"
+                  label="Valider"
                   disabled={input.trim().length < 4 || busy}
                   onPress={async () => {
                     setBusy(true);
@@ -156,7 +156,7 @@ export default function ReferralCard() {
                     if (r.ok) {
                       grantBonus(REFEREE_BONUS);
                       setMsg(
-                        `🎁 ${r.referrer} lé out parin ! +🌶️${REFEREE_BONUS.piments} +🌽${REFEREE_BONUS.grains}`
+                        `🎁 ${r.referrer} est ton parrain ! +🌶️${REFEREE_BONUS.piments} +🌽${REFEREE_BONUS.grains}`
                       );
                       setInput('');
                       void fetchReferralState().then(setState);

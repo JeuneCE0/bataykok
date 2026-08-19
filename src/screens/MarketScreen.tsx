@@ -61,7 +61,7 @@ export default function MarketScreen() {
       if (sales.length === 0) return;
       const total = sales.reduce((s, x) => s + Math.round(x.price * (1 - MARKET_FEE)), 0);
       grantBonus({ grains: total });
-      setMsg(`💰 ${sales.length} vant konklu — +🌽${fmt(total)} (komisyon ${MARKET_FEE * 100} %)`);
+      setMsg(`💰 ${sales.length} ventes conclues — +🌽${fmt(total)} (commission ${MARKET_FEE * 100} %)`);
     });
   }, [onlineState, reload, grantBonus]);
 
@@ -78,11 +78,11 @@ export default function MarketScreen() {
   if (onlineState !== 'ok') {
     return (
       <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-        <ScreenTitle title="Lotèl dé Vant" sub="Ashté é vann ant zoueur" accent={C.lagoon} />
+        <ScreenTitle title="Lotèl dé Vant" sub="Acheter et vendre entre joueurs" accent={C.lagoon} />
         <Card>
           <Text style={T.dim}>
-            Lotèl i marche zis en lign. Dès ke la konèksyon i mars, out annons
-            i aparè isi.
+            L’hôtel ne fonctionne qu’en ligne. Dès que la connexion revient, les
+            annonces apparaissent ici.
           </Text>
         </Card>
       </ScrollView>
@@ -91,14 +91,14 @@ export default function MarketScreen() {
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-      <ScreenTitle title="Lotèl dé Vant" sub="Ashté é vann ant zoueur" accent={C.lagoon} />
+      <ScreenTitle title="Lotèl dé Vant" sub="Acheter et vendre entre joueurs" accent={C.lagoon} />
 
       <Segmented
         value={view}
         onChange={setView}
         options={[
-          { id: 'buy', label: '🛍️  Ashté' },
-          { id: 'sell', label: '🏷️  Vann' },
+          { id: 'buy', label: '🛍️  Acheter' },
+          { id: 'sell', label: '🏷️  Vendre' },
         ]}
       />
 
@@ -113,14 +113,14 @@ export default function MarketScreen() {
         <>
           <GhostButton
             icon="🔄"
-            label="Rafréchi"
+            label="Rafraîchir"
             onPress={reload}
             style={{ alignSelf: 'center', marginVertical: 6 }}
           />
           {listings.length === 0 ? (
             <Card>
               <Text style={T.dim}>
-                Pa ankor d'annons. Sois lo prémié à vann in zafèr !
+                Pas encore d’annonce. Sois le premier à vendre quelque chose !
               </Text>
             </Card>
           ) : (
@@ -145,18 +145,18 @@ export default function MarketScreen() {
                         <Text style={styles.stats} numberOfLines={2}>
                           niv. {l.item.level} · {itemStats(l.item)}
                         </Text>
-                        <Text style={styles.seller}>Vandu par {l.sellerName}</Text>
+                        <Text style={styles.seller}>Vendu par {l.sellerName}</Text>
                         {open === l.id && <CompareLines cmp={cmp} />}
                       </View>
                       <View style={{ alignItems: 'flex-end', gap: 6 }}>
                         <Text style={styles.price}>🌽 {fmt(l.price)}</Text>
                         {l.isMine ? (
                           <GhostButton
-                            label="Retiré"
+                            label="Retirer"
                             onPress={async () => {
                               const it = await cancelListing(l.id);
                               if (it && addItem(it)) {
-                                setMsg('Annons retiré, zafèr dan out sak.');
+                                setMsg('Annonce retirée, objet remis dans ton sak.');
                                 void reload();
                               }
                             }}
@@ -165,7 +165,7 @@ export default function MarketScreen() {
                           <Button
                             size="sm"
                             variant={cmp.diff > 0 ? 'cane' : 'gold'}
-                            label="Ashté"
+                            label="Acheter"
                             disabled={player.grains < l.price || busy}
                             onPress={async () => {
                               setBusy(true);
@@ -173,12 +173,12 @@ export default function MarketScreen() {
                               if (!r.ok) {
                                 setMsg(r.error);
                               } else if (!spendGrains(r.price)) {
-                                setMsg('Pa assé de grains.');
+                                setMsg('Pas assez de grains.');
                               } else if (!addItem(r.item)) {
                                 grantBonus({ grains: r.price });
-                                setMsg('Out sak lé plin — lasha anulé.');
+                                setMsg('Ton sak est plein — achat annulé.');
                               } else {
-                                setMsg(`✅ ${r.item.name} lé dan out sak !`);
+                                setMsg(`✅ ${r.item.name} est dans ton sak !`);
                               }
                               setBusy(false);
                               void reload();
@@ -200,9 +200,9 @@ export default function MarketScreen() {
       ) : (
         <>
           <Card>
-            <SectionTitle icon="🏷️">Sak — choizi in zafèr à vann</SectionTitle>
+            <SectionTitle icon="🏷️">Sak — choisir un objet à vendre</SectionTitle>
             {player.inventory.length === 0 ? (
-              <Text style={T.dim}>Out sak lé vid.</Text>
+              <Text style={T.dim}>Ton sak est vide.</Text>
             ) : (
               player.inventory.map((it) => {
                 const col = RARITY_COLORS[it.rarity];
@@ -235,13 +235,13 @@ export default function MarketScreen() {
 
           {selling && (
             <Card glow={C.lagoon}>
-              <SectionTitle icon="💰">Pri de vant</SectionTitle>
+              <SectionTitle icon="💰">Prix de vente</SectionTitle>
               <Text style={styles.quote}>
                 {quote && quote.sales > 0
-                  ? `Kot du marsé : ~🌽${fmt(quote.median)} (${quote.sales} vant · de ${fmt(
+                  ? `Cote du marché : ~🌽${fmt(quote.median)} (${quote.sales} vant · de ${fmt(
                       quote.min
                     )} à ${fmt(quote.max)})`
-                  : `Pa ankor de vant konparab. Lo Bazar i rashèt à 🌽${fmt(
+                  : `Pas encore de vente comparable. Le Bazar rachète à 🌽${fmt(
                       Math.round(selling.price * 0.4)
                     )}.`}
               </Text>
@@ -256,7 +256,7 @@ export default function MarketScreen() {
                   maxLength={8}
                 />
                 <Button
-                  label="Mèt en vant"
+                  label="Mettre en vente"
                   disabled={!price || Number(price) < 1 || busy}
                   onPress={async () => {
                     const p = Number(price);
@@ -264,19 +264,19 @@ export default function MarketScreen() {
                     const ok = await listItem(selling, p);
                     setBusy(false);
                     if (!ok) {
-                      setMsg('Mis en vant inposib.');
+                      setMsg('Mise en vente impossible.');
                       return;
                     }
                     removeItem(selling.id);
                     setSelling(null);
                     setPrice('');
-                    setMsg(`🏷️ ${selling.name} lé en vant pou 🌽${fmt(p)}.`);
+                    setMsg(`🏷️ ${selling.name} est en vente pour 🌽${fmt(p)}.`);
                     void reload();
                   }}
                 />
               </View>
               <Text style={styles.fee}>
-                Komisyon de lotèl : {MARKET_FEE * 100} % su la vant.
+                Commission de l’hôtel : {MARKET_FEE * 100} % sur la vente.
               </Text>
             </Card>
           )}

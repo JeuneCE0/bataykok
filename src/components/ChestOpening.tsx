@@ -264,7 +264,7 @@ export default function ChestOpening({
           <Button
             full
             size="lg"
-            label="Anpoch !"
+            label="Empocher !"
             onPress={onClose}
             style={{ marginTop: 18 }}
           />

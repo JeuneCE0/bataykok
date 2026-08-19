@@ -69,7 +69,7 @@ export default function DungeonScreen() {
             levels: r?.levels ?? 0,
             note: won
               ? null
-              : `Ou la retir ${Math.round(damage * 100)} % de sa vi. Renforsi out kok, pi revien.`,
+              : `Tu lui as retiré ${Math.round(damage * 100)} % de sa vie. Renforce ton kok, puis reviens.`,
           });
           setFight(null);
         }}
@@ -92,7 +92,7 @@ export default function DungeonScreen() {
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
         title="Rout dé Sirk"
-        sub="13 gardien su la rout. Chak étaz i pass in sèl foi."
+        sub="13 gardiens sur la route. Chaque étage ne se passe qu’une fois."
         accent={C.mystic}
       />
 
@@ -110,10 +110,10 @@ export default function DungeonScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.keyTitle}>
-              {keys > 0 ? `${keys} clé dan out pòch` : 'Pu de clé'}
+              {keys > 0 ? `${keys} clés en poche` : 'Plus de clé'}
             </Text>
             <Text style={styles.keySub}>
-              1 gratui chak jour · kofr dé défi · 1 kèt su 12 · pub
+              1 offerte par jour · coffre des défis · 1 quête sur 12 · pub
             </Text>
           </View>
           <Button
@@ -125,19 +125,19 @@ export default function DungeonScreen() {
           />
         </View>
         {keys < MAX_KEYS && (
-          <AdButton kind="key" full label="Gagne in clé (pub)" />
+          <AdButton kind="key" full label="Gagner une clé (pub)" />
         )}
       </Card>
 
       {/* Progression */}
       <Card>
-        <SectionTitle icon="🗺️">Progresyon</SectionTitle>
+        <SectionTitle icon="🗺️">Progression</SectionTitle>
         <Bar
           value={dungeonFloor}
           max={BOSSES.length}
           variant="mystic"
           height={16}
-          label={`${dungeonFloor} / ${BOSSES.length} gardien vinku`}
+          label={`${dungeonFloor} / ${BOSSES.length} gardiens vaincus`}
         />
       </Card>
 
@@ -199,7 +199,7 @@ export default function DungeonScreen() {
                     {current && (
                       <Chip
                         label={
-                          ratio >= 1.1 ? 'À TA PORTÉ' : ratio >= 0.8 ? 'DIR' : 'TRÈ DIR'
+                          ratio >= 1.1 ? 'À TA PORTÉE' : ratio >= 0.8 ? 'DUR' : 'TRÈS DUR'
                         }
                         color={ratio >= 1.1 ? C.cane : ratio >= 0.8 ? C.gold : C.piment}
                         active
@@ -216,7 +216,7 @@ export default function DungeonScreen() {
                     colors={['rgba(255,246,232,0.07)', 'rgba(255,246,232,0.02)']}
                     style={styles.rewardBox}
                   >
-                    <Text style={styles.rewardLabel}>RÉKONPANS GARANTI</Text>
+                    <Text style={styles.rewardLabel}>RÉCOMPENSE GARANTIE</Text>
                     <View style={styles.rewardRow}>
                       <Text style={styles.rewardItem}>🌽 {fmt(boss.reward.grains)}</Text>
                       <Text style={styles.rewardItem}>✨ {fmt(boss.reward.xp)}</Text>
@@ -236,7 +236,7 @@ export default function DungeonScreen() {
                     size="lg"
                     variant="mystic"
                     icon="🗝️"
-                    label={keys > 0 ? 'Rentre dann étaz' : 'Pu de clé'}
+                    label={keys > 0 ? 'Affronter le gardien' : 'Plus de clé'}
                     onPress={() => launch(boss)}
                     disabled={keys <= 0}
                     style={{ marginTop: 10, ...SHADOW.card }}

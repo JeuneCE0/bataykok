@@ -56,7 +56,7 @@ export default function FreeChest() {
 
   return (
     <Card glow={ready ? C.gold : undefined}>
-      <SectionTitle icon="🧧">Kofr gratui</SectionTitle>
+      <SectionTitle icon="🧧">Coffre gratuit</SectionTitle>
       <View style={styles.row}>
         <Animated.View
           style={{
@@ -80,12 +80,12 @@ export default function FreeChest() {
 
         <View style={{ flex: 1, gap: 3 }}>
           <Text style={styles.title}>
-            {ready ? 'Ton kofr lé pré !' : 'Kofr en préparation'}
+            {ready ? 'Ton coffre est prêt !' : 'Coffre en préparation'}
           </Text>
           <Text style={styles.sub}>
             {ready
-              ? 'Grains, piments ou in ékipman — o azar.'
-              : `Disponib dan ${formatLong(remaining)}`}
+              ? 'Grains, piments ou un ékipman — au hasard.'
+              : `Disponible dans ${formatLong(remaining)}`}
           </Text>
 
         </View>

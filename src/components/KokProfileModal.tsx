@@ -91,14 +91,14 @@ export default function KokProfileModal({
             </View>
 
             <Card compact>
-              <SectionTitle icon="⚔️">Statistik de batay</SectionTitle>
+              <SectionTitle icon="⚔️">Statistiques de combat</SectionTitle>
               <Line label="❤️  PV" value={fmt(hp)} />
               <Line label="🗡️  Dégâts" value={`${profile.weaponMin}–${profile.weaponMax}`} />
               <Line label="🛡️  Armur" value={`${profile.armor}`} />
             </Card>
 
             <Card compact>
-              <SectionTitle icon="💪">Attribu</SectionTitle>
+              <SectionTitle icon="💪">Attributs</SectionTitle>
               {ATTRS.map((a) => (
                 <Line
                   key={a}
@@ -139,7 +139,7 @@ export default function KokProfileModal({
 
             {guild && (
               <Card compact>
-                <SectionTitle icon="🏠">Ékiri</SectionTitle>
+                <SectionTitle icon="🏠">Écurie</SectionTitle>
                 <Text style={styles.guild}>
                   {guild.emblem} {guild.name}
                 </Text>
@@ -149,8 +149,8 @@ export default function KokProfileModal({
 
             {!profile.equipment && !profile.isMe && (
               <Text style={styles.hint}>
-                L'ékipman d'in advèrsèr i rèt sekré — ou vwa zis sak li vo o
-                konba.
+                L’ékipman d’un adversaire reste secret — tu ne vois que ce qu’il vaut
+                au combat.
               </Text>
             )}
           </ScrollView>

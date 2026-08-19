@@ -8,7 +8,7 @@ import { Card, GhostButton, SectionTitle } from './ui';
 
 const KIND: Record<BattleLogEntry['kind'], { icon: string; label: string }> = {
   attack: { icon: '⚔️', label: 'Batay' },
-  defense: { icon: '🛡️', label: 'Défans' },
+  defense: { icon: '🛡️', label: 'Défense' },
   dungeon: { icon: '🗝️', label: 'Gardien' },
 };
 
@@ -24,7 +24,7 @@ export default function BattleLog() {
 
   return (
     <Card>
-      <SectionTitle icon="📜">Jounal dé batay</SectionTitle>
+      <SectionTitle icon="📜">Journal des combats</SectionTitle>
       {shown.map((e) => {
         const k = KIND[e.kind];
         return (

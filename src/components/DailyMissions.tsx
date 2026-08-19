@@ -72,7 +72,7 @@ export default function DailyMissions() {
       >
         <Text style={{ fontSize: 26 }}>{chestClaimed ? '📭' : '🧰'}</Text>
         <View style={{ flex: 1 }}>
-          <Text style={styles.chestTitle}>Kofr du jour</Text>
+          <Text style={styles.chestTitle}>Coffre du jour</Text>
           <Text style={styles.chestSub}>
             {chestClaimed
               ? 'Déjà ouvert — retour demain !'
