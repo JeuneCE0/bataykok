@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { ATTR_LABELS, CLASSES } from '../classes';
+import { ALBUM_RARITIES } from '../album';
 import { UNIQUE_BY_ID, forgeUnique } from '../uniques';
 import {
   generateItem,
@@ -9,6 +10,7 @@ import {
   RARITY_LABELS,
   RARITY_ORDER,
   rarityRank,
+  isTopRarity,
   itemValue,
   rollRarity,
   shopRotation,
@@ -133,11 +135,21 @@ describe('comparaison d’ékipman', () => {
     assert.equal(cmp.deltas.length, 0);
   });
 
-  it('l’écart annoncé correspond aux scores', () => {
-    const a = generateItem(20, 'arme', 'rar');
-    const b = generateItem(20, 'arme', 'commun');
-    const cmp = compareToEquipped(a, joueur({ arme: b }));
-    assert.equal(cmp.diff, cmp.score - cmp.currentScore);
+  it('hors panoplie, l’écart va dans le même sens que les scores', () => {
+    // `diff` n'est plus la simple différence des deux scores : il mesure l'effet
+    // réel de l'échange sur les attributs totaux, panoplies comprises. Sans
+    // panoplie en jeu, les deux doivent au moins s'accorder sur le signe.
+    for (let i = 0; i < 30; i++) {
+      const a = generateItem(20, 'arme', 'rar');
+      const b = generateItem(20, 'arme', 'commun');
+      delete a.setId;
+      delete b.setId;
+      const cmp = compareToEquipped(a, joueur({ arme: b }));
+      assert.ok(
+        Math.sign(cmp.diff) === Math.sign(cmp.score - cmp.currentScore),
+        `écart ${cmp.diff} contre scores ${cmp.score} / ${cmp.currentScore}`
+      );
+    }
   });
 });
 
@@ -234,5 +246,95 @@ describe('objets uniques', () => {
     for (let i = 0; i < N; i++) if (rollRarity() === 'zanset') n++;
     const taux = n / N;
     assert.ok(taux > 0.0004 && taux < 0.0018, `taux de zanset : ${(taux * 100).toFixed(3)} %`);
+  });
+});
+
+describe('gamme d’exception', () => {
+  it('le zanset compte comme mitik ou mieux', () => {
+    // Six endroits comparaient à `'mitik'` en littéral : trouver l'objet le plus
+    // rare du jeu ne validait pas l'étape « Trouv in objè Mitik ».
+    assert.equal(isTopRarity('mitik'), true);
+    assert.equal(isTopRarity('zanset'), true);
+    assert.equal(isTopRarity('lezand'), false);
+    assert.equal(isTopRarity(undefined), false);
+  });
+
+  it('toute gamme au sommet de l’ordre est reconnue', () => {
+    // Garde-fou pour le prochain palier ajouté : il devra passer sans retoucher
+    // les appelants.
+    const sommet = RARITY_ORDER[RARITY_ORDER.length - 1];
+    assert.equal(isTopRarity(sommet), true);
+  });
+
+  it('le Zalbum couvre toutes les gammes', () => {
+    for (const r of RARITY_ORDER) {
+      assert.ok(ALBUM_RARITIES.includes(r), `gamme absente du Zalbum : ${r}`);
+    }
+  });
+});
+
+describe('comparaison et panoplies', () => {
+  const setDef = SETS[0];
+  // armure figée : `generateItem` la tire au hasard, et l'écart d'armure
+  // noierait le signal qu'on veut mesurer (le gain ou la perte de panoplie)
+  const piece = (slot: SlotId): Item => ({
+    ...generateItem(20, slot, 'kalite'),
+    setId: setDef.id,
+    bonuses: { [setDef.attr]: 20 },
+    armor: 30,
+  });
+
+  it('casser une panoplie de quatre est signalé comme un recul', () => {
+    // Le jeu conseillait de retirer la quatrième pièce d'un set pour une pièce
+    // nue à peine supérieure — et « Vendre le surplus » pouvait liquider un set
+    // entier.
+    const porte: Partial<Record<SlotId, Item>> = {
+      arme: piece('arme'),
+      tete: piece('tete'),
+      torse: piece('torse'),
+      pattes: piece('pattes'),
+    };
+    const p = joueur(porte);
+    // une pièce nue légèrement meilleure en brut, mais hors panoplie
+    const nue: Item = {
+      ...generateItem(20, 'tete', 'kalite'),
+      bonuses: { [setDef.attr]: 26 },
+      armor: 30,
+    };
+    delete nue.setId;
+    const cmp = compareToEquipped(nue, p);
+    assert.equal(cmp.verdict, 'worse', `verdict ${cmp.verdict} (diff ${cmp.diff})`);
+  });
+
+  it('une pièce nettement meilleure reste meilleure, panoplie ou non', () => {
+    // L'inverse du piège : la protection ne doit pas figer l'équipement à vie.
+    const porte: Partial<Record<SlotId, Item>> = {
+      arme: piece('arme'),
+      tete: piece('tete'),
+      torse: piece('torse'),
+      pattes: piece('pattes'),
+    };
+    const p = joueur(porte);
+    const bien: Item = {
+      ...generateItem(20, 'tete', 'mitik'),
+      bonuses: { [setDef.attr]: 300 },
+      armor: 30,
+    };
+    delete bien.setId;
+    assert.equal(compareToEquipped(bien, p).verdict, 'better');
+  });
+
+  it('compléter une panoplie est signalé comme un gain', () => {
+    const porte: Partial<Record<SlotId, Item>> = {
+      arme: piece('arme'),
+      tete: piece('tete'),
+      torse: piece('torse'),
+    };
+    const p = joueur(porte);
+    // même valeur brute que ce qui est porté, mais elle boucle les quatre pièces
+    const quatrieme = piece('pattes');
+    const cmp = compareToEquipped(quatrieme, p);
+    assert.equal(cmp.verdict, 'empty', 'l’emplacement pattes devrait être vide');
+    assert.ok(cmp.diff > 0, `compléter la panoplie ne rapporte rien (${cmp.diff})`);
   });
 });

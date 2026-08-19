@@ -2,7 +2,7 @@ import { CLASSES } from './classes';
 import { playerArmor, playerWeapon, totalAttrs } from './formulas';
 import { ATTR_LABELS } from './classes';
 import { RARITY_COLORS, RARITY_ORDER, rarityRank } from './items';
-import { AttrId, Fighter, Item, PlayerState } from './types';
+import { AttrId, Attributes, Fighter, Item, PlayerState } from './types';
 
 /**
  * Score de puissance : une seule note comparable entre deux objets. Pondérée
@@ -38,30 +38,52 @@ export interface ItemComparison {
   equipped: Item | null;
 }
 
-/** Compare un objet à celui déjà porté sur le même emplacement. */
+/**
+ * Compare un objet à celui déjà porté sur le même emplacement.
+ *
+ * La comparaison portait sur les deux objets isolés, en ignorant les
+ * panoplies : le jeu conseillait de retirer la quatrième pièce d'un set pour
+ * une pièce nue de statistiques légèrement supérieures, et « Vendre le
+ * surplus » pouvait liquider un set complet. On compare désormais les
+ * attributs **totaux** avant et après l'échange, bonus de panoplie compris.
+ */
 export function compareToEquipped(
   it: Item,
   player: PlayerState
 ): ItemComparison {
   const cur = player.equipment[it.slot] ?? null;
-  const score = itemScore(it, player.classId);
-  const currentScore = cur ? itemScore(cur, player.classId) : 0;
-  const diff = score - currentScore;
+  const cls = CLASSES[player.classId];
 
-  const deltas: StatDelta[] = [];
+  const pesee = (a: Attributes) =>
+    (Object.keys(a) as AttrId[]).reduce(
+      (sum, k) =>
+        sum + a[k] * (k === cls.mainAttr ? 2.4 : k === 'endurance' ? 1.5 : 1),
+      0
+    );
+
+  const apres: PlayerState = { ...player, equipment: { ...player.equipment, [it.slot]: it } };
+  const attrsAvant = totalAttrs(player);
+  const attrsApres = totalAttrs(apres);
+
   const dmg = (x: Item | null) =>
     x && x.dmgMin && x.dmgMax ? (x.dmgMin + x.dmgMax) / 2 : 0;
+  const armes = (dmg(it) - dmg(cur)) * 3.2;
+  const armures = ((it.armor ?? 0) - (cur?.armor ?? 0)) * 1.3;
+
+  const diff = Math.round(pesee(attrsApres) - pesee(attrsAvant) + armes + armures);
+  const score = itemScore(it, player.classId);
+  const currentScore = cur ? itemScore(cur, player.classId) : 0;
+
+  const deltas: StatDelta[] = [];
   const dDmg = dmg(it) - dmg(cur);
   if (dDmg !== 0) deltas.push({ label: 'Dégâts', delta: Math.round(dDmg) });
   const dArm = (it.armor ?? 0) - (cur?.armor ?? 0);
   if (dArm !== 0) deltas.push({ label: 'Armure', delta: dArm });
 
-  const keys = new Set<AttrId>([
-    ...(Object.keys(it.bonuses) as AttrId[]),
-    ...((cur ? Object.keys(cur.bonuses) : []) as AttrId[]),
-  ]);
-  keys.forEach((k) => {
-    const d = (it.bonuses[k] ?? 0) - (cur?.bonuses[k] ?? 0);
+  // les écarts affichés incluent le gain ou la perte de panoplie : c'est
+  // précisément ce que le joueur ne voyait pas
+  (Object.keys(attrsApres) as AttrId[]).forEach((k) => {
+    const d = attrsApres[k] - attrsAvant[k];
     if (d !== 0) deltas.push({ label: ATTR_LABELS[k], delta: d });
   });
 
@@ -71,7 +93,7 @@ export function compareToEquipped(
     diff,
     verdict: !cur ? 'empty' : diff > 0 ? 'better' : diff < 0 ? 'worse' : 'equal',
     deltas,
-  equipped: cur,
+    equipped: cur,
   };
 }
 

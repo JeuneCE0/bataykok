@@ -23,7 +23,14 @@ import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
 import { honorFloor } from '../game/ranks';
-import { SLOT_LIST, generateItem, resaleValue, rollRarity, shopRotation } from '../game/items';
+import {
+  SLOT_LIST,
+  generateItem,
+  isTopRarity,
+  resaleValue,
+  rollRarity,
+  shopRotation,
+} from '../game/items';
 import { expectedRarity } from '../game/reference';
 import { SET_BY_ID } from '../game/sets';
 import { compareToEquipped } from '../game/power';
@@ -710,7 +717,7 @@ export const useGame = create<GameState>()(
             activeQuest: null,
             quests: generateQuests(p.level),
             lastOutcome: outcome,
-            foundMitik: s.foundMitik || item?.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(item?.rarity),
             album: item ? addToAlbum(s.album, item) : s.album,
             keys: foundKey ? s.keys + 1 : s.keys,
           });
@@ -821,7 +828,7 @@ export const useGame = create<GameState>()(
             nextTicketAt: spent.nextAt,
             winStreak: streak,
             album: drop ? addToAlbum(s.album, drop) : s.album,
-            foundMitik: s.foundMitik || drop?.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(drop?.rarity),
             battleLog: pushLog(s.battleLog, {
               id: `a${Date.now()}`,
               kind: 'attack',
@@ -883,7 +890,7 @@ export const useGame = create<GameState>()(
               inventory: [...s.player.inventory, item],
             },
             shop: s.shop.filter((i) => i.id !== item.id),
-            foundMitik: s.foundMitik || item.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(item.rarity),
             album: addToAlbum(s.album, item),
           });
           track('buy');
@@ -1288,7 +1295,7 @@ export const useGame = create<GameState>()(
           set({
             player: { ...s.player, inventory: [...s.player.inventory, item] },
             album: addToAlbum(s.album, item),
-            foundMitik: s.foundMitik || item.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(item.rarity),
           });
           return true;
         },
@@ -1341,7 +1348,7 @@ export const useGame = create<GameState>()(
             player: p,
             chestNextAt: Date.now() + CHEST_MS,
             album: item ? addToAlbum(s.album, item) : s.album,
-            foundMitik: s.foundMitik || item?.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(item?.rarity),
           });
           return { grains, piments, item };
         },
@@ -1433,7 +1440,7 @@ export const useGame = create<GameState>()(
             keys: s.keys - 1,
             dungeonFloor: floor,
             album: item ? addToAlbum(s.album, item) : s.album,
-            foundMitik: s.foundMitik || item?.rarity === 'mitik',
+            foundMitik: s.foundMitik || isTopRarity(item?.rarity),
             battleLog: pushLog(s.battleLog, {
               id: `d${Date.now()}`,
               kind: 'dungeon',

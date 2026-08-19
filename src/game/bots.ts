@@ -62,6 +62,8 @@ function buildLadder(): Bot[] {
  * n'opposait plus aucune résistance passé le premier palier de boutique.
  */
 function rarityForLevel(level: number, roll: number): Rarity {
+  // volontairement sans « zanset » : les uniques se trouvent, ils ne se
+  // distribuent pas à l'échelle
   const tiers: Rarity[] = ['commun', 'korek', 'kalite', 'rar', 'lezand', 'mitik'];
   const base = level < 7 ? 0 : level < 15 ? 1 : level < 25 ? 2 : level < 34 ? 3 : level < 41 ? 4 : 5;
   // ±1 palier : deux bots du même niveau ne se ressemblent pas

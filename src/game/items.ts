@@ -40,6 +40,18 @@ export function rarityRank(r: Rarity): number {
   return RARITY_ORDER.indexOf(r);
 }
 
+/**
+ * Gamme d'exception : mitik ou au-dessus.
+ *
+ * Six endroits comparaient à `'mitik'` en littéral. Quand « zanset » est venu
+ * se placer au-dessus, trouver l'objet le plus rare du jeu ne validait plus
+ * l'étape « Trouv in objè Mitik » — le même trou qui avait figé le chemin du
+ * ti kok à 7/12.
+ */
+export function isTopRarity(r: Rarity | undefined): boolean {
+  return r !== undefined && rarityRank(r) >= rarityRank('mitik');
+}
+
 const RARITY_MULT: Record<Rarity, number> = {
   commun: 1,
   korek: 1.35,

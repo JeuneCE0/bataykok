@@ -23,6 +23,7 @@ export const ALBUM_RARITIES: Rarity[] = [
   'rar',
   'lezand',
   'mitik',
+  'zanset',
 ];
 
 export const ALBUM_SIZE = ALBUM_SLOTS.length * ALBUM_RARITIES.length;
