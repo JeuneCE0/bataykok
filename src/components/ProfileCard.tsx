@@ -8,6 +8,7 @@ import { kokPower } from '../game/power';
 import { PlayerState } from '../game/types';
 import { C, F, R } from '../theme';
 import Rooster from './Rooster';
+import { auraColor } from '../game/power';
 
 /**
  * Carte de profil : la vue que l'on capture pour la partager. Pas de
@@ -34,7 +35,7 @@ export default function ProfileCard({
       <View style={styles.body}>
         <View style={styles.portrait}>
           <View style={[styles.halo, { backgroundColor: cls.color }]} />
-          <Rooster appearance={player.appearance} size={132} />
+          <Rooster appearance={player.appearance} size={132} aura={auraColor(player)} />
         </View>
 
         <View style={{ flex: 1, gap: 6 }}>

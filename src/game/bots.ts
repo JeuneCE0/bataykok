@@ -1,26 +1,17 @@
 import { CLASSES, CLASS_LIST } from './classes';
+import { BODY_COLORS, COMB_COLORS, FREE_COUNTS } from './cosmetics';
 import { mulberry32, playerToFighter } from './formulas';
 import { SLOT_LIST, generateItem } from './items';
 import { botNames } from './names';
 import { Appearance, Bot, ClassId, Fighter, Item, PlayerState, Rarity, SlotId } from './types';
 
-export const BODY_COLORS = ['#8d5524', '#3b3b3b', '#e8e4d8', '#b5541c', '#5d4037', '#7b1fa2'];
-export const COMB_COLORS = ['#e53935', '#ff7043', '#c2185b', '#f9a825', '#6a1b9a'];
-export const TAIL_PALETTES: string[][] = [
-  ['#1b5e20', '#2e7d32', '#43a047'],
-  ['#0d47a1', '#1976d2', '#42a5f5'],
-  ['#b71c1c', '#e53935', '#ff7043'],
-  ['#4a148c', '#7b1fa2', '#ab47bc'],
-  ['#004d40', '#00897b', '#4db6ac'],
-];
-export const ACCESSORIES = ['Aucun', 'Bandana', 'Lunettes soleil', 'Chapo payanké', 'Chaîne en or'];
-
+/** Un bot ne porte que du cosmétique gratuit : il n'a rien acheté au Bazar. */
 export function randomAppearance(rand: () => number = Math.random): Appearance {
   return {
-    bodyColor: BODY_COLORS[Math.floor(rand() * BODY_COLORS.length)],
-    combColor: COMB_COLORS[Math.floor(rand() * COMB_COLORS.length)],
-    tailPalette: Math.floor(rand() * TAIL_PALETTES.length),
-    accessory: Math.floor(rand() * ACCESSORIES.length),
+    bodyColor: BODY_COLORS[Math.floor(rand() * FREE_COUNTS.body)],
+    combColor: COMB_COLORS[Math.floor(rand() * FREE_COUNTS.comb)],
+    tailPalette: Math.floor(rand() * FREE_COUNTS.tail),
+    accessory: Math.floor(rand() * FREE_COUNTS.accessory),
   };
 }
 
@@ -123,6 +114,7 @@ export function botProfile(bot: Bot): PlayerState {
     guildId: null,
     transport: 0,
     talents: [],
+    cosmetics: [],
   };
   profileCache.set(bot.id, profile);
   return profile;

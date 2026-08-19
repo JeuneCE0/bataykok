@@ -42,6 +42,7 @@ import { AttrId, Item, SlotId } from '../game/types';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
+import { auraColor } from '../game/power';
 
 const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
   off: '📴 Hors ligne',
@@ -172,7 +173,7 @@ export default function CharacterScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={styles.portrait}>
             <View style={[styles.halo, { backgroundColor: cls.color }]} />
-            <Rooster appearance={player.appearance} size={128} alive />
+            <Rooster appearance={player.appearance} size={128} alive aura={auraColor(player)} />
           </View>
           <View style={{ flex: 1, gap: 7 }}>
             <Text style={[styles.className, { color: cls.color }]} numberOfLines={1}>

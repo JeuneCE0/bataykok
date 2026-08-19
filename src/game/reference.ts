@@ -71,5 +71,6 @@ export function referencePlayer(
     guildId: null,
     transport: 0,
     talents: [],
+    cosmetics: [],
   };
 }

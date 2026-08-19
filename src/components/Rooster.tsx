@@ -12,7 +12,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import { TAIL_PALETTES } from '../game/bots';
+import { TAIL_PALETTES } from '../game/cosmetics';
 import { Appearance } from '../game/types';
 import { shade } from '../theme';
 
@@ -27,6 +27,12 @@ interface Props {
   portrait?: boolean;
   /** respiration + clignement — réservé aux grands portraits */
   alive?: boolean;
+  /**
+   * Halo de la meilleure gamme portée. C'est la seule façon de voir d'un coup
+   * d'œil, dans une liste, qu'un kok est bien équipé — la fiche détaillée
+   * demandait deux touchers.
+   */
+  aura?: string | null;
 }
 
 /**
@@ -40,6 +46,7 @@ export default function Rooster({
   ground = true,
   portrait = false,
   alive = false,
+  aura = null,
 }: Props) {
   // useId garantit des identifiants de dégradé uniques : deux coqs côte à côte
   // ne doivent pas se voler leurs couleurs.
@@ -137,6 +144,21 @@ export default function Rooster({
           </LinearGradient>
         ))}
       </Defs>
+
+      {aura ? (
+        <G>
+          <Circle cx={100} cy={116} r={86} fill={aura} opacity={0.13} />
+          <Circle
+            cx={100}
+            cy={116}
+            r={84}
+            fill="none"
+            stroke={aura}
+            strokeWidth={2}
+            opacity={0.5}
+          />
+        </G>
+      ) : null}
 
       {ground && <Ellipse cx={108} cy={202} rx={54} ry={8} fill="#000" opacity={0.32} />}
 
@@ -314,6 +336,52 @@ export default function Rooster({
             fill="none"
           />
           <Circle cx={149} cy={85} r={5.5} fill="#FFD84D" stroke="#B98B14" strokeWidth={1.2} />
+        </G>
+      )}
+      {/* Kouronn — le seul accessoire qui se voit de loin dans une liste */}
+      {appearance.accessory === 5 && (
+        <G stroke="#9A7018" strokeWidth={1.3} strokeLinejoin="round">
+          <Path
+            d="M131 30 L 136 15 L 143 25 L 150 11 L 157 25 L 164 15 L 169 30 Z"
+            fill="#FFD84D"
+          />
+          <Rect x={131} y={29} width={38} height={6} rx={2} fill="#E8B93C" />
+          <Circle cx={150} cy={20} r={2.6} fill="#E0353A" stroke="none" />
+        </G>
+      )}
+      {/* Kask volkan */}
+      {appearance.accessory === 6 && (
+        <G stroke="#3A2118" strokeWidth={1.4} strokeLinejoin="round">
+          <Path d="M128 38 C 132 16, 168 16, 172 38 Z" fill="#6E4B3A" />
+          <Path d="M147 15 L 153 15 L 152 40 L 148 40 Z" fill="#E0561F" stroke="none" />
+          <Rect x={127} y={37} width={46} height={5} rx={2.5} fill="#4E3428" />
+        </G>
+      )}
+      {/* Flèr tiaré */}
+      {appearance.accessory === 7 && (
+        <G>
+          {[0, 72, 144, 216, 288].map((a) => (
+            <Ellipse
+              key={a}
+              cx={176 + 7 * Math.cos((a * Math.PI) / 180)}
+              cy={44 + 7 * Math.sin((a * Math.PI) / 180)}
+              rx={5.4}
+              ry={4}
+              fill="#FFF4E6"
+              stroke="#E8C9B0"
+              strokeWidth={0.8}
+            />
+          ))}
+          <Circle cx={176} cy={44} r={3.4} fill="#F5C542" />
+        </G>
+      )}
+      {/* Linèt an lor */}
+      {appearance.accessory === 8 && (
+        <G>
+          <Rect x={144} y={34} width={22} height={13} rx={5} fill="#2A1F08" />
+          <Rect x={146} y={36} width={8} height={4} rx={2} fill="#FFD84D" opacity={0.9} />
+          <Path d="M144 39 L 133 35" stroke="#C89B3C" strokeWidth={3} strokeLinecap="round" fill="none" />
+          <Rect x={143} y={33} width={24} height={2.4} rx={1.2} fill="#FFD84D" />
         </G>
       )}
     </Svg>

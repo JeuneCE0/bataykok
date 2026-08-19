@@ -12,11 +12,14 @@ import {
 import Rooster from '../components/Rooster';
 import { Button, Card, Chip, SectionTitle, T } from '../components/ui';
 import {
+} from '../game/bots';
+import {
   ACCESSORIES,
   BODY_COLORS,
   COMB_COLORS,
+  FREE_COUNTS,
   TAIL_PALETTES,
-} from '../game/bots';
+} from '../game/cosmetics';
 import { ATTR_LABELS, CLASS_LIST } from '../game/classes';
 import { randomKokName } from '../game/names';
 import { Appearance } from '../game/types';
@@ -116,7 +119,7 @@ export default function CreationScreen() {
 
         <Text style={styles.optLabel}>{t('creation.bodyColor')}</Text>
         <View style={styles.swatchRow}>
-          {BODY_COLORS.map((c) => (
+          {BODY_COLORS.slice(0, FREE_COUNTS.body).map((c) => (
             <Swatch
               key={c}
               color={c}
@@ -128,7 +131,7 @@ export default function CreationScreen() {
 
         <Text style={styles.optLabel}>{t('creation.combColor')}</Text>
         <View style={styles.swatchRow}>
-          {COMB_COLORS.map((c) => (
+          {COMB_COLORS.slice(0, FREE_COUNTS.comb).map((c) => (
             <Swatch
               key={c}
               color={c}
@@ -140,7 +143,7 @@ export default function CreationScreen() {
 
         <Text style={styles.optLabel}>{t('creation.tail')}</Text>
         <View style={styles.swatchRow}>
-          {TAIL_PALETTES.map((p, i) => (
+          {TAIL_PALETTES.slice(0, FREE_COUNTS.tail).map((p, i) => (
             <Pressable
               key={i}
               onPress={() => setAppearance({ ...appearance, tailPalette: i })}
@@ -158,7 +161,7 @@ export default function CreationScreen() {
 
         <Text style={styles.optLabel}>{t('creation.accessory')}</Text>
         <View style={styles.swatchRow}>
-          {ACCESSORIES.map((a, i) => (
+          {ACCESSORIES.slice(0, FREE_COUNTS.accessory).map((a, i) => (
             <Chip
               key={a}
               label={a}

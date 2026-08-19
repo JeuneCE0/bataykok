@@ -1,6 +1,7 @@
 import { CLASSES } from './classes';
 import { playerArmor, playerWeapon, totalAttrs } from './formulas';
 import { ATTR_LABELS } from './classes';
+import { RARITY_COLORS, RARITY_ORDER, rarityRank } from './items';
 import { AttrId, Fighter, Item, PlayerState } from './types';
 
 /**
@@ -101,4 +102,18 @@ export function kokPower(p: PlayerState): number {
       ((w.min + w.max) / 2) * cls.dmgMult * 3 +
       playerArmor(p) * 1.2
   );
+}
+
+/**
+ * Couleur de la meilleure gamme portée — le halo du coq. Un joueur doit voir
+ * qu'il a progressé sans ouvrir de fiche.
+ */
+export function auraColor(player: PlayerState): string | null {
+  let best = -1;
+  for (const it of Object.values(player.equipment) as (Item | undefined)[]) {
+    if (it) best = Math.max(best, rarityRank(it.rarity));
+  }
+  // en dessous de « rar », le halo n'apprendrait rien : presque tout le monde
+  // porte du commun ou du korek
+  return best >= 3 ? RARITY_COLORS[RARITY_ORDER[best]] : null;
 }

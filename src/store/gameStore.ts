@@ -20,6 +20,7 @@ import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
+import { COSMETIC_BY_ID } from '../game/cosmetics';
 import { generateItem, resaleValue, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
 import {
@@ -224,6 +225,8 @@ interface GameState {
   leaveGuild: () => void;
   donateGuild: (grains: number) => void;
   buyTransport: (index: number) => void;
+  buyCosmetic: (id: string) => boolean;
+  setAppearance: (a: Partial<Appearance>) => void;
   buyGrains: (piments: number) => void;
   addPiments: (n: number) => void;
   claimStep: (id: StepId) => void;
@@ -423,6 +426,7 @@ export const useGame = create<GameState>()(
             guildId: null,
             transport: 0,
             talents: [],
+            cosmetics: [],
           };
           trackEvent('player_created', { classId });
           set({
@@ -923,6 +927,37 @@ export const useGame = create<GameState>()(
             player: { ...s.player, grains: s.player.grains - cost },
             guildLevel: s.guildLevel + 1,
           });
+        },
+
+        /**
+         * Achat d'un cosmétique. Il n'entre jamais dans les statistiques :
+         * c'est le seul poste de dépense qui ne déséquilibre rien, donc le seul
+         * qu'on puisse laisser cher sans fermer la porte aux joueurs gratuits.
+         */
+        buyCosmetic: (id) => {
+          const s = get();
+          const c = COSMETIC_BY_ID[id];
+          if (!s.player || !c) return false;
+          if (s.player.cosmetics.includes(id)) return false;
+          const grains = c.grains ?? 0;
+          const piments = c.piments ?? 0;
+          if (s.player.grains < grains || s.player.piments < piments) return false;
+          set({
+            player: {
+              ...s.player,
+              grains: s.player.grains - grains,
+              piments: s.player.piments - piments,
+              cosmetics: [...s.player.cosmetics, id],
+            },
+          });
+          trackEvent('cosmetic_bought', { id, rarity: c.rarity });
+          return true;
+        },
+
+        setAppearance: (a) => {
+          const s = get();
+          if (!s.player) return;
+          set({ player: { ...s.player, appearance: { ...s.player.appearance, ...a } } });
         },
 
         buyTransport: (index) => {

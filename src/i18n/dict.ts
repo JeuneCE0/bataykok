@@ -64,6 +64,124 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Cosmétiques ───────────────────────────────────────────────────────
+  'cosmetic.body.gold': {
+    fr: 'Plumage doré',
+    rcf: 'Plimaz doré',
+  },
+  'cosmetic.body.ocean': {
+    fr: 'Bleu océan',
+    rcf: 'Blé loséan',
+  },
+  'cosmetic.body.lagon': {
+    fr: 'Vert lagon',
+    rcf: 'Vèr lagon',
+  },
+  'cosmetic.body.brik': {
+    fr: 'Rouge brique',
+    rcf: 'Rouj brik',
+  },
+  'cosmetic.body.rose': {
+    fr: 'Rose letchi',
+    rcf: 'Rose letchi',
+  },
+  'cosmetic.body.obsidian': {
+    fr: 'Obsidienne',
+    rcf: 'Obsidienn',
+  },
+  'cosmetic.comb.neon': {
+    fr: 'Crête néon',
+    rcf: 'Krèt néon',
+  },
+  'cosmetic.comb.kann': {
+    fr: 'Vert canne',
+    rcf: 'Vèr kann',
+  },
+  'cosmetic.comb.fuchsia': {
+    fr: 'Fuchsia',
+    rcf: 'Fuksia',
+  },
+  'cosmetic.comb.blan': {
+    fr: 'Blanc pur',
+    rcf: 'Blan pir',
+  },
+  'cosmetic.tail.lor': {
+    fr: 'Queue dorée',
+    rcf: 'Ké doré',
+  },
+  'cosmetic.tail.mistik': {
+    fr: 'Queue mystique',
+    rcf: 'Ké mistik',
+  },
+  'cosmetic.tail.lonbraz': {
+    fr: 'Queue d’ombre',
+    rcf: 'Ké lonbraz',
+  },
+  'cosmetic.tail.volkan': {
+    fr: 'Queue du volcan',
+    rcf: 'Ké volkan',
+  },
+  'cosmetic.acc.kouronn': {
+    fr: 'Couronne',
+    rcf: 'Kouronn',
+  },
+  'cosmetic.acc.kask': {
+    fr: 'Casque du volcan',
+    rcf: 'Kask volkan',
+  },
+  'cosmetic.acc.tiare': {
+    fr: 'Fleur de tiaré',
+    rcf: 'Flèr tiaré',
+  },
+  'cosmetic.acc.linet_lor': {
+    fr: 'Lunettes en or',
+    rcf: 'Linèt an lor',
+  },
+  'cosmetic.section': {
+    fr: 'Apparence',
+    rcf: 'Aparans',
+  },
+  'cosmetic.shopTitle': {
+    fr: 'Plumage & parures',
+    rcf: 'Plimaz & parir',
+  },
+  'cosmetic.shopSub': {
+    fr: 'Change la tête de ton coq — aucun effet au combat, tout l’effet au rond.',
+    rcf: 'Shanz la tèt out kok — okin éfé o batay, tout léfé dann rond.',
+  },
+  'cosmetic.owned': {
+    fr: 'Possédé',
+    rcf: 'Néna',
+  },
+  'cosmetic.equipped': {
+    fr: 'Porté',
+    rcf: 'Su li',
+  },
+  'cosmetic.preview': {
+    fr: 'Aperçu',
+    rcf: 'Aparsi',
+  },
+  'cosmetic.body': {
+    fr: 'Corps',
+    rcf: 'Kor',
+  },
+  'cosmetic.comb': {
+    fr: 'Crête',
+    rcf: 'Krèt',
+  },
+  'cosmetic.tail': {
+    fr: 'Queue',
+    rcf: 'Ké',
+  },
+  'cosmetic.accessory': {
+    fr: 'Accessoire',
+    rcf: 'Aksesoir',
+  },
+  'cosmetic.locked': {
+    fr: 'À acheter au Bazar',
+    rcf: 'Pou ashté o Bazar',
+  },
+
   // ─── Gardiens du donjon ────────────────────────────────────────────────
   'boss.tikok.flavor': {
     fr: 'Un petit coq marron garde l’entrée de la ravine. Il n’est pas gros, mais il mord.',

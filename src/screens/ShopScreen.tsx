@@ -5,6 +5,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import AdButton from '../components/AdButton';
 import FadeIn from '../components/FadeIn';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
+import CosmeticsShop from '../components/CosmeticsShop';
 import MarketScreen from './MarketScreen';
 import {
   Button,
@@ -37,7 +38,7 @@ const PIMENT_PACKS = [
 
 export default function ShopScreen() {
   const t = useT();
-  const [tab, setTab] = useState<'bazar' | 'lotel'>('bazar');
+  const [tab, setTab] = useState<'bazar' | 'plimaz' | 'lotel'>('bazar');
   const [open, setOpen] = useState<string | null>(null);
   const player = useGame((s) => s.player);
   const shop = useGame((s) => s.shop);
@@ -80,10 +81,20 @@ export default function ShopScreen() {
       onChange={setTab}
       options={[
         { id: 'bazar', label: '🛒  Bazar' },
+        { id: 'plimaz', label: '🎨  Plimaz' },
         { id: 'lotel', label: '⚖️  Lotèl' },
       ]}
     />
   );
+
+  if (tab === 'plimaz') {
+    return (
+      <View style={{ flex: 1 }}>
+        {switcher}
+        <CosmeticsShop />
+      </View>
+    );
+  }
 
   if (tab === 'lotel') {
     return (

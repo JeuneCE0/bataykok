@@ -86,6 +86,8 @@ export interface PlayerState {
   transport: number; // index du moyen de transport possédé
   /** talents choisis (voir game/talents.ts) */
   talents: string[];
+  /** cosmétiques achetés (voir game/cosmetics.ts) */
+  cosmetics: string[];
 }
 
 export interface Quest {

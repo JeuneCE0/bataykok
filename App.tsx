@@ -19,7 +19,7 @@ import LevelUpOverlay from './src/components/LevelUpOverlay';
 import Rooster from './src/components/Rooster';
 import StepBanner from './src/components/StepBanner';
 import TalentModal from './src/components/TalentModal';
-import { BODY_COLORS, COMB_COLORS } from './src/game/bots';
+import { BODY_COLORS, COMB_COLORS } from './src/game/cosmetics';
 import ArenaScreen from './src/screens/ArenaScreen';
 import CharacterScreen from './src/screens/CharacterScreen';
 import CreationScreen from './src/screens/CreationScreen';
