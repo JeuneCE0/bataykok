@@ -214,3 +214,10 @@ $$;
 
 revoke all on function public.submit_arena_result(uuid, boolean) from public, anon;
 grant execute on function public.submit_arena_result(uuid, boolean) to authenticated;
+
+-- ─── 5. search_path figé sur les validateurs ─────────────────────────────
+-- Un `search_path` mutable laisse un rôle interposer ses propres fonctions
+-- devant les nôtres. Sans conséquence ici (les deux ne manipulent que des
+-- types de base) mais c'est une porte qu'on ne laisse pas entrouverte.
+alter function public.item_value_ceiling(int, text) set search_path = public, pg_temp;
+alter function public.market_item_is_sane(jsonb, int, text) set search_path = public, pg_temp;
