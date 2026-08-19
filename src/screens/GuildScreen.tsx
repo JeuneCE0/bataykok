@@ -59,6 +59,11 @@ export default function GuildScreen() {
 
   useEffect(() => {
     void refresh();
+    // Le serveur n'apprend l'écurie qu'au prochain envoi du snapshot : sans ce
+    // second passage, on venait de rejoindre et le tableau ne nous comptait
+    // pas encore.
+    const t = setTimeout(() => void refresh(), 2500);
+    return () => clearTimeout(t);
   }, [refresh]);
 
   if (!player) return null;

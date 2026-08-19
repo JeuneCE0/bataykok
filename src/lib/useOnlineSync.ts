@@ -14,10 +14,16 @@ export function useOnlineSync() {
   const setOnlineState = useGame((s) => s.setOnlineState);
   const applyDefenses = useGame((s) => s.applyDefenses);
   const claimed = useRef(false);
+  // L'écurie fait partie de la signature : sans elle, rejoindre une écurie ne
+  // remontait pas au serveur avant le prochain changement de niveau ou de
+  // grains — et `donate_to_guild` refusait, puisque le serveur ignorait encore
+  // que le joueur en avait une.
   const signature = player
     ? `${player.level}:${player.honor}:${player.wins}:${player.losses}:${
         Object.keys(player.equipment).length
-      }:${dungeonFloor}:${albumSize}:${Math.round(player.grains / 500)}`
+      }:${dungeonFloor}:${albumSize}:${Math.round(player.grains / 500)}:${
+        player.guildId ?? '-'
+      }`
     : '';
   const last = useRef<string>('');
 
