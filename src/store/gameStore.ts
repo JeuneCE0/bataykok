@@ -35,6 +35,7 @@ import {
   adGrains,
   DAILY_CHEST,
   MAX_ADS_PER_DAY,
+  isStepComplete as stepComplete,
   MissionKind,
   MissionState,
   rollDailyMissions,
@@ -1396,7 +1397,7 @@ export const useGame = create<GameState>()(
   )
 );
 
-/** Une étape est franchie quand son objectif de jeu est atteint. */
+/** Adaptateur : l'état du store vers le contexte attendu par le moteur. */
 export function isStepComplete(
   id: StepId,
   s: Pick<GameState, 'player' | 'stats' | 'foundMitik' | 'dungeonFloor'>
@@ -1404,34 +1405,19 @@ export function isStepComplete(
   const p = s.player;
   if (!p) return false;
   const st = { ...emptyStats(), ...s.stats };
-  switch (id) {
-    case 'equip':
-      return Object.keys(p.equipment).length > 0;
-    case 'quest':
-      return st.quests >= 1;
-    case 'attr':
-      return st.attrs >= 1;
-    case 'arena':
-      return st.arenas >= 1;
-    case 'shop':
-      return st.buys >= 1;
-    case 'win':
-      return p.wins >= 1;
-    case 'guild':
-      return !!p.guildId;
-    case 'donjon':
-      return s.dungeonFloor >= 1;
-    case 'level3':
-      return p.level >= 3;
-    case 'transport':
-      return p.transport > 0;
-    case 'level5':
-      return p.level >= 5;
-    case 'mitik':
-      return s.foundMitik;
-    default:
-      return false;
-  }
+  return stepComplete(id, {
+    equippedCount: Object.keys(p.equipment).length,
+    quests: st.quests,
+    attrs: st.attrs,
+    arenas: st.arenas,
+    buys: st.buys,
+    wins: p.wins,
+    hasGuild: !!p.guildId,
+    level: p.level,
+    transport: p.transport,
+    dungeonFloor: s.dungeonFloor,
+    foundMitik: s.foundMitik,
+  });
 }
 
 /** L'objectif courant du joueur : première étape non encaissée. */

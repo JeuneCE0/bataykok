@@ -12,7 +12,12 @@ export interface ClassDef {
   hpMult: number;
   /** plafond de réduction des dégâts par l'armure */
   armorCap: number;
-  /** multiplicateur de dégâts d'arme */
+  /**
+   * Multiplicateur de dégâts d'arme. C'est le seul levier d'équilibrage :
+   * PV, armure et capacités portent l'identité de la classe et ne bougent pas.
+   * Valeurs issues d'une recherche automatique (scripts/tune-balance.ts) qui
+   * a ramené l'écart entre classes de 32 à moins de 5 points.
+   */
   dmgMult: number;
   emoji: string;
   color: string;
@@ -30,7 +35,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Race légendaire du rond. Li tape for, li tape dur. Oté !",
     hpMult: 5,
     armorCap: 0.5,
-    dmgMult: 0.95,
+    dmgMult: 1.09,
     emoji: '⚔️',
     color: '#c0392b',
   },
@@ -45,7 +50,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Fin malin sa ! Ou tape, li lé déjà pi là.",
     hpMult: 4,
     armorCap: 0.25,
-    dmgMult: 1.0,
+    dmgMult: 0.91,
     emoji: '💨',
     color: '#27ae60',
   },
@@ -60,7 +65,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Élevé aux tisanes péi dans les hauts de Cilaos. Son regard i fé fré dann do.",
     hpMult: 2,
     armorCap: 0.1,
-    dmgMult: 3.4,
+    dmgMult: 3.34,
     emoji: '🌿',
     color: '#8e44ad',
   },
@@ -75,7 +80,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Attrapé dans les ravines de Mafate. Personne i tient dan son chemin.",
     hpMult: 4,
     armorCap: 0.25,
-    dmgMult: 0.9,
+    dmgMult: 0.89,
     emoji: '🔥',
     color: '#d35400',
   },
@@ -90,7 +95,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Nourri au rougail piment depuis poussin. Son bec i brûle.",
     hpMult: 5,
     armorCap: 0.5,
-    dmgMult: 0.9,
+    dmgMult: 1.07,
     emoji: '🌶️',
     color: '#e74c3c',
   },
@@ -105,7 +110,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Star des kabars. Son maloya i fé trembler le gallodrome.",
     hpMult: 3,
     armorCap: 0.1,
-    dmgMult: 2.5,
+    dmgMult: 2.46,
     emoji: '🎵',
     color: '#f39c12',
   },

@@ -1,4 +1,4 @@
-import { TextStyle } from 'react-native';
+import type { TextStyle } from 'react-native';
 
 /**
  * Direction artistique « Kabar Volcan » : nuit tropicale profonde, braise du

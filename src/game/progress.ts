@@ -73,8 +73,8 @@ export const STEPS: StepDef[] = [
     hint: 'Un bon ékipman change tout. Regarde les flèches vertes !',
     icon: '🛒',
     tab: 'bazar',
-    grains: 120,
-    piments: 0,
+    grains: 160,
+    piments: 1,
   },
   {
     id: 'win',
@@ -91,8 +91,8 @@ export const STEPS: StepDef[] = [
     hint: 'Les écuries donnent des bonus XP et grains permanents.',
     icon: '🏠',
     tab: 'ecurie',
-    grains: 150,
-    piments: 1,
+    grains: 240,
+    piments: 2,
   },
   {
     id: 'donjon',
@@ -100,8 +100,8 @@ export const STEPS: StepDef[] = [
     hint: 'Su la Rout dé Sirk, chak gardien i lâche in ékipman garanti.',
     icon: '🗝️',
     tab: 'donjon',
-    grains: 200,
-    piments: 2,
+    grains: 300,
+    piments: 3,
   },
   {
     id: 'level3',
@@ -109,8 +109,8 @@ export const STEPS: StepDef[] = [
     hint: 'Enchaîne quêtes et batays pour monter en niveau.',
     icon: '⭐',
     tab: 'quetes',
-    grains: 250,
-    piments: 3,
+    grains: 350,
+    piments: 4,
   },
   {
     id: 'transport',
@@ -118,8 +118,8 @@ export const STEPS: StepDef[] = [
     hint: 'Au Garage : tes quêtes iront bien plus vite.',
     icon: '🛵',
     tab: 'bazar',
-    grains: 300,
-    piments: 2,
+    grains: 450,
+    piments: 5,
   },
   {
     id: 'level5',
@@ -127,8 +127,8 @@ export const STEPS: StepDef[] = [
     hint: 'Ton kok devient un vrai batayeur.',
     icon: '🔥',
     tab: 'rond',
-    grains: 500,
-    piments: 5,
+    grains: 600,
+    piments: 7,
   },
   {
     id: 'mitik',
@@ -136,10 +136,61 @@ export const STEPS: StepDef[] = [
     hint: 'La rareté suprême. Tente le Bazar et les quêtes longues.',
     icon: '💎',
     tab: 'bazar',
-    grains: 800,
-    piments: 8,
+    grains: 900,
+    piments: 10,
   },
 ];
+
+/** Ce que le moteur doit savoir pour juger une étape franchie. */
+export interface StepContext {
+  equippedCount: number;
+  quests: number;
+  attrs: number;
+  arenas: number;
+  buys: number;
+  wins: number;
+  hasGuild: boolean;
+  level: number;
+  transport: number;
+  dungeonFloor: number;
+  foundMitik: boolean;
+}
+
+/**
+ * Une étape est franchie quand son objectif de jeu est atteint.
+ *
+ * Le switch **doit** couvrir tous les StepId : une étape ajoutée sans son cas
+ * ici retombe sur `false` et fige le chemin pour toujours — c'est arrivé avec
+ * « Bat out prémié gardien ». Le test `progress.test.ts` le vérifie.
+ */
+export function isStepComplete(id: StepId, c: StepContext): boolean {
+  switch (id) {
+    case 'equip':
+      return c.equippedCount > 0;
+    case 'quest':
+      return c.quests >= 1;
+    case 'attr':
+      return c.attrs >= 1;
+    case 'arena':
+      return c.arenas >= 1;
+    case 'shop':
+      return c.buys >= 1;
+    case 'win':
+      return c.wins >= 1;
+    case 'guild':
+      return c.hasGuild;
+    case 'donjon':
+      return c.dungeonFloor >= 1;
+    case 'level3':
+      return c.level >= 3;
+    case 'transport':
+      return c.transport > 0;
+    case 'level5':
+      return c.level >= 5;
+    case 'mitik':
+      return c.foundMitik;
+  }
+}
 
 export const STEP_BY_ID: Record<StepId, StepDef> = STEPS.reduce(
   (acc, s) => {

@@ -28,7 +28,8 @@ Ou scanne le QR code avec l'app **Expo Go** sur un vrai téléphone (iOS ou Andr
 ## Ce qui est implémenté
 
 - **Création du kok** : 6 classes jouables, personnalisation (couleur du corps, crête, plumes de queue, accessoires), nom libre ou généré aléatoirement.
-- **Classes** (équilibrées par simulation, winrates 45–58 %) :
+- **Classes** (équilibrées par simulation — 47 à 50 % de victoires, moins de
+  3 points d'écart ; `npm test` le vérifie à chaque fois) :
   - ⚔️ **Kok Gèp** (Guerrier, Force) — bloque 25 % des coups
   - 💨 **Kok Malin** (Esquiveur, Adresse) — esquive 50 % des attaques
   - 🌿 **Kok Tisanèr** (Mystique, Esprit) — attaques imblocables/inesquivables
@@ -125,6 +126,25 @@ police **Baloo 2**, surfaces en dégradés avec liseré lumineux, boutons à rel
 (halo de lave + poussière). Le coq respire et cligne des yeux ; les combats sont mis en
 scène (bond, secousse, flash d'impact, dégâts flottants, gerbe de plumes, KO renversé).
 
+## Tests
+
+```bash
+npm test        # 65 tests du moteur, ~0,3 s
+npm run typecheck
+```
+
+`node:test` + `tsx`, aucune dépendance lourde. Les tests ne couvrent que
+`src/game/` — le moteur pur, sans React Native — et c'est volontaire : c'est
+là que vivent les règles, et c'est là que les bugs coûtent cher.
+
+Deux d'entre eux ont été écrits après coup, pour des bugs réellement rencontrés :
+
+- **une étape du chemin ajoutée sans son cas dans le switch** retombait sur
+  `false` et figeait la progression à vie. Le test parcourt maintenant toutes
+  les étapes déclarées.
+- **la courbe de récompenses reculait trois fois** (une étape plus avancée
+  payait moins que la précédente). Invisible à l'œil, évident au test.
+
 ## Structure du code
 
 ```
@@ -151,6 +171,7 @@ src/
     names.ts       # générateur de noms créoles
     rewards.ts     # récompenses de batay (défaite comprise), bonus, consolation
     day.ts         # jour de jeu en heure locale
+    __tests__/     # 65 tests : progression, combat, récompenses, objets, formules
   store/
     gameStore.ts   # état global zustand + persistance
     alerts.ts      # pastilles d'appel à l'action par onglet
