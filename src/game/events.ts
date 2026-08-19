@@ -96,7 +96,7 @@ const EVENTS: DayEvent[] = [
     shortKey: 'event.sitarane.short',
     icon: '🌑',
     color: C.piment,
-    mult: 0.5,
+    mult: 1.6,
   },
   {
     kind: 'chans',
@@ -118,7 +118,7 @@ export function eventOfDay(day: string): DayEvent {
 /** Ce que l'événement du jour change dans un combat. */
 export function eventCombatMods(ev: DayEvent): CombatMods {
   if (ev.kind === 'krit') return { critMult: ev.mult };
-  if (ev.kind === 'sitarane') return { armorScale: ev.mult };
+  if (ev.kind === 'sitarane') return { damageScale: ev.mult };
   return {};
 }
 

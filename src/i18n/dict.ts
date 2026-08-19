@@ -142,12 +142,12 @@ export const DICT = {
     rcf: 'Nuit Sitarane',
   },
   'event.sitarane.desc': {
-    fr: 'L’armure ne protège plus qu’à moitié — les combats sont courts et brutaux',
-    rcf: 'Larmir i protèz pi ka moityé — bann batay lé kourt ek brital',
+    fr: 'Tout le monde frappe +60 % plus fort — les combats sont courts et brutaux',
+    rcf: 'Tout le monde i tape +60 % pli for — bann batay lé kourt ek brital',
   },
   'event.sitarane.short': {
-    fr: 'Armure ÷2',
-    rcf: 'Armir ÷2',
+    fr: 'Dégâts ×1,6',
+    rcf: 'Dégâ ×1,6',
   },
   'event.chans.title': {
     fr: 'Doigt du gramoune',

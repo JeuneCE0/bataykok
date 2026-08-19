@@ -47,7 +47,7 @@ function critChance(attacker: Fighter, defender: Fighter): number {
 function baseDamage(
   attacker: Fighter,
   defender: Fighter,
-  armorScale = 1
+  damageScale = 1
 ): number {
   const c = CLASSES[attacker.classId];
   const cd = CLASSES[defender.classId];
@@ -59,9 +59,9 @@ function baseDamage(
   // réduction par l'armure (plafonnée par la classe du défenseur)
   const reduction = Math.min(
     cd.armorCap,
-    (defender.armor * armorScale) / (Math.max(1, attacker.level) * 12)
+    defender.armor / (Math.max(1, attacker.level) * 12)
   );
-  dmg *= 1 - reduction;
+  dmg *= (1 - reduction) * damageScale;
   return Math.max(1, dmg);
 }
 
@@ -75,8 +75,17 @@ function baseDamage(
 export interface CombatMods {
   /** multiplicateur des dégâts critiques (2 par défaut) */
   critMult?: number;
-  /** part d'armure conservée — 0,5 rend les combats brutaux */
-  armorScale?: number;
+  /**
+   * Multiplicateur global de dégâts — 1,6 rend les combats courts et brutaux.
+   *
+   * Première tentative : diviser l'armure. Elle était inerte (le plafond de
+   * classe étant souvent déjà atteint, réduire la valeur ne changeait rien),
+   * puis, une fois portée sur la réduction effective, franchement biaisée —
+   * les classes à fort `armorCap` (gèp, piman) tombaient de 61 % à 52 % de
+   * victoires quand les autres ne bougeaient pas. Un multiplicateur qui
+   * s'applique aux deux camps raccourcit les combats sans favoriser personne.
+   */
+  damageScale?: number;
 }
 
 /** Simule un combat complet, tour par tour, façon Shakes & Fidget. */
@@ -158,7 +167,7 @@ export function simulateCombat(a: Fighter, b: Fighter, mods: CombatMods = {}): C
           text: pick(BLOCK_LINES, atk.name, def.name),
         });
       } else {
-        let dmg = baseDamage(atk, def, mods.armorScale ?? 1);
+        let dmg = baseDamage(atk, def, mods.damageScale ?? 1);
         const isCrit = Math.random() < critChance(atk, def);
         if (isCrit) dmg *= mods.critMult ?? 2;
         if (segaBuff[atkIdx]) {

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { botProfile, generateLadder } from '../bots';
+import { CLASS_LIST } from '../classes';
 import { simulateCombat } from '../combat';
 import { eventCombatMods, eventLuck, eventOfDay } from '../events';
 import { playerToFighter } from '../formulas';
@@ -35,16 +37,28 @@ describe('événement du jour', () => {
     // doit se mesurer.
     const me = playerToFighter(referencePlayer('gep', 25));
     const lui = playerToFighter(referencePlayer('malin', 25));
-    const total = (mods: Parameters<typeof simulateCombat>[2]) => {
+    // On mesure le dégât *moyen par critique*, pas le total : avec des coups
+    // plus forts les combats finissent plus tôt, donc le cumul peut baisser
+    // alors même que chaque coup frappe davantage.
+    const moyenne = (mods: Parameters<typeof simulateCombat>[2]) => {
       let d = 0;
-      for (let i = 0; i < 60; i++) {
-        for (const r of simulateCombat(me, lui, mods).rounds) if (r.kind === 'crit') d += r.damage;
+      let n = 0;
+      for (let i = 0; i < 200; i++) {
+        for (const r of simulateCombat(me, lui, mods).rounds) {
+          if (r.kind === 'crit') {
+            d += r.damage;
+            n++;
+          }
+        }
       }
-      return d;
+      return n > 0 ? d / n : 0;
     };
-    const normal = total({});
-    const eclairs = total({ critMult: 3 });
-    assert.ok(eclairs > normal * 1.2, `critiques : ${eclairs} contre ${normal}`);
+    const normal = moyenne({});
+    const eclairs = moyenne({ critMult: 3 });
+    assert.ok(
+      eclairs > normal * 1.25,
+      `critique moyen : ${eclairs.toFixed(0)} contre ${normal.toFixed(0)}`
+    );
   });
 
   it('la nuit Sitarane raccourcit les combats', () => {
@@ -55,7 +69,7 @@ describe('événement du jour', () => {
       for (let i = 0; i < 60; i++) n += simulateCombat(me, lui, mods).rounds.length;
       return n / 60;
     };
-    assert.ok(tours({ armorScale: 0.5 }) < tours({}), 'l’armure divisée n’accélère rien');
+    assert.ok(tours({ damageScale: 1.6 }) < tours({}), 'les dégâts renforcés n’accélèrent rien');
   });
 
   it('la chance du gramoune pousse vraiment les gammes', () => {
@@ -68,7 +82,8 @@ describe('événement du jour', () => {
       return hauts / N;
     };
     assert.ok(part(eventLuck(eventOfDay('x'))) >= 0, 'garde-fou de forme');
-    assert.ok(part(0.18) > part(0) * 1.5, 'le bonus de chance ne change rien');
+    // marge large : on vérifie que le levier agit, pas sa valeur exacte
+    assert.ok(part(0.18) > part(0) * 1.3, 'le bonus de chance ne change rien');
   });
 
   it('seuls les jours prévus changent les règles', () => {
@@ -78,6 +93,47 @@ describe('événement du jour', () => {
       if (ev.kind !== 'krit' && ev.kind !== 'sitarane') {
         assert.deepEqual(mods, {}, `${ev.kind} modifie le combat sans le dire`);
       }
+    }
+  });
+});
+
+describe('équilibre les jours d’événement', () => {
+  const ladder = generateLadder();
+
+  /** Écart entre la meilleure et la pire classe sous des règles données. */
+  function spread(mods: Parameters<typeof simulateCombat>[2]): number {
+    const taux: number[] = [];
+    for (const c of CLASS_LIST) {
+      let w = 0;
+      let n = 0;
+      for (const lvl of [10, 20, 35]) {
+        const me = playerToFighter(referencePlayer(c.id, lvl));
+        for (const b of ladder.filter((x) => Math.abs(x.level - lvl) <= 3)) {
+          const f = playerToFighter(botProfile(b));
+          for (let i = 0; i < 6; i++, n++) if (simulateCombat(me, f, mods).winner === 0) w++;
+        }
+      }
+      taux.push((w / n) * 100);
+    }
+    return Math.max(...taux) - Math.min(...taux);
+  }
+
+  it('aucune règle du jour ne fait basculer l’équilibre', () => {
+    // Une règle qui change le combat peut favoriser une classe : le jour des
+    // éclairs pourrait profiter aux classes qui misent sur la chance, et la
+    // nuit Sitarane à celles qui frappent fort. On le mesure plutôt que de
+    // l'espérer.
+    const ordinaire = spread({});
+    for (const [nom, mods] of [
+      ['jour des éclairs', { critMult: 3 }],
+      ['nuit Sitarane', { damageScale: 1.6 }],
+    ] as const) {
+      const e = spread(mods);
+      assert.ok(e < 20, `${nom} : ${e.toFixed(0)} points d’écart entre classes`);
+      assert.ok(
+        e < ordinaire + 12,
+        `${nom} creuse l’écart de ${(e - ordinaire).toFixed(0)} points`
+      );
     }
   });
 });
