@@ -152,6 +152,5 @@ export interface GuildDef {
   id: string;
   name: string;
   motto: string;
-  members: string[];
   emblem: string;
 }

@@ -15,7 +15,6 @@ import {
 import {
   GUILD_GOLD_BONUS_PER_LEVEL,
   GUILD_XP_BONUS_PER_LEVEL,
-  guildUpgradeCost,
 } from '../game/guilds';
 import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
@@ -23,6 +22,7 @@ import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
 import { honorFloor } from '../game/ranks';
+import { DonateResult, donateToGuild } from '../lib/guild';
 import {
   SLOT_LIST,
   generateItem,
@@ -234,7 +234,9 @@ interface GameState {
   sellItem: (item: Item) => void;
   joinGuild: (guildId: string) => void;
   leaveGuild: () => void;
-  donateGuild: (grains: number) => void;
+  /** verse à la caisse commune ; renvoie l'état de l'écurie, ou null si refusé */
+  donateGuild: (amount: number) => Promise<DonateResult | null>;
+  setGuildLevel: (level: number) => void;
   buyTransport: (index: number) => void;
   buyCosmetic: (id: string) => boolean;
   /** achète une panoplie complète : huit pièces + le look assorti */
@@ -935,16 +937,30 @@ export const useGame = create<GameState>()(
           set({ player: { ...s.player, guildId: null }, guildLevel: 0 });
         },
 
-        donateGuild: (grains) => {
+        /**
+         * Verse à la caisse commune de l'écurie.
+         *
+         * Le niveau n'appartient plus au joueur : il est partagé, versé par
+         * tous les membres et rendu par le serveur. Rien n'est débité tant que
+         * le serveur n'a pas accepté — sinon un plafond journalier atteint
+         * coûterait des grains pour rien.
+         */
+        donateGuild: async (amount) => {
           const s = get();
-          if (!s.player || !s.player.guildId) return;
-          const cost = guildUpgradeCost(s.guildLevel);
-          if (grains < cost || s.player.grains < cost) return;
+          if (!s.player?.guildId || amount < 1) return null;
+          if (s.player.grains < amount) return null;
+          const res = await donateToGuild(amount);
+          if (!res) return null;
+          const cur = get();
+          if (!cur.player) return null;
           set({
-            player: { ...s.player, grains: s.player.grains - cost },
-            guildLevel: s.guildLevel + 1,
+            player: { ...cur.player, grains: Math.max(0, cur.player.grains - amount) },
+            guildLevel: res.level,
           });
+          return res;
         },
+
+        setGuildLevel: (level) => set({ guildLevel: level }),
 
         /**
          * Achat d'un cosmétique. Il n'entre jamais dans les statistiques :

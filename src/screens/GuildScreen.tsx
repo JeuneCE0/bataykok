@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FadeIn from '../components/FadeIn';
@@ -13,12 +13,18 @@ import {
   T,
 } from '../components/ui';
 import { fmt } from '../game/formulas';
+import { CLASSES } from '../game/classes';
 import {
   GUILD_GOLD_BONUS_PER_LEVEL,
   GUILD_XP_BONUS_PER_LEVEL,
   GUILDS,
-  guildUpgradeCost,
 } from '../game/guilds';
+import {
+  GuildBoardRow,
+  RosterRow,
+  fetchGuildBoard,
+  fetchRoster,
+} from '../lib/guild';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
@@ -30,12 +36,36 @@ export default function GuildScreen() {
   const joinGuild = useGame((s) => s.joinGuild);
   const leaveGuild = useGame((s) => s.leaveGuild);
   const donateGuild = useGame((s) => s.donateGuild);
+  const setGuildLevel = useGame((s) => s.setGuildLevel);
+
+  const [board, setBoard] = useState<GuildBoardRow[]>([]);
+  const [roster, setRoster] = useState<RosterRow[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const guildId = player?.guildId ?? null;
+
+  // Le tableau est partagé : il faut le relire, pas le déduire du local.
+  const refresh = useCallback(async () => {
+    const b = await fetchGuildBoard();
+    setBoard(b);
+    if (guildId) {
+      const mine = b.find((g) => g.key === guildId);
+      if (mine) setGuildLevel(mine.level);
+      setRoster(await fetchRoster(guildId));
+    } else {
+      setRoster([]);
+    }
+  }, [guildId, setGuildLevel]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   if (!player) return null;
   const myGuild = GUILDS.find((g) => g.id === player.guildId);
+  const mine = board.find((g) => g.key === player.guildId) ?? null;
 
   if (myGuild) {
-    const cost = guildUpgradeCost(guildLevel);
     return (
       <ScrollView style={styles.root} contentContainerStyle={styles.content}>
         <View style={styles.crest}>
@@ -66,28 +96,68 @@ export default function GuildScreen() {
               />
             </View>
           </View>
-          <Button
-            full
-            style={{ marginTop: 14 }}
-            icon="🔨"
-            label={t('guild.upgrade')}
-            sub={`🌽 ${fmt(cost)}`}
-            onPress={() => donateGuild(cost)}
-            disabled={player.grains < cost}
-          />
         </Card>
 
         <Card>
-          <SectionTitle icon="🐓">{t('guild.members')}</SectionTitle>
-          <View style={[styles.memberRow, styles.meRow]}>
-            <Text style={styles.memberMe}>🐓 {player.name}</Text>
-            <Chip label="ou !" color={C.gold} active />
-          </View>
-          {myGuild.members.map((m) => (
-            <View key={m} style={styles.memberRow}>
-              <Text style={styles.member}>🐔 {m}</Text>
-            </View>
-          ))}
+          <SectionTitle icon="🪙">{t('guild.pot')}</SectionTitle>
+          <Text style={styles.potHint}>{t('guild.potHint')}</Text>
+          {mine ? (
+            <>
+              <Bar
+                value={mine.pot}
+                max={Math.max(1, mine.threshold)}
+                variant="gold"
+                height={14}
+                label={`${fmt(mine.pot)} / ${fmt(mine.threshold)}`}
+              />
+              <View style={styles.donateRow}>
+                {[500, 2000, 10000].map((montant) => (
+                  <Button
+                    key={montant}
+                    style={styles.donateBtn}
+                    size="sm"
+                    label={`🌽${fmt(montant)}`}
+                    disabled={busy || player.grains < montant}
+                    onPress={async () => {
+                      setBusy(true);
+                      const res = await donateGuild(montant);
+                      setBusy(false);
+                      if (!res) {
+                        setMsg(t('guild.donateLimit'));
+                        return;
+                      }
+                      setMsg(res.leveled ? t('guild.levelUp', { n: res.level }) : null);
+                      void refresh();
+                    }}
+                  />
+                ))}
+              </View>
+              {msg ? <Text style={styles.msg}>{msg}</Text> : null}
+            </>
+          ) : (
+            <Text style={styles.potHint}>{t('guild.offline')}</Text>
+          )}
+        </Card>
+
+        <Card>
+          <SectionTitle icon="🐓">{t('guild.topDonors')}</SectionTitle>
+          {roster.length === 0 ? (
+            <Text style={styles.potHint}>{t('guild.empty')}</Text>
+          ) : (
+            roster.map((m) => (
+              <View
+                key={m.id}
+                style={[styles.memberRow, m.name === player.name && styles.meRow]}
+              >
+                <Text style={styles.member} numberOfLines={1}>
+                  {CLASSES[m.classId]?.emoji ?? '🐔'} {m.name}
+                </Text>
+                <Text style={styles.donated} numberOfLines={1}>
+                  🌽 {fmt(m.donated)}
+                </Text>
+              </View>
+            ))
+          )}
         </Card>
 
         <GhostButton
@@ -115,16 +185,18 @@ export default function GuildScreen() {
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.guildName}>{g.name}</Text>
               <Text style={styles.motto}>« {g.motto} »</Text>
-              <Chip
-                label={`${g.members.length + 1} membres`}
-                color={C.lagoon}
-                style={{ alignSelf: 'flex-start' }}
-              />
+              <View style={styles.guildChips}>
+                <Chip
+                  label={t('guild.membersCount', { n: board.find((b) => b.key === g.id)?.members ?? 0 })}
+                  color={C.lagoon}
+                />
+                <Chip
+                  label={t('common.level', { n: board.find((b) => b.key === g.id)?.level ?? 1 })}
+                  color={C.gold}
+                />
+              </View>
             </View>
           </View>
-          <Text style={styles.members} numberOfLines={1}>
-            {g.members.slice(0, 3).join(' · ')}…
-          </Text>
           <Button full label={t('guild.join')} onPress={() => joinGuild(g.id)} />
         </Card>
         </FadeIn>
@@ -200,6 +272,25 @@ const styles = StyleSheet.create({
     color: C.textDim,
   },
   members: { ...T.tiny, color: C.textFaint, marginVertical: 10 },
+  potHint: {
+    fontFamily: F.regular,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textDim,
+    marginBottom: 10,
+  },
+  donateRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  donateBtn: { flex: 1, alignSelf: 'auto' },
+  msg: {
+    fontFamily: F.black,
+    fontSize: 13,
+    lineHeight: 18,
+    color: C.gold,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  donated: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17, color: C.gold },
+  guildChips: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   memberRow: {
     flexDirection: 'row',
     alignItems: 'center',

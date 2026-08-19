@@ -64,6 +64,56 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Écurie vivante ────────────────────────────────────────────────────
+  'guild.pot': {
+    fr: 'Caisse commune',
+    rcf: 'Kès komin',
+  },
+  'guild.potHint': {
+    fr: 'Tout ce que les membres versent monte le niveau — pour tout le monde.',
+    rcf: 'Tout sak bann manm i vèrs i mont le nivo — pou tout le monde.',
+  },
+  'guild.donate': {
+    fr: 'Verser à la caisse',
+    rcf: 'Vèrs dan la kès',
+  },
+  'guild.donateLimit': {
+    fr: 'Plafond du jour atteint',
+    rcf: 'Plafon du zour atin',
+  },
+  'guild.membersCount': {
+    fr: '{n} membre',
+    rcf: '{n} manm',
+  },
+  'guild.membersCount_n': {
+    fr: '{n} membres',
+    rcf: '{n} manm',
+  },
+  'guild.empty': {
+    fr: 'Personne encore. Sois le premier !',
+    rcf: 'Personn ankor. Soi le premié !',
+  },
+  'guild.topDonors': {
+    fr: 'Ceux qui font vivre l’écurie',
+    rcf: 'Sak i fé viv lékiri',
+  },
+  'guild.donated': {
+    fr: '{n} versés',
+    rcf: '{n} vèrsé',
+  },
+  'guild.levelUp': {
+    fr: 'L’écurie passe niveau {n} !',
+    rcf: 'Lékiri i pass nivo {n} !',
+  },
+  'guild.offline': {
+    fr: 'Écurie hors ligne — les données reviendront à la connexion.',
+    rcf: 'Lékiri dékonekté — bann done i sar rovni a la konèksyon.',
+  },
+  'guild.you': {
+    fr: 'toi',
+    rcf: 'ou',
+  },
+
   // ─── Affaire du jour ───────────────────────────────────────────────────
   'deal.badge': {
     fr: 'AFFAIRE DU JOUR',
