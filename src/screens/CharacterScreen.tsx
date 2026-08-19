@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import BattleLog from '../components/BattleLog';
@@ -91,9 +91,14 @@ export default function CharacterScreen() {
     for (let i = 0; i < bulk; i++) total += attrCost(player.baseAttrs[a] + i);
     return total;
   };
-  // les améliorations d'abord : le joueur voit tout de suite quoi équiper
-  const bag = [...player.inventory].sort(
-    (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
+  // un tri qui compare chaque objet à l'équipement : à ne refaire que si le
+  // sak ou l'ékipman change, pas à chaque frappe dans un champ
+  const bag = useMemo(
+    () =>
+      [...player.inventory].sort(
+        (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
+      ),
+    [player]
   );
 
   const switcher = (

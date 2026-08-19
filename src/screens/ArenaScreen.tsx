@@ -79,10 +79,12 @@ export default function ArenaScreen() {
   const [reward, setReward] = useState<RewardView | null>(null);
 
   useEffect(() => {
+    // affichage à la seconde ; la régénération des jetons n'a pas besoin
+    // d'être plus fine non plus
     const t = setInterval(() => {
       setNow(Date.now());
       regenTickets();
-    }, 500);
+    }, 1000);
     return () => clearInterval(t);
   }, [regenTickets]);
 

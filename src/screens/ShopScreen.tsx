@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import AdButton from '../components/AdButton';
@@ -53,6 +53,11 @@ export default function ShopScreen() {
   const dayEvent = eventOfDay(localDay());
   const priceOf = (base: number) =>
     Math.round(base * (dayEvent.kind === 'shop' ? dayEvent.mult : 1));
+  const shopWithCompare = useMemo(
+    () =>
+      player ? shop.map((it) => ({ it, cmp: compareToEquipped(it, player) })) : [],
+    [shop, player]
+  );
 
   if (!player) return null;
 
@@ -98,9 +103,8 @@ export default function ShopScreen() {
 
       <AdButton kind="grains" full />
 
-      {shop.map((it, si) => {
+      {shopWithCompare.map(({ it, cmp }, si) => {
         const col = RARITY_COLORS[it.rarity];
-        const cmp = compareToEquipped(it, player);
         return (
           <FadeIn key={it.id} index={si}>
           <Card glow={cmp.diff > 0 ? C.cane : undefined} compact>

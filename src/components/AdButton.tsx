@@ -34,10 +34,13 @@ export default function AdButton({
   const [now, setNow] = useState(Date.now());
   const pulse = useRef(new Animated.Value(0)).current;
 
+  // ne tourner que pendant l'attente : sans cooldown, ce minuteur réveillait
+  // l'écran chaque seconde pour rien — et il y a plusieurs boutons par écran
   useEffect(() => {
+    if (adNextAt <= Date.now()) return;
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [adNextAt]);
 
   useEffect(() => {
     if (!playing) return;

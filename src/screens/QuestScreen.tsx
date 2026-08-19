@@ -43,7 +43,8 @@ export default function QuestScreen() {
 
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 500);
+    // l'affichage est à la seconde : inutile de réveiller l'écran deux fois par seconde
+    const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
 

@@ -52,7 +52,6 @@ export default function App() {
   const regenTickets = useGame((s) => s.regenTickets);
   useOnlineSync();
   const [tab, setTab] = useState<Tab>('kok');
-  const [now, setNow] = useState(Date.now());
   const [fontsLoaded] = useFonts({
     Baloo2_500Medium,
     Baloo2_600SemiBold,
@@ -78,10 +77,9 @@ export default function App() {
   useEffect(() => {
     ensureDaily();
     const t = setInterval(ensureDaily, 60_000);
-    const tick = setInterval(() => {
-      setNow(Date.now());
-      regenTickets();
-    }, 2_000);
+    // pas de setState ici : réveiller App toutes les deux secondes
+    // re-rendait aussi l'écran affiché, combat compris
+    const tick = setInterval(regenTickets, 2_000);
     return () => {
       clearInterval(t);
       clearInterval(tick);
@@ -111,9 +109,7 @@ export default function App() {
                   {tab === 'ecurie' && <GuildScreen />}
                   {tab === 'bazar' && <ShopScreen />}
                 </View>
-                {!combatActive && (
-                  <TabBar active={tab} onChange={setTab} now={now} />
-                )}
+                {!combatActive && <TabBar active={tab} onChange={setTab} />}
                 <DailyModal />
                 <DefenseReport />
                 <LevelUpOverlay />
@@ -130,13 +126,11 @@ export default function App() {
 function TabBar({
   active,
   onChange,
-  now,
 }: {
   active: Tab;
   onChange: (t: Tab) => void;
-  now: number;
 }) {
-  const alerts = useAlerts(now);
+  const alerts = useAlerts();
   return (
     <LinearGradient
       colors={['rgba(12,7,20,0.5)', 'rgba(12,7,20,0.97)']}
