@@ -66,7 +66,12 @@ export function arenaReward({
     parts.push({ label: 'Défèt — ti konsolasyon', mult: LOSS_XP });
   }
 
-  const underdog = underdogBonus(myPower, opPower);
+  // Le bonus « outsider » compte moitié moins quand on perd. À plein tarif,
+  // perdre en ligne contre deux fois plus fort rapportait exactement l'XP
+  // d'une victoire locale (0,5 × 1,6 × 1,25 = 1,0) pour deux points d'honneur :
+  // la stratégie optimale était d'attaquer le plus fort et de perdre exprès,
+  // ce qui vidait le rond de toute décision.
+  const underdog = underdogBonus(myPower, opPower) * (won ? 1 : 0.5);
   if (underdog > 0) {
     parts.push({ label: 'Pli for ke ou', mult: 1 + underdog });
     gold = Math.round(gold * (1 + underdog));
@@ -92,9 +97,12 @@ export function arenaReward({
   }
 
   // l'honneur suit le mérite : battre plus fort en rapporte davantage
+  // l'honneur, lui, suit le mérite plein : battre plus fort en rapporte
+  // davantage, et perdre contre plus fort coûte moins cher
+  const merite = underdogBonus(myPower, opPower);
   const honor = won
-    ? Math.round(8 * (1 + underdog))
-    : -Math.max(2, Math.round(5 * (1 - underdog)));
+    ? Math.round(8 * (1 + merite))
+    : -Math.max(2, Math.round(5 * (1 - merite)));
 
   return { gold, xp, honor, parts };
 }

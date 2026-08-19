@@ -114,3 +114,46 @@ describe('défense hors ligne', () => {
     assert.ok(defense.xp < arenaXp(10));
   });
 });
+
+describe('le rond ne doit pas se farmer en perdant', () => {
+  const fort = { level: 20, myPower: 100, opPower: 200, streak: 0 };
+
+  it('perdre en ligne contre bien plus fort rapporte moins que gagner en local', () => {
+    // Le test précédent comparait des adversaires *égaux* : il passait alors
+    // que le cas exploitable — attaquer deux fois plus fort et perdre exprès —
+    // rendait exactement l'XP d'une victoire locale pour deux points d'honneur.
+    const victoireLocale = arenaReward({
+      level: 20,
+      myPower: 100,
+      opPower: 100,
+      streak: 0,
+      won: true,
+      online: false,
+    });
+    const defaite = arenaReward({ ...fort, won: false, online: true });
+    assert.ok(
+      defaite.xp < victoireLocale.xp,
+      `défaite ${defaite.xp} XP contre victoire locale ${victoireLocale.xp} XP`
+    );
+    assert.ok(defaite.gold < victoireLocale.gold, 'idem sur les grains');
+  });
+
+  it('gagner contre plus fort reste nettement plus payant que perdre', () => {
+    const gagne = arenaReward({ ...fort, won: true, online: true });
+    const perdu = arenaReward({ ...fort, won: false, online: true });
+    assert.ok(gagne.xp > perdu.xp * 2, `${gagne.xp} contre ${perdu.xp}`);
+  });
+
+  it('perdre contre plus fort coûte toujours moins d’honneur', () => {
+    const contreFort = arenaReward({ ...fort, won: false, online: true });
+    const contreEgal = arenaReward({
+      level: 20,
+      myPower: 100,
+      opPower: 100,
+      streak: 0,
+      won: false,
+      online: true,
+    });
+    assert.ok(contreFort.honor > contreEgal.honor, 'le mérite ne joue plus sur l’honneur');
+  });
+});
