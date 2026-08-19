@@ -1,87 +1,93 @@
 import { questGold, questXp, rnd } from './formulas';
+import { TransKey } from '../i18n';
 import { Quest } from './types';
 
 interface QuestTemplate {
-  title: string;
-  place: string;
-  flavor: string;
+  titleKey: TransKey;
+  placeKey: TransKey;
+  flavorKey: TransKey;
 }
 
+/**
+ * Les quêtes tirées sont persistées dans la sauvegarde : elles portent donc
+ * des clés et non du texte, sinon changer de langue laisserait les quêtes en
+ * cours dans l'ancienne.
+ */
 const TEMPLATES: QuestTemplate[] = [
   {
-    title: 'Chasse au tangue',
-    place: 'Ravine de Mafate',
-    flavor: "In tangue i nargue a ou depuis le bord de la ravine. Montre a li kisa lé le chef.",
+    titleKey: 'quest.tangue.title',
+    placeKey: 'quest.tangue.place',
+    flavorKey: 'quest.tangue.flavor',
   },
   {
-    title: 'Livraison de makatias',
-    place: 'Boutik chinois de Saint-Paul',
-    flavor: "Le boutik chinois i cherche un livreur rapide. Fé pa tomber les makatias !",
+    titleKey: 'quest.makatia.title',
+    placeKey: 'quest.makatia.place',
+    flavorKey: 'quest.makatia.flavor',
   },
   {
-    title: 'Gardien du marché forain',
-    place: 'Marché de Saint-Pierre',
-    flavor: 'Des margouyas i vol les letchis. Fé le ménage dan les étals !',
+    titleKey: 'quest.marche.title',
+    placeKey: 'quest.marche.place',
+    flavorKey: 'quest.marche.flavor',
   },
   {
-    title: 'Course contre le siklone',
-    place: 'Route du Littoral',
-    flavor: 'Alerte orange ! Ramène les poules à la kaz avant les rafales.',
+    titleKey: 'quest.siklone.title',
+    placeKey: 'quest.siklone.place',
+    flavorKey: 'quest.siklone.flavor',
   },
   {
-    title: 'Randonnée du Piton',
-    place: 'Piton de la Fournaise',
-    flavor: "Le volkan i gronde. Va vérifier si le Pas de Bellecombe lé toujours là.",
+    titleKey: 'quest.piton.title',
+    placeKey: 'quest.piton.place',
+    flavorKey: 'quest.piton.flavor',
   },
   {
-    title: 'Bal la poussière',
-    place: 'Kabar de Sainte-Suzanne',
-    flavor: 'Le kabar i manque un danseur. Montre ton plus beau séga !',
+    titleKey: 'quest.kabar.title',
+    placeKey: 'quest.kabar.place',
+    flavorKey: 'quest.kabar.flavor',
   },
   {
-    title: 'Pique-nique sous les filaos',
-    place: "Plage de l'Ermitage",
-    flavor: 'Des zoizos blan i attaque le cari. Défends le marmite familial !',
+    titleKey: 'quest.filaos.title',
+    placeKey: 'quest.filaos.place',
+    flavorKey: 'quest.filaos.flavor',
   },
   {
-    title: 'Brouillard du Maïdo',
-    place: 'Maïdo',
-    flavor: 'In poussin lé perdu dan le brouillard. Ramène a li avant la nuit.',
+    titleKey: 'quest.maido.title',
+    placeKey: 'quest.maido.place',
+    flavorKey: 'quest.maido.flavor',
   },
   {
-    title: 'Traversée de Takamaka',
-    place: 'Forêt de Bébour-Bélouve',
-    flavor: 'La forêt lé sombre, les fanjans lé géants. Trouve le chemin !',
+    titleKey: 'quest.takamaka.title',
+    placeKey: 'quest.takamaka.place',
+    flavorKey: 'quest.takamaka.flavor',
   },
   {
-    title: 'Défi du Cap Méchant',
-    place: 'Cap Méchant',
-    flavor: 'Les vagues i tape fort. Reste digne face à la houle australe !',
+    titleKey: 'quest.capmechant.title',
+    placeKey: 'quest.capmechant.place',
+    flavorKey: 'quest.capmechant.flavor',
   },
   {
-    title: 'Cueillette de goyaviers',
-    place: 'Plaine des Palmistes',
-    flavor: 'La saison lé bonne ! Ramasse in máx de goyaviers avant les tangues.',
+    titleKey: 'quest.goyavier.title',
+    placeKey: 'quest.goyavier.place',
+    flavorKey: 'quest.goyavier.flavor',
   },
   {
-    title: 'Nuit à Grand-Bassin',
-    place: 'Grand-Bassin',
-    flavor: 'Le village lé isolé, la descente lé rude. Bon kouraz ti kok !',
+    titleKey: 'quest.grandbassin.title',
+    placeKey: 'quest.grandbassin.place',
+    flavorKey: 'quest.grandbassin.flavor',
   },
   {
-    title: 'Sécurité au bassin',
-    place: 'Bassin la Paix',
-    flavor: 'Des touristes zoreils i glisse su les galets. Va faire la circulation.',
+    titleKey: 'quest.bassinlapaix.title',
+    placeKey: 'quest.bassinlapaix.place',
+    flavorKey: 'quest.bassinlapaix.flavor',
   },
   {
-    title: 'Réveil du Gramoune',
-    place: 'Hauts de Cilaos',
-    flavor: 'Le vié tisanèr i dor depuis 3 jours. Chante pou réveil a li !',
+    titleKey: 'quest.gramoune.title',
+    placeKey: 'quest.gramoune.place',
+    flavorKey: 'quest.gramoune.flavor',
   },
   {
-    title: 'Concours de bichiques',
-    place: 'Rivière des Roches',
-    flavor: 'La pêche o bichiques lé ouverte. Attrape plis que les autres koks !',
+    titleKey: 'quest.bichique.title',
+    placeKey: 'quest.bichique.place',
+    flavorKey: 'quest.bichique.flavor',
   },
 ];
 
@@ -101,9 +107,9 @@ export function generateQuests(level: number, count = 3): Quest[] {
     const minutes = d.sec / 60;
     return {
       id: `q${Date.now()}_${qSeq++}`,
-      title: t.title,
-      place: t.place,
-      flavor: t.flavor,
+      titleKey: t.titleKey,
+      placeKey: t.placeKey,
+      flavorKey: t.flavorKey,
       durationSec: d.sec,
       motivationCost: Math.max(2, Math.round(minutes * 8)),
       gold: questGold(level, minutes),

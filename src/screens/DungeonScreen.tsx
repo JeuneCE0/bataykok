@@ -23,10 +23,12 @@ import { fmt, playerToFighter } from '../game/formulas';
 import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
 import { fighterPower } from '../game/power';
 import { CombatResult, Fighter } from '../game/types';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
 export default function DungeonScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const keys = useGame((s) => s.keys);
   const dungeonFloor = useGame((s) => s.dungeonFloor);
@@ -91,8 +93,8 @@ export default function DungeonScreen() {
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
-        title="Rout dé Sirk"
-        sub="13 gardiens sur la route. Chaque étage ne se passe qu’une fois."
+        title={t('dungeon.title')}
+        sub={t('dungeon.sub')}
         accent={C.mystic}
       />
 
@@ -125,13 +127,13 @@ export default function DungeonScreen() {
           />
         </View>
         {keys < MAX_KEYS && (
-          <AdButton kind="key" full label="Gagner une clé (pub)" />
+          <AdButton kind="key" full label={t('dungeon.adKey')} />
         )}
       </Card>
 
       {/* Progression */}
       <Card>
-        <SectionTitle icon="🗺️">Progression</SectionTitle>
+        <SectionTitle icon="🗺️">{t('dungeon.progress')}</SectionTitle>
         <Bar
           value={dungeonFloor}
           max={BOSSES.length}
@@ -145,7 +147,7 @@ export default function DungeonScreen() {
         <Card glow={C.gold}>
           <Text style={styles.outcomeTitle}>👑 La rout lé fini !</Text>
           <Text style={T.body}>
-            Ou la vinkri les 13 gardien. Out kok i rentre dan la légende.
+            {t('dungeon.allDone')}
           </Text>
         </Card>
       )}
@@ -191,11 +193,11 @@ export default function DungeonScreen() {
                     📍 {boss.place}
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-                    <Chip label={`Niv. ${boss.level}`} color={C.textDim} />
+                    <Chip label={t('common.level', { n: boss.level })} color={C.textDim} />
                     {!locked && (
                       <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
                     )}
-                    {cleared && <Chip label="✓ VINKU" color={C.cane} active />}
+                    {cleared && <Chip label={t('dungeon.cleared')} color={C.cane} active />}
                     {current && (
                       <Chip
                         label={
@@ -216,7 +218,7 @@ export default function DungeonScreen() {
                     colors={['rgba(255,246,232,0.07)', 'rgba(255,246,232,0.02)']}
                     style={styles.rewardBox}
                   >
-                    <Text style={styles.rewardLabel}>RÉCOMPENSE GARANTIE</Text>
+                    <Text style={styles.rewardLabel}>{t('dungeon.guaranteed')}</Text>
                     <View style={styles.rewardRow}>
                       <Text style={styles.rewardItem}>🌽 {fmt(boss.reward.grains)}</Text>
                       <Text style={styles.rewardItem}>✨ {fmt(boss.reward.xp)}</Text>

@@ -120,7 +120,7 @@ export default function CharacterScreen() {
       <View style={{ flex: 1 }}>
         {switcher}
         <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-          <ScreenTitle title="La Kaz" sub="Tes rendez-vous du jour" />
+          <ScreenTitle title="La Kaz" sub={t('kok.dailyMissions')} />
           <View style={{ alignItems: 'center', marginBottom: 10 }}>
             <Chip
               label={ONLINE_LABEL[onlineState]}
@@ -191,17 +191,17 @@ export default function CharacterScreen() {
         </View>
 
         <View style={styles.recordRow}>
-          <Chip icon="🏆" label={`${player.wins} V`} color={C.cane} />
-          <Chip icon="💀" label={`${player.losses} D`} color={C.piment} />
-          <Chip label={`#${player.rank} au rond`} color={C.gold} />
+          <Chip icon="🏆" label={t('common.wins', { n: player.wins })} color={C.cane} />
+          <Chip icon="💀" label={t('common.losses', { n: player.losses })} color={C.piment} />
+          <Chip label={t('kok.rank', { n: player.rank })} color={C.gold} />
         </View>
-        <Text style={styles.classDesc}>{cls.description}</Text>
+        <Text style={styles.classDesc}>{t(cls.descriptionKey)}</Text>
       </Card>
 
       {/* ─── Attributs ─── */}
       <Card>
         <View style={styles.sectionHead}>
-          <SectionTitle icon="💪">Attributs</SectionTitle>
+          <SectionTitle icon="💪">{t('kok.attrs')}</SectionTitle>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             {[1, 5, 10].map((n) => (
               <Chip
@@ -251,7 +251,7 @@ export default function CharacterScreen() {
 
       {(player.talents ?? []).length > 0 && (
         <Card>
-          <SectionTitle icon="🌟">Talan</SectionTitle>
+          <SectionTitle icon="🌟">{t('kok.talents')}</SectionTitle>
           {(player.talents ?? []).map((id) => {
             const t = TALENT_BY_ID[id];
             if (!t) return null;
@@ -271,11 +271,11 @@ export default function CharacterScreen() {
       {/* ─── Équipement ─── */}
       <Card>
         <View style={styles.sectionHead}>
-          <SectionTitle icon="🎽">Ékipman</SectionTitle>
+          <SectionTitle icon="🎽">{t('kok.equipment')}</SectionTitle>
           <Button
             size="sm"
             variant="cane"
-            label="Équiper le meilleur"
+            label={t('kok.equipBest')}
             onPress={() => {
               const n = equipBest();
               say(
@@ -320,7 +320,7 @@ export default function CharacterScreen() {
         <View style={styles.sectionHead}>
           <SectionTitle icon="🎒">Sak — {player.inventory.length}/24</SectionTitle>
           <GhostButton
-            label="Vendre le surplus"
+            label={t('kok.sellSurplus')}
             onPress={() => {
               const r = sellJunk();
               say(
@@ -332,7 +332,7 @@ export default function CharacterScreen() {
           />
         </View>
         {bag.length === 0 ? (
-          <Text style={T.dim}>Sak lé vide, ti kok. Passe au Bazar !</Text>
+          <Text style={T.dim}>{t('kok.bagEmpty')}</Text>
         ) : (
           bag.map((it) => {
             const cmp = compareToEquipped(it, player);
@@ -368,7 +368,7 @@ export default function CharacterScreen() {
                 <Button
                   size="sm"
                   variant={cmp.diff > 0 ? 'cane' : 'slate'}
-                  label="Ékipé"
+                  label={t('common.equip')}
                   onPress={() => equipItem(it)}
                 />
                 <GhostButton
@@ -399,14 +399,14 @@ export default function CharacterScreen() {
               <Button
                 size="sm"
                 variant={compareToEquipped(selected, player).diff > 0 ? 'cane' : 'slate'}
-                label="Ékipé"
+                label={t('common.equip')}
                 onPress={() => {
                   equipItem(selected);
                   setSelected(null);
                 }}
               />
             )}
-            <GhostButton label="Fermer" onPress={() => setSelected(null)} />
+            <GhostButton label={t('common.close')} onPress={() => setSelected(null)} />
           </View>
         </Card>
       )}

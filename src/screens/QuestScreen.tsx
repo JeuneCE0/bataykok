@@ -135,14 +135,14 @@ export default function QuestScreen() {
       {activeQuest ? (
         <Card glow={C.gold}>
           <SectionTitle icon="⏳">{t('quest.active')}</SectionTitle>
-          <Text style={styles.questTitle}>{activeQuest.quest.title}</Text>
+          <Text style={styles.questTitle}>{t(activeQuest.quest.titleKey)}</Text>
           <Chip
             icon="📍"
-            label={activeQuest.quest.place}
+            label={t(activeQuest.quest.placeKey)}
             color={C.lagoon}
             style={{ alignSelf: 'flex-start', marginTop: 6 }}
           />
-          <Text style={styles.flavor}>{activeQuest.quest.flavor}</Text>
+          <Text style={styles.flavor}>{t(activeQuest.quest.flavorKey)}</Text>
           {remaining > 0 ? (
             <>
               <Well style={styles.timerWell}>
@@ -223,10 +223,10 @@ export default function QuestScreen() {
             <FadeIn key={q.id} index={qi}>
             <Card>
               <View style={styles.questHead}>
-                <Text style={styles.questTitle}>{q.title}</Text>
-                <Chip icon="📍" label={q.place} color={C.lagoon} />
+                <Text style={styles.questTitle}>{t(q.titleKey)}</Text>
+                <Chip icon="📍" label={t(q.placeKey)} color={C.lagoon} />
               </View>
-              <Text style={styles.flavor}>{q.flavor}</Text>
+              <Text style={styles.flavor}>{t(q.flavorKey)}</Text>
               <StatGrid
                 items={[
                   {
@@ -253,7 +253,7 @@ export default function QuestScreen() {
                   await askNotificationPermission();
                   scheduleQuestDone(
                     Math.round(q.durationSec * (1 - transport.reduction)),
-                    q.title
+                    t(q.titleKey)
                   );
                 }}
                 disabled={motivation < q.motivationCost}

@@ -24,6 +24,7 @@ import { compareToEquipped } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { TRANSPORTS } from '../game/transport';
 import { AttrId, Item } from '../game/types';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { localDay } from '../game/day';
 import { C, F, G, R } from '../theme';
@@ -35,6 +36,7 @@ const PIMENT_PACKS = [
 ];
 
 export default function ShopScreen() {
+  const t = useT();
   const [tab, setTab] = useState<'bazar' | 'lotel'>('bazar');
   const [open, setOpen] = useState<string | null>(null);
   const player = useGame((s) => s.player);
@@ -97,8 +99,8 @@ export default function ShopScreen() {
     {switcher}
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
-        title="Bazar Forain"
-        sub="Ékipman fré du jour — arrivage chaque matin !"
+        title={t('shop.title')}
+        sub={t('shop.sub')}
       />
 
       <AdButton kind="grains" full />
@@ -151,7 +153,7 @@ export default function ShopScreen() {
       })}
       <GhostButton
         icon="🔄"
-        label="Nouvel arrivage · 🌶️1"
+        label={`${t('shop.reroll')} · 🌶️1`}
         onPress={() => refreshShop(true)}
         disabled={player.piments < 1}
         style={{ alignSelf: 'center', marginTop: 4 }}
@@ -159,29 +161,29 @@ export default function ShopScreen() {
 
       {/* ─── Garage ─── */}
       <ScreenTitle
-        title="Garage Ti Kok"
-        sub="Va plus vite en quête ek in bon transport !"
+        title={t('shop.garage')}
+        sub={t('shop.garageSub')}
         accent={C.lagoon}
       />
-      {TRANSPORTS.map((t, i) => {
+      {TRANSPORTS.map((tr, i) => {
         const owned = player.transport >= i;
         const active = player.transport === i;
         return (
-          <Card key={t.name} compact glow={active ? C.cane : undefined}>
+          <Card key={tr.name} compact glow={active ? C.cane : undefined}>
             <View style={styles.itemRow}>
               <View style={styles.transportIcon}>
-                <Text style={{ fontSize: 26 }}>{t.emoji}</Text>
+                <Text style={{ fontSize: 26 }}>{tr.emoji}</Text>
               </View>
               <View style={{ flex: 1, gap: 3 }}>
-                <Text style={styles.itemName}>{t.name}</Text>
-                {t.reduction > 0 && (
+                <Text style={styles.itemName}>{tr.name}</Text>
+                {tr.reduction > 0 && (
                   <Chip
-                    label={`−${Math.round(t.reduction * 100)}% de durée`}
+                    label={t('shop.durationCut', { n: Math.round(tr.reduction * 100) })}
                     color={C.lagoon}
                     style={{ alignSelf: 'flex-start' }}
                   />
                 )}
-                <Text style={styles.itemStats}>{t.flavor}</Text>
+                <Text style={styles.itemStats}>{tr.flavor}</Text>
               </View>
               {owned ? (
                 <Text style={[styles.owned, !active && { color: C.textFaint }]}>
@@ -190,12 +192,12 @@ export default function ShopScreen() {
               ) : (
                 <Button
                   size="sm"
-                  variant={t.costPiments ? 'piment' : 'gold'}
-                  label={t.costGrains ? `🌽${fmt(t.costGrains)}` : `🌶️${t.costPiments}`}
+                  variant={tr.costPiments ? 'piment' : 'gold'}
+                  label={tr.costGrains ? `🌽${fmt(tr.costGrains)}` : `🌶️${tr.costPiments}`}
                   onPress={() => buyTransport(i)}
                   disabled={
-                    (t.costGrains ? player.grains < t.costGrains : false) ||
-                    (t.costPiments ? player.piments < t.costPiments : false)
+                    (tr.costGrains ? player.grains < tr.costGrains : false) ||
+                    (tr.costPiments ? player.piments < tr.costPiments : false)
                   }
                 />
               )}
@@ -206,8 +208,8 @@ export default function ShopScreen() {
 
       {/* ─── Piments ─── */}
       <ScreenTitle
-        title="La Kaz à Piments"
-        sub="La monnaie premium du kok batayeur"
+        title={t('shop.piments')}
+        sub={t('shop.pimentsSub')}
         accent={C.piment}
       />
       <Card>
@@ -243,7 +245,7 @@ export default function ShopScreen() {
         {passUntil > Date.now() ? (
           <>
             <Chip
-              label={`Actif jusqu'au ${new Date(passUntil).toLocaleDateString('fr-FR')}`}
+              label={t('shop.passActive', { d: new Date(passUntil).toLocaleDateString('fr-FR') })}
               color={C.cane}
               active
               style={{ alignSelf: 'flex-start', marginBottom: 10 }}
@@ -265,7 +267,8 @@ export default function ShopScreen() {
             full
             variant="mystic"
             size="lg"
-            label="S'abonner · 6,99 € / moi"
+            label={t('shop.subscribe')}
+              sub="6,99 € / mois"
             onPress={() =>
               Alert.alert(
                 'Abonnement simulé 💳',
@@ -306,7 +309,8 @@ export default function ShopScreen() {
             full
             variant="ember"
             size="lg"
-            label="Prendre l'offre · −62 %"
+            label={t('shop.takeOffer')}
+                sub="−62 %"
             onPress={() =>
               Alert.alert(
                 'Achat simulé 💳',
@@ -331,7 +335,7 @@ export default function ShopScreen() {
               <Text style={styles.itemName}>×{p.piments} piments</Text>
               <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                 {p.tag && <Chip label={p.tag} color={C.gold} active />}
-                {p.bonus > 0 && <Chip label={`+${p.bonus} % ofèr`} color={C.cane} />}
+                {p.bonus > 0 && <Chip label={t('shop.bonus', { n: p.bonus })} color={C.cane} />}
               </View>
             </View>
             <Button

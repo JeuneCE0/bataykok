@@ -17,13 +17,15 @@ import {
   COMB_COLORS,
   TAIL_PALETTES,
 } from '../game/bots';
-import { CLASS_LIST } from '../game/classes';
+import { ATTR_LABELS, CLASS_LIST } from '../game/classes';
 import { randomKokName } from '../game/names';
 import { Appearance } from '../game/types';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R, SHADOW, shade } from '../theme';
 
 export default function CreationScreen() {
+  const t = useT();
   const createPlayer = useGame((s) => s.createPlayer);
   const [classIdx, setClassIdx] = useState(0);
   const [name, setName] = useState(randomKokName());
@@ -42,7 +44,7 @@ export default function CreationScreen() {
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text style={styles.brand}>BATAY KOK</Text>
-        <Text style={styles.tagline}>Kréé out kok, ti kok. Le rond i attend a ou !</Text>
+        <Text style={styles.tagline}>{t('creation.tagline')}</Text>
       </View>
 
       {/* Sélecteur de classe */}
@@ -97,22 +99,22 @@ export default function CreationScreen() {
         <Text style={[styles.className, { color: cls.color }]}>
           {cls.emoji} {cls.name}
         </Text>
-        <Text style={styles.classSub}>{cls.subtitle}</Text>
+        <Text style={styles.classSub}>{t(cls.subtitleKey)}</Text>
 
         <View style={styles.chipRow}>
-          <Chip icon="★" label={cls.mainAttrLabel} color={C.gold} />
-          <Chip label={cls.subtitle} color={cls.color} />
+          <Chip icon="★" label={ATTR_LABELS[cls.mainAttr]} color={C.gold} />
+          <Chip label={t(cls.subtitleKey)} color={cls.color} />
         </View>
 
-        <Text style={styles.desc}>{cls.description}</Text>
-        <Text style={styles.flavor}>« {cls.flavor} »</Text>
+        <Text style={styles.desc}>{t(cls.descriptionKey)}</Text>
+        <Text style={styles.flavor}>« {t(cls.flavorKey)} »</Text>
       </Card>
 
       {/* Apparence */}
       <Card>
-        <SectionTitle icon="🎨">Plimaz — apparence</SectionTitle>
+        <SectionTitle icon="🎨">{t('creation.appearance')}</SectionTitle>
 
-        <Text style={styles.optLabel}>Couleur du corps</Text>
+        <Text style={styles.optLabel}>{t('creation.bodyColor')}</Text>
         <View style={styles.swatchRow}>
           {BODY_COLORS.map((c) => (
             <Swatch
@@ -124,7 +126,7 @@ export default function CreationScreen() {
           ))}
         </View>
 
-        <Text style={styles.optLabel}>Couleur de la crête</Text>
+        <Text style={styles.optLabel}>{t('creation.combColor')}</Text>
         <View style={styles.swatchRow}>
           {COMB_COLORS.map((c) => (
             <Swatch
@@ -136,7 +138,7 @@ export default function CreationScreen() {
           ))}
         </View>
 
-        <Text style={styles.optLabel}>Plumes de queue</Text>
+        <Text style={styles.optLabel}>{t('creation.tail')}</Text>
         <View style={styles.swatchRow}>
           {TAIL_PALETTES.map((p, i) => (
             <Pressable
@@ -154,7 +156,7 @@ export default function CreationScreen() {
           ))}
         </View>
 
-        <Text style={styles.optLabel}>Accessoire</Text>
+        <Text style={styles.optLabel}>{t('creation.accessory')}</Text>
         <View style={styles.swatchRow}>
           {ACCESSORIES.map((a, i) => (
             <Chip
@@ -170,7 +172,7 @@ export default function CreationScreen() {
 
       {/* Nom */}
       <Card>
-        <SectionTitle icon="📛">Nom de ton kok</SectionTitle>
+        <SectionTitle icon="📛">{t('creation.name')}</SectionTitle>
         <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
           <TextInput
             style={styles.input}
@@ -185,7 +187,7 @@ export default function CreationScreen() {
       </Card>
 
       <Button
-        label="Rentre dann rond !"
+        label={t('creation.go')}
         icon="⚔️"
         variant="ember"
         size="lg"

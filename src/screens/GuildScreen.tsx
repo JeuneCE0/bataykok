@@ -19,10 +19,12 @@ import {
   GUILDS,
   guildUpgradeCost,
 } from '../game/guilds';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 
 export default function GuildScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const guildLevel = useGame((s) => s.guildLevel);
   const joinGuild = useGame((s) => s.joinGuild);
@@ -42,13 +44,13 @@ export default function GuildScreen() {
         <ScreenTitle title={myGuild.name} sub={`« ${myGuild.motto} »`} />
 
         <Card glow={C.gold}>
-          <SectionTitle icon="⭐">Niveau de l'écurie</SectionTitle>
+          <SectionTitle icon="⭐">{t('guild.level')}</SectionTitle>
           <View style={styles.levelRow}>
             <Text style={styles.guildLevel}>{guildLevel}</Text>
             <View style={{ flex: 1, gap: 8 }}>
               <BonusLine
                 icon="✨"
-                label="Bonus XP en quête"
+                label={t('guild.xpBonus')}
                 value={`+${guildLevel * GUILD_XP_BONUS_PER_LEVEL}%`}
                 color={C.mystic}
                 pct={Math.min(1, (guildLevel * GUILD_XP_BONUS_PER_LEVEL) / 100)}
@@ -56,7 +58,7 @@ export default function GuildScreen() {
               />
               <BonusLine
                 icon="🌽"
-                label="Bonus grains en quête"
+                label={t('guild.goldBonus')}
                 value={`+${guildLevel * GUILD_GOLD_BONUS_PER_LEVEL}%`}
                 color={C.gold}
                 pct={Math.min(1, (guildLevel * GUILD_GOLD_BONUS_PER_LEVEL) / 100)}
@@ -68,14 +70,15 @@ export default function GuildScreen() {
             full
             style={{ marginTop: 14 }}
             icon="🔨"
-            label={`Améliorer l'écurie · 🌽${fmt(cost)}`}
+            label={t('guild.upgrade')}
+            sub={`🌽 ${fmt(cost)}`}
             onPress={() => donateGuild(cost)}
             disabled={player.grains < cost}
           />
         </Card>
 
         <Card>
-          <SectionTitle icon="🐓">Membres</SectionTitle>
+          <SectionTitle icon="🐓">{t('guild.members')}</SectionTitle>
           <View style={[styles.memberRow, styles.meRow]}>
             <Text style={styles.memberMe}>🐓 {player.name}</Text>
             <Chip label="ou !" color={C.gold} active />
@@ -88,7 +91,7 @@ export default function GuildScreen() {
         </Card>
 
         <GhostButton
-          label="Quitter l'écurie"
+          label={t('guild.leave')}
           onPress={leaveGuild}
           style={{ alignSelf: 'center', marginTop: 6 }}
         />
@@ -99,8 +102,8 @@ export default function GuildScreen() {
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
-        title="Les Écuries"
-        sub="Rejoins une écurie et gagne des bonus XP et grains !"
+        title={t('guild.title')}
+        sub={t('guild.sub')}
       />
       {GUILDS.map((g, gi) => (
         <FadeIn key={g.id} index={gi}>
@@ -122,7 +125,7 @@ export default function GuildScreen() {
           <Text style={styles.members} numberOfLines={1}>
             {g.members.slice(0, 3).join(' · ')}…
           </Text>
-          <Button full label="Rejoindre" onPress={() => joinGuild(g.id)} />
+          <Button full label={t('guild.join')} onPress={() => joinGuild(g.id)} />
         </Card>
         </FadeIn>
       ))}

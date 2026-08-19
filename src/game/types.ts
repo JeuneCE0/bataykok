@@ -1,3 +1,5 @@
+import { TransKey } from '../i18n';
+
 // ─── Types du jeu Batay Kok ───────────────────────────────────────────────
 
 export type ClassId = 'gep' | 'malin' | 'tizane' | 'sovaz' | 'piman' | 'sega';
@@ -88,9 +90,10 @@ export interface PlayerState {
 
 export interface Quest {
   id: string;
-  title: string;
-  place: string;
-  flavor: string;
+  /** clés i18n : une quête en cours est persistée, elle doit suivre la langue */
+  titleKey: TransKey;
+  placeKey: TransKey;
+  flavorKey: TransKey;
   durationSec: number;
   motivationCost: number;
   gold: number;

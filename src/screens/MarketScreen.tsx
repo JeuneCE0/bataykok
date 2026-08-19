@@ -28,11 +28,13 @@ import {
   listItem,
   Quote,
 } from '../lib/market';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 
 export default function MarketScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const onlineState = useGame((s) => s.onlineState);
   const removeItem = useGame((s) => s.removeItem);
@@ -78,7 +80,7 @@ export default function MarketScreen() {
   if (onlineState !== 'ok') {
     return (
       <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-        <ScreenTitle title="Lotèl dé Vant" sub="Acheter et vendre entre joueurs" accent={C.lagoon} />
+        <ScreenTitle title={t('market.title')} sub={t('market.sub')} accent={C.lagoon} />
         <Card>
           <Text style={T.dim}>
             L’hôtel ne fonctionne qu’en ligne. Dès que la connexion revient, les
@@ -91,7 +93,7 @@ export default function MarketScreen() {
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-      <ScreenTitle title="Lotèl dé Vant" sub="Acheter et vendre entre joueurs" accent={C.lagoon} />
+      <ScreenTitle title={t('market.title')} sub={t('market.sub')} accent={C.lagoon} />
 
       <Segmented
         value={view}
@@ -113,14 +115,14 @@ export default function MarketScreen() {
         <>
           <GhostButton
             icon="🔄"
-            label="Rafraîchir"
+            label={t('market.refresh')}
             onPress={reload}
             style={{ alignSelf: 'center', marginVertical: 6 }}
           />
           {listings.length === 0 ? (
             <Card>
               <Text style={T.dim}>
-                Pas encore d’annonce. Sois le premier à vendre quelque chose !
+                {t('market.none')}
               </Text>
             </Card>
           ) : (
@@ -152,7 +154,7 @@ export default function MarketScreen() {
                         <Text style={styles.price}>🌽 {fmt(l.price)}</Text>
                         {l.isMine ? (
                           <GhostButton
-                            label="Retirer"
+                            label={t('market.withdraw')}
                             onPress={async () => {
                               const it = await cancelListing(l.id);
                               if (it && addItem(it)) {
@@ -165,7 +167,7 @@ export default function MarketScreen() {
                           <Button
                             size="sm"
                             variant={cmp.diff > 0 ? 'cane' : 'gold'}
-                            label="Acheter"
+                            label={t('common.buy')}
                             disabled={player.grains < l.price || busy}
                             onPress={async () => {
                               setBusy(true);
@@ -200,9 +202,9 @@ export default function MarketScreen() {
       ) : (
         <>
           <Card>
-            <SectionTitle icon="🏷️">Sak — choisir un objet à vendre</SectionTitle>
+            <SectionTitle icon="🏷️">{t('market.pickItem')}</SectionTitle>
             {player.inventory.length === 0 ? (
-              <Text style={T.dim}>Ton sak est vide.</Text>
+              <Text style={T.dim}>{t('market.bagEmpty')}</Text>
             ) : (
               player.inventory.map((it) => {
                 const col = RARITY_COLORS[it.rarity];
@@ -235,7 +237,7 @@ export default function MarketScreen() {
 
           {selling && (
             <Card glow={C.lagoon}>
-              <SectionTitle icon="💰">Prix de vente</SectionTitle>
+              <SectionTitle icon="💰">{t('market.price')}</SectionTitle>
               <Text style={styles.quote}>
                 {quote && quote.sales > 0
                   ? `Cote du marché : ~🌽${fmt(quote.median)} (${quote.sales} vant · de ${fmt(
@@ -256,7 +258,7 @@ export default function MarketScreen() {
                   maxLength={8}
                 />
                 <Button
-                  label="Mettre en vente"
+                  label={t('market.list')}
                   disabled={!price || Number(price) < 1 || busy}
                   onPress={async () => {
                     const p = Number(price);
