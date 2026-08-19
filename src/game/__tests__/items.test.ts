@@ -26,7 +26,7 @@ function joueur(equipment: Partial<Record<SlotId, Item>> = {}): PlayerState {
     name: 'Test', classId: 'gep', level: 20, xp: 0,
     appearance: { bodyColor: '#8d5524', combColor: '#e53935', tailPalette: 0, accessory: 0 },
     baseAttrs: { force: 40, adresse: 20, esprit: 20, endurance: 30, chance: 15 },
-    equipment, inventory: [], grains: 0, piments: 0, honor: 100,
+    equipment, inventory: [], grains: 0, piments: 0, honor: 100, honorPeak: 100,
     rank: 1, wins: 0, losses: 0, guildId: null, transport: 0, talents: [], cosmetics: [],
   };
 }
