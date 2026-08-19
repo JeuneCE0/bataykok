@@ -64,6 +64,279 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Gardiens du donjon ────────────────────────────────────────────────
+  'boss.tikok.flavor': {
+    fr: 'Un petit coq marron garde l’entrée de la ravine. Il n’est pas gros, mais il mord.',
+    rcf: 'In ti kok maron i garde l\'entrée de la ravine. Li lé pa gro, mé li mord.',
+  },
+  'boss.zarlor.flavor': {
+    fr: 'Il cache son trésor dans une case créole. Il faudra passer sur lui avant.',
+    rcf: 'Li kach son trézor dann kaz kréol. Faudra passe su li avant.',
+  },
+  'boss.vakoa.flavor': {
+    fr: 'Son plumage est dur comme un vacoa. Les éperons glissent dessus.',
+    rcf: 'Son plimaz lé dur kom in vakoa. Les zéprons i glisse dessus.',
+  },
+  'boss.cilaos.flavor': {
+    fr: 'Le vieux tisaneur l’a formé. Il frappe avec le pouvoir des plantes.',
+    rcf: 'Le vié tisanèr la formé a li. I tape ek le pouvoir des plantes.',
+  },
+  'boss.mafate.flavor': {
+    fr: 'Trois jours de marche pour arriver jusqu’à lui. Il n’est pas content.',
+    rcf: 'Trois jours de marche pou ariv jusqu\'à li. Li lé pa content.',
+  },
+  'boss.sitarane.flavor': {
+    fr: 'On ne prononce pas son nom après minuit. Il se bat dans l’ombre.',
+    rcf: 'Le nom la pa prononsé apré minui. Li bat dann lonbraz.',
+  },
+  'boss.volkan.flavor': {
+    fr: 'Sa crête brûle. Approche-toi, tu seras cuit.',
+    rcf: 'Son krèt i brile. Aproche a ou, ou sar kui.',
+  },
+  'boss.grandmere.flavor': {
+    fr: 'La légende dit qu’il n’a jamais perdu un combat. Jamais.',
+    rcf: 'La légende i di li la jamé perdu in batay. Zamé.',
+  },
+  'boss.capmechant.flavor': {
+    fr: 'Il se bat comme la houle : ça ne s’arrête jamais, ça ne fatigue pas.',
+    rcf: 'Li bat kom la houle : sa arète zamé, sa fatig pa.',
+  },
+  'boss.papang.flavor': {
+    fr: 'Le roi des oiseaux tourne dans le ciel. Il te voit avant que tu le voies.',
+    rcf: 'Le roi des zoizo i tourne dann siel. Li vwa a ou avan ou vwa a li.',
+  },
+  'boss.fournez.flavor': {
+    fr: 'Le feu dans les veines, la lave dans le cœur. Le rond tremble quand il entre.',
+    rcf: 'Fé dann vèn, lav dann kèr. Le rond i tremble kan li rentre.',
+  },
+  'boss.zamal.flavor': {
+    fr: 'Personne ne connaît son âge. Personne ne l’a vu perdre.',
+    rcf: 'Personn i koné son laz. Personn la vu a li perdre.',
+  },
+  'boss.maloya.flavor': {
+    fr: 'Le dernier. Son séga fait danser la mort. Bon courage petit coq.',
+    rcf: 'Le dernié. Son séga i fé danse la mor. Bon kouraz ti kok.',
+  },
+
+  // ─── Talents & chemin du ti kok ────────────────────────────────────────
+  'talent.kou_dur.title': {
+    fr: 'Coup dur',
+    rcf: 'Kou dur',
+  },
+  'talent.kou_dur.desc': {
+    fr: '+12 % de dégâts d’arme',
+    rcf: '+12 % de dégâ darm',
+  },
+  'talent.kwir_dur.title': {
+    fr: 'Cuir dur',
+    rcf: 'Kwir dur',
+  },
+  'talent.kwir_dur.desc': {
+    fr: '+15 % de points de vie',
+    rcf: '+15 % de poin de vi',
+  },
+  'talent.ti_komersan.title': {
+    fr: 'Petit commerçant',
+    rcf: 'Ti komersan',
+  },
+  'talent.ti_komersan.desc': {
+    fr: '+20 % de grains sur tout',
+    rcf: '+20 % de grin su tout',
+  },
+  'talent.lespri_vif.title': {
+    fr: 'Esprit vif',
+    rcf: 'Lespri vif',
+  },
+  'talent.lespri_vif.desc': {
+    fr: '+25 % de chance de coup critique',
+    rcf: '+25 % de shans de kou kritik',
+  },
+  'talent.karapas.title': {
+    fr: 'Carapace',
+    rcf: 'Karapas',
+  },
+  'talent.karapas.desc': {
+    fr: '+25 % d’armure',
+    rcf: '+25 % darmir',
+  },
+  'talent.bon_zelev.title': {
+    fr: 'Bon élève',
+    rcf: 'Bon zélèv',
+  },
+  'talent.bon_zelev.desc': {
+    fr: '+20 % d’XP sur tout',
+    rcf: '+20 % dXP su tout',
+  },
+  'talent.sof_rapid.title': {
+    fr: 'Souffle rapide',
+    rcf: 'Sof rapid',
+  },
+  'talent.sof_rapid.desc': {
+    fr: '+1 jeton de combat',
+    rcf: '+1 zeton de batay',
+  },
+  'talent.pié_lézé.title': {
+    fr: 'Pied léger',
+    rcf: 'Pié lézé',
+  },
+  'talent.pié_lézé.desc': {
+    fr: '−20 % sur la durée des quêtes',
+    rcf: '−20 % su le tan bann kést',
+  },
+  'talent.fors_brit.title': {
+    fr: 'Force brute',
+    rcf: 'Fors brit',
+  },
+  'talent.fors_brit.desc': {
+    fr: '+18 % de dégâts d’arme',
+    rcf: '+18 % de dégâ darm',
+  },
+  'talent.kok_dasié.title': {
+    fr: 'Coq d’acier',
+    rcf: 'Kok d’asié',
+  },
+  'talent.kok_dasié.desc': {
+    fr: '+22 % de PV et +15 % d’armure',
+    rcf: '+22 % de PV ek +15 % darmir',
+  },
+  'talent.chaser.title': {
+    fr: 'Chasseur',
+    rcf: 'Chasèr',
+  },
+  'talent.chaser.desc': {
+    fr: '+30 % de grains et +15 % d’XP',
+    rcf: '+30 % de grin ek +15 % dXP',
+  },
+  'talent.zéprons_fé.title': {
+    fr: 'Éperons de fer',
+    rcf: 'Zéprons de fé',
+  },
+  'talent.zéprons_fé.desc': {
+    fr: '+25 % de dégâts d’arme',
+    rcf: '+25 % de dégâ darm',
+  },
+  'talent.lezand.title': {
+    fr: 'Légende du rond',
+    rcf: 'Lézand du rond',
+  },
+  'talent.lezand.desc': {
+    fr: '+2 jetons de combat',
+    rcf: '+2 zeton de batay',
+  },
+  'talent.mèt_kritik.title': {
+    fr: 'Maître du critique',
+    rcf: 'Mèt du kritik',
+  },
+  'talent.mèt_kritik.desc': {
+    fr: '+40 % de chance de critique',
+    rcf: '+40 % de shans de kritik',
+  },
+  'talent.gran_batayeur.title': {
+    fr: 'Grand batailleur',
+    rcf: 'Gran batayèr',
+  },
+  'talent.gran_batayeur.desc': {
+    fr: '+20 % de dégâts et +20 % de PV',
+    rcf: '+20 % de dégâ ek +20 % de PV',
+  },
+  'step.equip.title': {
+    fr: 'Équipe tes éperons',
+    rcf: 'Ékip out zéprons',
+  },
+  'step.equip.hint': {
+    fr: 'Dans ton sac, équipe une arme sur ton coq.',
+    rcf: 'Dan out sak, ékip in arm su out kok.',
+  },
+  'step.quest.title': {
+    fr: 'Fais ta première quête',
+    rcf: 'Fé out prémié kèt',
+  },
+  'step.quest.hint': {
+    fr: 'Chez Mémé Zizine, pars en quête et récupère la récompense.',
+    rcf: 'Kaz Mémé Zizine, part an kést ek ramas out rékonpans.',
+  },
+  'step.attr.title': {
+    fr: 'Monte un attribut',
+    rcf: 'Monte in attribi',
+  },
+  'step.attr.hint': {
+    fr: 'Dépense des grains pour muscler ton coq.',
+    rcf: 'Dépans bann grin pou miskle out kok.',
+  },
+  'step.arena.title': {
+    fr: 'Entre dans le rond',
+    rcf: 'Rentre dann rond',
+  },
+  'step.arena.hint': {
+    fr: 'Lance ton premier combat au gallodrome.',
+    rcf: 'Lans out premié batay o galodrom.',
+  },
+  'step.shop.title': {
+    fr: 'Achète au Bazar',
+    rcf: 'Ashète o Bazar',
+  },
+  'step.shop.hint': {
+    fr: 'Un bon équipement change tout. Regarde les flèches vertes !',
+    rcf: 'In bon ékipman i shanz tout. Get bann flèsh vèrt !',
+  },
+  'step.win.title': {
+    fr: 'Gagne un combat',
+    rcf: 'Gingn in batay',
+  },
+  'step.win.hint': {
+    fr: 'Monte au Palmarès en battant un coq mieux classé.',
+    rcf: 'Mont o Palmarès an batan in kok mié klasé.',
+  },
+  'step.guild.title': {
+    fr: 'Rejoins une écurie',
+    rcf: 'Rant dan in lékiri',
+  },
+  'step.guild.hint': {
+    fr: 'Les écuries donnent des bonus XP et grains permanents.',
+    rcf: 'Bann lékiri i donn bonis XP ek grin permanan.',
+  },
+
+  'step.donjon.title': {
+    fr: 'Bats ton premier gardien',
+    rcf: 'Bat out prémié gardien',
+  },
+  'step.donjon.hint': {
+    fr: 'Sur la Route des Cirques, chaque gardien lâche un équipement garanti.',
+    rcf: 'Su la Rout dé Sirk, shak gardien i lâsh in ékipman garanti.',
+  },
+  'step.level3.title': {
+    fr: 'Atteins le niveau 3',
+    rcf: 'Ariv nivo 3',
+  },
+  'step.level3.hint': {
+    fr: 'Enchaîne quêtes et combats pour monter en niveau.',
+    rcf: 'Anshène kést ek batay pou mont an nivo.',
+  },
+  'step.transport.title': {
+    fr: 'Achète un transport',
+    rcf: 'Ashète in transpor',
+  },
+  'step.transport.hint': {
+    fr: 'Au Garage : tes quêtes iront bien plus vite.',
+    rcf: 'O Garaz : out kést i sar bien pli vit.',
+  },
+  'step.level5.title': {
+    fr: 'Atteins le niveau 5',
+    rcf: 'Ariv nivo 5',
+  },
+  'step.level5.hint': {
+    fr: 'Ton coq devient un vrai batailleur.',
+    rcf: 'Out kok i vien in vré batayèr.',
+  },
+  'step.mitik.title': {
+    fr: 'Trouve un objet Mitik',
+    rcf: 'Trouv in objè Mitik',
+  },
+  'step.mitik.hint': {
+    fr: 'La rareté suprême. Tente le Bazar et les quêtes longues.',
+    rcf: 'La rarté siprèm. Tant le Bazar ek bann kést long.',
+  },
+
   // ─── Quêtes (contenu) ──────────────────────────────────────────────────
   'quest.tangue.title': {
     fr: 'Chasse au tangue',

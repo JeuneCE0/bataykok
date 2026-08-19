@@ -253,14 +253,14 @@ export default function CharacterScreen() {
         <Card>
           <SectionTitle icon="🌟">{t('kok.talents')}</SectionTitle>
           {(player.talents ?? []).map((id) => {
-            const t = TALENT_BY_ID[id];
-            if (!t) return null;
+            const tal = TALENT_BY_ID[id];
+            if (!tal) return null;
             return (
               <View key={id} style={styles.talentRow}>
-                <Text style={{ fontSize: 18 }}>{t.icon}</Text>
+                <Text style={{ fontSize: 18 }}>{tal.icon}</Text>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.talentName}>{t.title}</Text>
-                  <Text style={styles.talentDesc}>{t.desc}</Text>
+                  <Text style={styles.talentName}>{t(tal.titleKey)}</Text>
+                  <Text style={styles.talentDesc}>{t(tal.descKey)}</Text>
                 </View>
               </View>
             );

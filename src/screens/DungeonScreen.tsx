@@ -213,7 +213,7 @@ export default function DungeonScreen() {
 
               {current && (
                 <>
-                  <Text style={styles.flavor}>{boss.flavor}</Text>
+                  <Text style={styles.flavor}>{t(boss.flavorKey)}</Text>
                   <LinearGradient
                     colors={['rgba(255,246,232,0.07)', 'rgba(255,246,232,0.02)']}
                     style={styles.rewardBox}

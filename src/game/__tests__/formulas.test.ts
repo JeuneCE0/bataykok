@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { translate } from '../../i18n';
+
 import { eventOfDay } from '../events';
 import {
   arenaGold, arenaXp, attrCost, grainsPerPiment, maxHp,
@@ -103,7 +105,7 @@ describe('talents', () => {
       assert.equal(new Set(tier.choices.map((c) => c.id)).size, 3);
       tier.choices.forEach((c) => {
         assert.ok(Object.keys(c.effect).length > 0, `talent sans effet : ${c.id}`);
-        assert.ok(c.desc.length > 5);
+        assert.ok(translate('fr', c.descKey).length > 5, `talent sans texte : ${c.id}`);
       });
     }
   });

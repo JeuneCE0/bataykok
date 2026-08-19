@@ -36,7 +36,8 @@ export function translate(lang: Lang, key: TransKey, p?: Params): string {
     | { fr: string; rcf?: string }
     | undefined;
   if (!entry) {
-    if (__DEV__) console.warn(`[i18n] clé absente : ${key}`);
+    // `__DEV__` n'existe pas hors bundle React Native (tests, scripts)
+    if (typeof __DEV__ !== 'undefined' && __DEV__) console.warn(`[i18n] clé absente : ${key}`);
     return key;
   }
   return fill((lang === 'rcf' ? entry.rcf : undefined) ?? entry.fr, p);

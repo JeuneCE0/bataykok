@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { pendingTier } from '../game/talents';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 
@@ -26,6 +27,8 @@ export default function TalentModal() {
       useNativeDriver: true,
     }).start();
   }, [tier, pop]);
+
+  const t = useT();
 
   // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
   // l'instance au lieu de la démonter. Démonter une Modal encore présentée
@@ -71,8 +74,8 @@ export default function TalentModal() {
                     <Text style={{ fontSize: 22 }}>{c.icon}</Text>
                   </LinearGradient>
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={styles.choiceTitle}>{c.title}</Text>
-                    <Text style={styles.choiceDesc}>{c.desc}</Text>
+                    <Text style={styles.choiceTitle}>{t(c.titleKey)}</Text>
+                    <Text style={styles.choiceDesc}>{t(c.descKey)}</Text>
                   </View>
                   <Text style={styles.arrow}>›</Text>
                 </Pressable>

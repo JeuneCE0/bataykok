@@ -1,4 +1,5 @@
 import { CLASSES } from './classes';
+import { TransKey } from '../i18n';
 import { Appearance, ClassId, Fighter, Rarity } from './types';
 
 /**
@@ -11,7 +12,7 @@ export interface Boss {
   floor: number;
   name: string;
   place: string;
-  flavor: string;
+  flavorKey: TransKey;
   level: number;
   classId: ClassId;
   /** multiplicateur de statistiques par rapport à un adversaire du même niveau */
@@ -39,7 +40,7 @@ export const BOSSES: Boss[] = [
     floor: 1,
     name: 'Ti Kok Sovaz',
     place: 'Ravine Saint-Gilles',
-    flavor: "In ti kok maron i garde l'entrée de la ravine. Li lé pa gro, mé li mord.",
+    flavorKey: 'boss.tikok.flavor',
     level: 3,
     classId: 'sovaz',
     power: 1.1,
@@ -50,7 +51,7 @@ export const BOSSES: Boss[] = [
     floor: 2,
     name: 'Zarlor de Salazie',
     place: 'Hell-Bourg',
-    flavor: 'Li kach son trézor dann kaz kréol. Faudra passe su li avant.',
+    flavorKey: 'boss.tikok.flavor',
     level: 6,
     classId: 'gep',
     power: 1.15,
@@ -61,7 +62,7 @@ export const BOSSES: Boss[] = [
     floor: 3,
     name: 'Kok Vakoa',
     place: 'Forêt de Bébour',
-    flavor: 'Son plimaz lé dur kom in vakoa. Les zéprons i glisse dessus.',
+    flavorKey: 'boss.zarlor.flavor',
     level: 9,
     classId: 'gep',
     power: 1.2,
@@ -72,7 +73,7 @@ export const BOSSES: Boss[] = [
     floor: 4,
     name: 'Gardien de Cilaos',
     place: 'Cirque de Cilaos',
-    flavor: "Le vié tisanèr la formé a li. I tape ek le pouvoir des plantes.",
+    flavorKey: 'boss.vakoa.flavor',
     level: 12,
     classId: 'tizane',
     power: 1.25,
@@ -83,7 +84,7 @@ export const BOSSES: Boss[] = [
     floor: 5,
     name: 'Bèf Mafate',
     place: 'Îlet à Malheur',
-    flavor: "Trois jours de marche pou ariv jusqu'à li. Li lé pa content.",
+    flavorKey: 'boss.mafate.flavor',
     level: 15,
     classId: 'sovaz',
     power: 1.3,
@@ -94,7 +95,7 @@ export const BOSSES: Boss[] = [
     floor: 6,
     name: 'Sitarane',
     place: 'Cimetière de Saint-Pierre',
-    flavor: "Le nom la pa prononsé apré minui. Li bat dann lonbraz.",
+    flavorKey: 'boss.cilaos.flavor',
     level: 18,
     classId: 'malin',
     power: 1.35,
@@ -105,7 +106,7 @@ export const BOSSES: Boss[] = [
     floor: 7,
     name: 'Kok Volkan',
     place: 'Pas de Bellecombe',
-    flavor: 'Son krèt i brile. Aproche a ou, ou sar kui.',
+    flavorKey: 'boss.mafate.flavor',
     level: 21,
     classId: 'piman',
     power: 1.4,
@@ -116,7 +117,7 @@ export const BOSSES: Boss[] = [
     floor: 8,
     name: 'Grand-Mère Kal',
     place: 'Piton Grand-Mère',
-    flavor: "La légende i di li la jamé perdu in batay. Zamé.",
+    flavorKey: 'boss.sitarane.flavor',
     level: 24,
     classId: 'tizane',
     power: 1.45,
@@ -127,7 +128,7 @@ export const BOSSES: Boss[] = [
     floor: 9,
     name: 'Kap Méchant',
     place: 'Sud sauvage',
-    flavor: 'Li bat kom la houle : sa arète zamé, sa fatig pa.',
+    flavorKey: 'boss.volkan.flavor',
     level: 27,
     classId: 'gep',
     power: 1.5,
@@ -138,7 +139,7 @@ export const BOSSES: Boss[] = [
     floor: 10,
     name: 'Papang Roi',
     place: 'Cirque de Mafate',
-    flavor: "Le roi des zoizo i tourne dann siel. Li vwa a ou avan ou vwa a li.",
+    flavorKey: 'boss.grandmere.flavor',
     level: 30,
     classId: 'malin',
     power: 1.55,
@@ -149,7 +150,7 @@ export const BOSSES: Boss[] = [
     floor: 11,
     name: 'Kok Fournèz',
     place: 'Cratère Dolomieu',
-    flavor: 'Fé dann vèn, lav dann kèr. Le rond i tremble kan li rentre.',
+    flavorKey: 'boss.capmechant.flavor',
     level: 34,
     classId: 'piman',
     power: 1.62,
@@ -160,7 +161,7 @@ export const BOSSES: Boss[] = [
     floor: 12,
     name: 'Zamal Gramoune',
     place: 'Hauts de Sainte-Rose',
-    flavor: "Personn i koné son laz. Personn la vu a li perdre.",
+    flavorKey: 'boss.papang.flavor',
     level: 38,
     classId: 'tizane',
     power: 1.7,
@@ -171,7 +172,7 @@ export const BOSSES: Boss[] = [
     floor: 13,
     name: 'Maloya Mistik',
     place: 'Grand-Bassin',
-    flavor: "Le dernié. Son séga i fé danse la mor. Bon kouraz ti kok.",
+    flavorKey: 'boss.fournez.flavor',
     level: 42,
     classId: 'sega',
     power: 1.8,

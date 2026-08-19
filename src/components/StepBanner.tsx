@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { STEPS, TabId } from '../game/progress';
 import { currentStep, useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
+import { useT } from '../i18n/useT';
 
 /**
  * Le fil rouge du joueur : une seule prochaine action, toujours visible, qui
@@ -24,6 +25,7 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
 
   const done = claimedSteps.length;
   const total = STEPS.length;
+  const t = useT();
 
   return (
     <Pressable
@@ -53,14 +55,14 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
             CHEMIN DU TI KOK · {done}/{total}
           </Text>
           <Text style={styles.title} numberOfLines={1}>
-            {step.def.title}
+            {t(step.def.titleKey)}
           </Text>
           <Text style={styles.hint} numberOfLines={2}>
             {step.ready
               ? `Bravo ! Récupère ${step.def.grains > 0 ? `🌽${step.def.grains}` : ''} ${
                   step.def.piments > 0 ? `🌶️${step.def.piments}` : ''
                 }`
-              : step.def.hint}
+              : t(step.def.hintKey)}
           </Text>
         </View>
 

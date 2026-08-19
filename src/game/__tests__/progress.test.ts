@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { translate } from '../../i18n';
+
 import {
   DAILY_CHEST,
   isStepComplete,
@@ -50,7 +52,7 @@ describe('chemin du ti kok', () => {
       assert.equal(
         isStepComplete(step.id, accompli),
         true,
-        `l'étape « ${step.title} » (${step.id}) reste infranchissable`
+        `l'étape « ${translate('fr', step.titleKey)} » (${step.id}) reste infranchissable`
       );
     }
   });
@@ -60,15 +62,17 @@ describe('chemin du ti kok', () => {
       assert.equal(
         isStepComplete(step.id, vierge),
         false,
-        `l'étape « ${step.title} » se valide sans rien faire`
+        `l'étape « ${translate('fr', step.titleKey)} » se valide sans rien faire`
       );
     }
   });
 
   it('chaque étape a un onglet, une récompense et un texte', () => {
     for (const s of STEPS) {
-      assert.ok(s.title.length > 3, `titre trop court : ${s.id}`);
-      assert.ok(s.hint.length > 10, `indice trop court : ${s.id}`);
+      for (const lang of ['fr', 'rcf'] as const) {
+        assert.ok(translate(lang, s.titleKey).length > 3, `titre trop court : ${s.id} (${lang})`);
+        assert.ok(translate(lang, s.hintKey).length > 10, `indice trop court : ${s.id} (${lang})`);
+      }
       assert.ok(s.grains > 0 || s.piments > 0, `étape sans récompense : ${s.id}`);
     }
   });

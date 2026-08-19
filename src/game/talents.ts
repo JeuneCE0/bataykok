@@ -1,3 +1,5 @@
+import { TransKey } from '../i18n';
+
 /**
  * Talents : un choix tous les cinq niveaux. C'est le seul endroit du jeu où
  * deux koks de même classe divergent — il faut donc que les options soient
@@ -16,8 +18,8 @@ export interface TalentEffects {
 
 export interface TalentDef {
   id: string;
-  title: string;
-  desc: string;
+  titleKey: TransKey;
+  descKey: TransKey;
   icon: string;
   effect: Partial<TalentEffects>;
 }
@@ -33,22 +35,22 @@ export const TALENT_TIERS: TalentTier[] = [
     choices: [
       {
         id: 'kou_dur',
-        title: 'Kou dur',
-        desc: '+12 % de dégâts d’arme',
+        titleKey: 'talent.kou_dur.title',
+        descKey: 'talent.kou_dur.desc',
         icon: '🗡️',
         effect: { dmg: 0.12 },
       },
       {
         id: 'kwir_dur',
-        title: 'Kwir dur',
-        desc: '+15 % de points de vie',
+        titleKey: 'talent.kwir_dur.title',
+        descKey: 'talent.kwir_dur.desc',
         icon: '❤️',
         effect: { hp: 0.15 },
       },
       {
         id: 'ti_komersan',
-        title: 'Ti komersan',
-        desc: '+20 % de grains sur tout',
+        titleKey: 'talent.ti_komersan.title',
+        descKey: 'talent.ti_komersan.desc',
         icon: '🌽',
         effect: { gold: 0.2 },
       },
@@ -59,22 +61,22 @@ export const TALENT_TIERS: TalentTier[] = [
     choices: [
       {
         id: 'lespri_vif',
-        title: 'Lespri vif',
-        desc: '+25 % de chance de coup kritik',
+        titleKey: 'talent.lespri_vif.title',
+        descKey: 'talent.lespri_vif.desc',
         icon: '⚡',
         effect: { crit: 0.25 },
       },
       {
         id: 'karapas',
-        title: 'Karapas',
-        desc: '+25 % d’armure',
+        titleKey: 'talent.karapas.title',
+        descKey: 'talent.karapas.desc',
         icon: '🛡️',
         effect: { armor: 0.25 },
       },
       {
         id: 'bon_zelev',
-        title: 'Bon zélèv',
-        desc: '+20 % d’XP sur tout',
+        titleKey: 'talent.bon_zelev.title',
+        descKey: 'talent.bon_zelev.desc',
         icon: '✨',
         effect: { xp: 0.2 },
       },
@@ -85,22 +87,22 @@ export const TALENT_TIERS: TalentTier[] = [
     choices: [
       {
         id: 'sof_rapid',
-        title: 'Sof rapid',
-        desc: '+1 jeton de batay',
+        titleKey: 'talent.sof_rapid.title',
+        descKey: 'talent.sof_rapid.desc',
         icon: '⚔️',
         effect: { tickets: 1 },
       },
       {
         id: 'pié_lézé',
-        title: 'Pié lézé',
-        desc: '−20 % sur la durée des quêtes',
+        titleKey: 'talent.pié_lézé.title',
+        descKey: 'talent.pié_lézé.desc',
         icon: '🛵',
         effect: { questSpeed: 0.2 },
       },
       {
         id: 'fors_brit',
-        title: 'Fors brit',
-        desc: '+18 % de dégâts d’arme',
+        titleKey: 'talent.fors_brit.title',
+        descKey: 'talent.fors_brit.desc',
         icon: '💥',
         effect: { dmg: 0.18 },
       },
@@ -111,22 +113,22 @@ export const TALENT_TIERS: TalentTier[] = [
     choices: [
       {
         id: 'kok_dasié',
-        title: 'Kok d’asié',
-        desc: '+22 % de PV et +15 % d’armure',
+        titleKey: 'talent.kok_dasié.title',
+        descKey: 'talent.kok_dasié.desc',
         icon: '🪨',
         effect: { hp: 0.22, armor: 0.15 },
       },
       {
         id: 'chaser',
-        title: 'Chasèr',
-        desc: '+30 % de grains et +15 % d’XP',
+        titleKey: 'talent.chaser.title',
+        descKey: 'talent.chaser.desc',
         icon: '💰',
         effect: { gold: 0.3, xp: 0.15 },
       },
       {
         id: 'zéprons_fé',
-        title: 'Zéprons de fé',
-        desc: '+25 % de dégâts d’arme',
+        titleKey: 'talent.zéprons_fé.title',
+        descKey: 'talent.zéprons_fé.desc',
         icon: '🔥',
         effect: { dmg: 0.25 },
       },
@@ -137,22 +139,22 @@ export const TALENT_TIERS: TalentTier[] = [
     choices: [
       {
         id: 'lezand',
-        title: 'Lézand du rond',
-        desc: '+2 jetons de batay',
+        titleKey: 'talent.lezand.title',
+        descKey: 'talent.lezand.desc',
         icon: '👑',
         effect: { tickets: 2 },
       },
       {
         id: 'mèt_kritik',
-        title: 'Mèt du kritik',
-        desc: '+40 % de chance de kritik',
+        titleKey: 'talent.mèt_kritik.title',
+        descKey: 'talent.mèt_kritik.desc',
         icon: '🎯',
         effect: { crit: 0.4 },
       },
       {
         id: 'gran_batayeur',
-        title: 'Gran batayèr',
-        desc: '+20 % de dégâts et +20 % de PV',
+        titleKey: 'talent.gran_batayeur.title',
+        descKey: 'talent.gran_batayeur.desc',
         icon: '🏆',
         effect: { dmg: 0.2, hp: 0.2 },
       },

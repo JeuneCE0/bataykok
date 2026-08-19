@@ -1,3 +1,5 @@
+import { TransKey } from '../i18n';
+
 import { mulberry32 } from './formulas';
 
 // ─── Chemin du ti kok : onboarding pas à pas ─────────────────────────────
@@ -20,8 +22,8 @@ export type TabId = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
 export interface StepDef {
   id: StepId;
-  title: string;
-  hint: string;
+  titleKey: TransKey;
+  hintKey: TransKey;
   icon: string;
   /** onglet vers lequel envoyer le joueur */
   tab: TabId;
@@ -33,8 +35,8 @@ export interface StepDef {
 export const STEPS: StepDef[] = [
   {
     id: 'equip',
-    title: 'Ékip out zéprons',
-    hint: 'Dan out sak, ékip in arme su out kok.',
+    titleKey: 'step.equip.title',
+    hintKey: 'step.equip.hint',
     icon: '🗡️',
     tab: 'kok',
     grains: 60,
@@ -42,8 +44,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'quest',
-    title: 'Fé out prémié kèt',
-    hint: 'Chez Mémé Zizine, pars en quête et récupère la récompense.',
+    titleKey: 'step.quest.title',
+    hintKey: 'step.quest.hint',
     icon: '🗺️',
     tab: 'quetes',
     grains: 90,
@@ -51,8 +53,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'attr',
-    title: 'Monte in attribut',
-    hint: 'Dépense des grains pour muscler ton kok.',
+    titleKey: 'step.attr.title',
+    hintKey: 'step.attr.hint',
     icon: '💪',
     tab: 'kok',
     grains: 80,
@@ -60,8 +62,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'arena',
-    title: 'Rentre dann rond',
-    hint: 'Lance ton premier combat au gallodrome.',
+    titleKey: 'step.arena.title',
+    hintKey: 'step.arena.hint',
     icon: '⚔️',
     tab: 'rond',
     grains: 100,
@@ -69,8 +71,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'shop',
-    title: 'Achète o Bazar',
-    hint: 'Un bon ékipman change tout. Regarde les flèches vertes !',
+    titleKey: 'step.shop.title',
+    hintKey: 'step.shop.hint',
     icon: '🛒',
     tab: 'bazar',
     grains: 160,
@@ -78,8 +80,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'win',
-    title: 'Gagne in batay',
-    hint: 'Monte au Palmarès en battant un kok mieux classé.',
+    titleKey: 'step.win.title',
+    hintKey: 'step.win.hint',
     icon: '🏆',
     tab: 'rond',
     grains: 200,
@@ -87,8 +89,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'guild',
-    title: "Rentre dan in n'écurie",
-    hint: 'Les écuries donnent des bonus XP et grains permanents.',
+    titleKey: 'step.guild.title',
+    hintKey: 'step.guild.hint',
     icon: '🏠',
     tab: 'ecurie',
     grains: 240,
@@ -96,8 +98,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'donjon',
-    title: 'Bat out prémié gardien',
-    hint: 'Su la Rout dé Sirk, chak gardien i lâche in ékipman garanti.',
+    titleKey: 'step.donjon.title',
+    hintKey: 'step.donjon.hint',
     icon: '🗝️',
     tab: 'donjon',
     grains: 300,
@@ -105,8 +107,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'level3',
-    title: 'Ariv nivo 3',
-    hint: 'Enchaîne quêtes et batays pour monter en niveau.',
+    titleKey: 'step.level3.title',
+    hintKey: 'step.level3.hint',
     icon: '⭐',
     tab: 'quetes',
     grains: 350,
@@ -114,8 +116,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'transport',
-    title: 'Achète in transport',
-    hint: 'Au Garage : tes quêtes iront bien plus vite.',
+    titleKey: 'step.transport.title',
+    hintKey: 'step.transport.hint',
     icon: '🛵',
     tab: 'bazar',
     grains: 450,
@@ -123,8 +125,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'level5',
-    title: 'Ariv nivo 5',
-    hint: 'Ton kok devient un vrai batayeur.',
+    titleKey: 'step.level5.title',
+    hintKey: 'step.level5.hint',
     icon: '🔥',
     tab: 'rond',
     grains: 600,
@@ -132,8 +134,8 @@ export const STEPS: StepDef[] = [
   },
   {
     id: 'mitik',
-    title: 'Trouv in objè Mitik',
-    hint: 'La rareté suprême. Tente le Bazar et les quêtes longues.',
+    titleKey: 'step.mitik.title',
+    hintKey: 'step.mitik.hint',
     icon: '💎',
     tab: 'bazar',
     grains: 900,
