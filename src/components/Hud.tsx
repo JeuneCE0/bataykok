@@ -1,10 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CLASSES } from '../game/classes';
 import { eventOfDay } from '../game/events';
 import { fmt, xpForLevel } from '../game/formulas';
+import { play, syncMusic } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import Counter from './Counter';
@@ -13,7 +14,11 @@ import { Bar } from './ui';
 
 export default function Hud() {
   const player = useGame((s) => s.player);
+  const sfxOn = useGame((s) => s.sfxOn);
+  const musicOn = useGame((s) => s.musicOn);
+  const toggleMute = useGame((s) => s.toggleMute);
   if (!player) return null;
+  const muted = !sfxOn && !musicOn;
   const cls = CLASSES[player.classId];
   const need = xpForLevel(player.level);
   const ev = eventOfDay(new Date().toISOString().slice(0, 10));
@@ -46,6 +51,22 @@ export default function Hud() {
           <Purse icon="🌽" value={player.grains} colors={G.gold} />
           <Purse icon="🌶️" value={player.piments} colors={G.piment} />
         </View>
+
+        <Pressable
+          onPress={() => {
+            const on = toggleMute();
+            syncMusic();
+            if (on) play('tap');
+          }}
+          hitSlop={10}
+          style={({ pressed }) => [
+            styles.mute,
+            muted && styles.muteOff,
+            pressed && { opacity: 0.6 },
+          ]}
+        >
+          <Text style={{ fontSize: 15 }}>{muted ? '🔇' : '🔊'}</Text>
+        </Pressable>
       </View>
 
       <View style={styles.xpRow}>
@@ -163,6 +184,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  mute: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    marginLeft: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: C.hairlineSoft,
+    backgroundColor: 'rgba(6,3,12,0.5)',
+  },
+  muteOff: { borderColor: C.piment, backgroundColor: 'rgba(255,59,92,0.14)' },
   purseValue: {
     fontFamily: F.black,
     fontSize: 14.5,

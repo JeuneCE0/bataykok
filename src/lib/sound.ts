@@ -1,29 +1,19 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 
+import { useGame } from '../store/gameStore';
+
 /**
- * Son du jeu. Tous les effets sont **synthétisés** (voir scripts/gen-sfx.js) :
- * aucune licence à gérer, quelques dizaines de kilo-octets, et un rendu
- * arcade qui colle au ton du jeu. À remplacer par du vrai son enregistré le
- * jour où le budget le permet.
+ * Son du jeu. Les effets sont **synthétisés** (voir scripts/gen-sfx.js) :
+ * aucune licence à gérer, 340 Ko d'AAC, et un rendu arcade qui colle au ton.
  *
- * Règle de survie : le son ne doit jamais empêcher de jouer. Toute erreur de
- * lecture est avalée, et l'app tourne à l'identique si l'audio est indisponible.
+ * Les réglages vivent dans le store (donc persistés et réactifs : le bouton du
+ * HUD doit changer d'icône à l'instant). Toute erreur de lecture est avalée —
+ * le son ne doit jamais empêcher de jouer.
  */
 
 export type Sfx =
-  | 'tap'
-  | 'confirm'
-  | 'deny'
-  | 'hit'
-  | 'crit'
-  | 'dodge'
-  | 'ko'
-  | 'coin'
-  | 'victory'
-  | 'defeat'
-  | 'levelup'
-  | 'chest';
+  | 'tap' | 'confirm' | 'deny' | 'hit' | 'crit' | 'dodge'
+  | 'ko' | 'coin' | 'victory' | 'defeat' | 'levelup' | 'chest';
 
 const FILES: Record<Sfx, number> = {
   tap: require('../../assets/sfx/tap.m4a'),
@@ -42,40 +32,27 @@ const FILES: Record<Sfx, number> = {
 
 const THEME = require('../../assets/sfx/theme.m4a');
 
-const KEY_SFX = 'bk.sound.sfx';
-const KEY_MUSIC = 'bk.sound.music';
-
-let sfxOn = true;
-let musicOn = true;
 let ready = false;
 const players = new Map<Sfx, AudioPlayer>();
 let theme: AudioPlayer | null = null;
 
-export async function initSound(): Promise<{ sfx: boolean; music: boolean }> {
+export async function initSound(): Promise<void> {
   try {
-    const [s, m] = await Promise.all([
-      AsyncStorage.getItem(KEY_SFX),
-      AsyncStorage.getItem(KEY_MUSIC),
-    ]);
-    sfxOn = s !== 'off';
-    musicOn = m !== 'off';
-
     await setAudioModeAsync({
       playsInSilentMode: false,
       shouldPlayInBackground: false,
-      // le jeu ne doit pas couper la musique que le joueur écoute déjà
+      // le jeu ne coupe pas la musique que le joueur écoute déjà
       interruptionMode: 'mixWithOthers',
     });
     ready = true;
-    if (musicOn) startTheme();
+    syncMusic();
   } catch {
     ready = false;
   }
-  return { sfx: sfxOn, music: musicOn };
 }
 
 export function play(name: Sfx, volume = 1) {
-  if (!ready || !sfxOn) return;
+  if (!ready || !useGame.getState().sfxOn) return;
   try {
     let p = players.get(name);
     if (!p) {
@@ -90,42 +67,26 @@ export function play(name: Sfx, volume = 1) {
   }
 }
 
-function startTheme() {
+/** Aligne la musique sur le réglage courant. */
+export function syncMusic() {
+  if (!ready) return;
+  const on = useGame.getState().musicOn;
   try {
-    if (!theme) {
-      theme = createAudioPlayer(THEME);
-      theme.loop = true;
-      theme.volume = 0.34;
+    if (on) {
+      if (!theme) {
+        theme = createAudioPlayer(THEME);
+        theme.loop = true;
+        theme.volume = 0.34;
+      }
+      theme.play();
+    } else {
+      theme?.pause();
     }
-    theme.play();
   } catch {
     theme = null;
   }
 }
 
-export function setSfxEnabled(on: boolean) {
-  sfxOn = on;
-  void AsyncStorage.setItem(KEY_SFX, on ? 'on' : 'off');
-  if (on) play('tap');
-}
-
-export function setMusicEnabled(on: boolean) {
-  musicOn = on;
-  void AsyncStorage.setItem(KEY_MUSIC, on ? 'on' : 'off');
-  if (on) startTheme();
-  else
-    try {
-      theme?.pause();
-    } catch {
-      /* rien à faire */
-    }
-}
-
-export function getSoundState() {
-  return { sfx: sfxOn, music: musicOn };
-}
-
-/** À l'extinction de l'app : libère les lecteurs. */
 export function releaseSound() {
   try {
     players.forEach((p) => p.remove());

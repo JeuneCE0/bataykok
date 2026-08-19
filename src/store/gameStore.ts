@@ -161,6 +161,9 @@ interface GameState {
   combatActive: boolean;
   /** état de la liaison multijoueur, pour qu'un échec ne soit jamais muet */
   onlineState: 'off' | 'sync' | 'ok' | 'error';
+  /** réglages audio (persistés) */
+  sfxOn: boolean;
+  musicOn: boolean;
   /** coffre gratuit : date de la prochaine ouverture */
   chestNextAt: number;
   /** Zalbum : clés emplacement:rareté déjà rencontrées */
@@ -227,6 +230,10 @@ interface GameState {
   buyStarterPack: () => void;
   setCombatActive: (v: boolean) => void;
   setOnlineState: (v: GameState['onlineState']) => void;
+  setSfxOn: (v: boolean) => void;
+  setMusicOn: (v: boolean) => void;
+  /** coupe ou rétablit tout d'un geste */
+  toggleMute: () => boolean;
   /** encaisse les défenses relevées au serveur et réaligne l'honneur */
   applyDefenses: (
     logs: DefenseLog[],
@@ -373,6 +380,8 @@ export const useGame = create<GameState>()(
         starterPackBought: false,
         combatActive: false,
         onlineState: 'off',
+        sfxOn: true,
+        musicOn: true,
         chestNextAt: 0,
         album: [],
         passUntil: 0,
@@ -1068,6 +1077,17 @@ export const useGame = create<GameState>()(
         setCombatActive: (v) => set({ combatActive: v }),
 
         setOnlineState: (v) => set({ onlineState: v }),
+
+        setSfxOn: (v) => set({ sfxOn: v }),
+        setMusicOn: (v) => set({ musicOn: v }),
+
+        toggleMute: () => {
+          const s = get();
+          const muted = !s.sfxOn && !s.musicOn;
+          // couper tout, ou tout rétablir : un seul geste, pas de demi-état
+          set({ sfxOn: muted, musicOn: muted });
+          return !muted;
+        },
 
         applyDefenses: (logs, serverHonor) => {
           const s = get();

@@ -1,46 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
-import {
-  getSoundState,
-  setMusicEnabled,
-  setSfxEnabled,
-} from '../lib/sound';
+import { play, syncMusic } from '../lib/sound';
+import { useGame } from '../store/gameStore';
 import { C, F } from '../theme';
-import { Card, SectionTitle } from './ui';
+import { Button, Card, SectionTitle } from './ui';
 
 /** Réglages audio : certains jouent en silence, ça doit se couper en un geste. */
 export default function SoundSettings() {
-  const [sfx, setSfx] = useState(true);
-  const [music, setMusic] = useState(true);
-
-  useEffect(() => {
-    const s = getSoundState();
-    setSfx(s.sfx);
-    setMusic(s.music);
-  }, []);
+  const sfxOn = useGame((s) => s.sfxOn);
+  const musicOn = useGame((s) => s.musicOn);
+  const setSfxOn = useGame((s) => s.setSfxOn);
+  const setMusicOn = useGame((s) => s.setMusicOn);
+  const toggleMute = useGame((s) => s.toggleMute);
+  const allOff = !sfxOn && !musicOn;
 
   return (
-    <Card>
+    <Card glow={allOff ? C.piment : undefined}>
       <SectionTitle icon="🔊">Son</SectionTitle>
+
       <Row
         label="Brui du zé"
         hint="Kou, piès, kofr, viktoir"
-        value={sfx}
+        value={sfxOn}
         onChange={(v) => {
-          setSfx(v);
-          setSfxEnabled(v);
+          setSfxOn(v);
+          if (v) play('tap');
         }}
       />
       <Row
         label="Mizik"
         hint="Boukl séga en fon"
-        value={music}
+        value={musicOn}
         onChange={(v) => {
-          setMusic(v);
-          setMusicEnabled(v);
+          setMusicOn(v);
+          syncMusic();
         }}
       />
+
+      <Button
+        full
+        variant={allOff ? 'cane' : 'slate'}
+        icon={allOff ? '🔊' : '🔇'}
+        label={allOff ? 'Rémèt le son' : 'Koup tout le son'}
+        onPress={() => {
+          const on = toggleMute();
+          syncMusic();
+          if (on) play('tap');
+        }}
+        style={{ marginTop: 12 }}
+      />
+      <Text style={styles.hintAll}>
+        Lo mèm bouton lé dan la bar du ho, pou koupé vitman.
+      </Text>
     </Card>
   );
 }
@@ -83,4 +95,12 @@ const styles = StyleSheet.create({
   },
   label: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
   hint: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  hintAll: {
+    fontFamily: F.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    color: C.textFaint,
+    marginTop: 8,
+    textAlign: 'center',
+  },
 });
