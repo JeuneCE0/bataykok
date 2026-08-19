@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CLASSES } from '../game/classes';
@@ -10,6 +10,7 @@ import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import Counter from './Counter';
 import Rooster from './Rooster';
+import SettingsModal from './SettingsModal';
 import { Bar } from './ui';
 
 export default function Hud() {
@@ -17,6 +18,7 @@ export default function Hud() {
   const sfxOn = useGame((s) => s.sfxOn);
   const musicOn = useGame((s) => s.musicOn);
   const toggleMute = useGame((s) => s.toggleMute);
+  const [settings, setSettings] = useState(false);
   if (!player) return null;
   const muted = !sfxOn && !musicOn;
   const cls = CLASSES[player.classId];
@@ -52,21 +54,35 @@ export default function Hud() {
           <Purse icon="🌶️" value={player.piments} colors={G.piment} />
         </View>
 
-        <Pressable
-          onPress={() => {
-            const on = toggleMute();
-            syncMusic();
-            if (on) play('tap');
-          }}
-          hitSlop={10}
-          style={({ pressed }) => [
-            styles.mute,
-            muted && styles.muteOff,
-            pressed && { opacity: 0.6 },
-          ]}
-        >
-          <Text style={{ fontSize: 15 }}>{muted ? '🔇' : '🔊'}</Text>
-        </Pressable>
+        {/* couper vite d'un côté, tout régler de l'autre */}
+        <View style={styles.tools}>
+          <Pressable
+            onPress={() => {
+              const on = toggleMute();
+              syncMusic();
+              if (on) play('tap');
+            }}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.mute,
+              muted && styles.muteOff,
+              pressed && { opacity: 0.6 },
+            ]}
+          >
+            <Text style={{ fontSize: 14 }}>{muted ? '🔇' : '🔊'}</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              play('tap');
+              setSettings(true);
+            }}
+            hitSlop={8}
+            style={({ pressed }) => [styles.mute, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={{ fontSize: 14 }}>⚙️</Text>
+          </Pressable>
+        </View>
+        <SettingsModal visible={settings} onClose={() => setSettings(false)} />
       </View>
 
       <View style={styles.xpRow}>
@@ -122,6 +138,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   row: { flexDirection: 'row', alignItems: 'center' },
+  tools: { gap: 5, marginLeft: 8 },
   avatar: {
     width: 54,
     height: 54,
@@ -185,10 +202,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mute: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    marginLeft: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

@@ -98,7 +98,7 @@ export default function DefenseReport() {
                         {d.attackerName}
                       </Text>
                       <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-                        <Chip label={`${cls.emoji} niv. ${d.attackerLevel}`} color={cls.color} />
+                        <Chip icon={cls.emoji} label={`niv. ${d.attackerLevel}`} color={cls.color} />
                         <Chip
                           label={d.defended ? 'Repoussé' : 'Battu'}
                           color={d.defended ? C.cane : C.piment}

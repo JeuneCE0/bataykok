@@ -11,6 +11,7 @@ import {
   GhostButton,
   ScreenTitle,
   SectionTitle,
+  StatGrid,
   StatRow,
   T,
   Well,
@@ -50,6 +51,16 @@ export default function QuestScreen() {
 
   if (!player) return null;
   const transport = TRANSPORTS[player.transport];
+  // une sauvegarde d'avant `startedAt` retombe sur la durée nominale
+  const questDuration = activeQuest
+    ? Math.max(
+        1,
+        Math.round(
+          (activeQuest.endsAt - (activeQuest.startedAt ?? activeQuest.endsAt - activeQuest.quest.durationSec * 1000)) /
+            1000
+        )
+      )
+    : 1;
   const remaining = activeQuest
     ? Math.max(0, Math.ceil((activeQuest.endsAt - now) / 1000))
     : 0;
@@ -72,44 +83,46 @@ export default function QuestScreen() {
         </View>
         <Bar value={motivation} max={MAX_MOTIVATION} variant="lagoon" height={16} />
 
-        {motivation < 20 && (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>
-              {motivation === 0 ? '😮‍💨 Pu d’énerzi' : '⚠️ Énerzi ba'}
-            </Text>
-            <Text style={styles.emptyText}>
-              Rechargée à fond dans {formatUntil(nextDailyReset() - now)} (minuit).
-              En attendant : une Dodo, un plein, ou une pub.
-            </Text>
-          </View>
-        )}
+        <Text style={styles.refillNote}>
+          {motivation >= MAX_MOTIVATION
+            ? 'Plin ! Le rond i attend a ou.'
+            : `Plein refé dan ${formatUntil(nextDailyReset() - now)} (minui)`}
+        </Text>
 
         <View style={styles.actions}>
           <Button
+            style={styles.action}
             size="sm"
             icon="🍺"
             label={
               dodosToday >= MAX_DODOS_PER_DAY
-                ? 'Dodo — plus rien aujourd’hui'
-                : `Dodo fraîche 🌶️1 · ${MAX_DODOS_PER_DAY - dodosToday} restantes`
+                ? 'Pu de Dodo zordi'
+                : `Dodo · ${MAX_DODOS_PER_DAY - dodosToday} restantes`
             }
+            sub={dodosToday >= MAX_DODOS_PER_DAY ? undefined : '🌶️ 1 · +20'}
             onPress={drinkDodo}
             disabled={dodosToday >= MAX_DODOS_PER_DAY || player.piments < 1}
           />
           <Button
+            style={styles.action}
             size="sm"
             variant="ember"
-            label="Plein 🌶️5"
+            icon="🫗"
+            label="Plein d'un coup"
+            sub={`🌶️ 5 · +${MAX_MOTIVATION - motivation}`}
             onPress={refillMotivation}
             disabled={player.piments < 5 || motivation >= MAX_MOTIVATION}
           />
         </View>
         <AdButton kind="dodo" full />
+
         <View style={styles.transportRow}>
+          <Text style={styles.transportLabel}>Transport</Text>
           <Chip
-            label={`${transport.emoji} ${transport.name}${
+            icon={transport.emoji}
+            label={`${transport.name}${
               transport.reduction > 0
-                ? ` · −${Math.round(transport.reduction * 100)}% durée`
+                ? ` · −${Math.round(transport.reduction * 100)}%`
                 : ''
             }`}
             color={C.mystic}
@@ -122,21 +135,27 @@ export default function QuestScreen() {
           <SectionTitle icon="⏳">Quête en cours</SectionTitle>
           <Text style={styles.questTitle}>{activeQuest.quest.title}</Text>
           <Chip
-            label={`📍 ${activeQuest.quest.place}`}
+            icon="📍"
+            label={activeQuest.quest.place}
             color={C.lagoon}
             style={{ alignSelf: 'flex-start', marginTop: 6 }}
           />
           <Text style={styles.flavor}>{activeQuest.quest.flavor}</Text>
           {remaining > 0 ? (
             <>
-              <Well style={{ alignItems: 'center', gap: 8 }}>
+              <Well style={styles.timerWell}>
+                <Text style={styles.timerCap}>Tan ki rest</Text>
                 <Text style={styles.countdown}>{formatTime(remaining)}</Text>
                 <Bar
-                  value={activeQuest.quest.durationSec - remaining}
-                  max={activeQuest.quest.durationSec}
+                  value={questDuration - remaining}
+                  max={questDuration}
                   variant="gold"
                   height={12}
                 />
+                <Text style={styles.timerSub}>
+                  {Math.round(((questDuration - remaining) / questDuration) * 100)} % ·
+                  {' '}récompense à l’arrivée
+                </Text>
               </Well>
               <GhostButton
                 label="Abandonner"
@@ -144,7 +163,7 @@ export default function QuestScreen() {
                   cancelQuest();
                   cancelQuestReminder();
                 }}
-                style={{ marginTop: 10 }}
+                style={styles.abandon}
               />
             </>
           ) : (
@@ -202,11 +221,10 @@ export default function QuestScreen() {
             <Card>
               <View style={styles.questHead}>
                 <Text style={styles.questTitle}>{q.title}</Text>
-                <Chip label={`📍 ${q.place}`} color={C.lagoon} />
+                <Chip icon="📍" label={q.place} color={C.lagoon} />
               </View>
               <Text style={styles.flavor}>{q.flavor}</Text>
-              <StatRow
-                style={{ marginBottom: 8 }}
+              <StatGrid
                 items={[
                   {
                     icon: '⏱️',
@@ -287,8 +305,51 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: C.textDim,
   },
-  actions: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' },
-  transportRow: { flexDirection: 'row', marginTop: 12 },
+  refillNote: {
+    fontFamily: F.semi,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.textFaint,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  // deux boutons de largeur égale : l'un ne doit pas écraser l'autre selon la
+  // longueur de son libellé
+  actions: { flexDirection: 'row', gap: 8, marginTop: 10, marginBottom: 8 },
+  action: { flex: 1, alignSelf: 'auto' },
+  transportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: C.hairlineSoft,
+  },
+  transportLabel: {
+    fontFamily: F.black,
+    fontSize: 11.5,
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+    color: C.textFaint,
+  },
+  timerWell: { alignItems: 'center', gap: 10, paddingVertical: 18 },
+  timerCap: {
+    fontFamily: F.black,
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    color: C.textFaint,
+    includeFontPadding: false,
+  },
+  timerSub: {
+    fontFamily: F.semi,
+    fontSize: 12,
+    lineHeight: 16,
+    color: C.textDim,
+    textAlign: 'center',
+  },
+  abandon: { alignSelf: 'center', marginTop: 12 },
   questHead: { gap: 8, alignItems: 'flex-start' },
   questTitle: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
   flavor: {
@@ -311,6 +372,8 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     lineHeight: 17,
     color: C.cane,
+    textAlign: 'center',
+    marginTop: 8,
     marginBottom: 12,
   },
 });

@@ -1,7 +1,8 @@
 import { CLASSES, CLASS_LIST } from './classes';
-import { mulberry32 } from './formulas';
+import { mulberry32, playerToFighter } from './formulas';
+import { SLOT_LIST, generateItem } from './items';
 import { botNames } from './names';
-import { Appearance, Bot, ClassId, Fighter } from './types';
+import { Appearance, Bot, ClassId, Fighter, Item, PlayerState, Rarity, SlotId } from './types';
 
 export const BODY_COLORS = ['#8d5524', '#3b3b3b', '#e8e4d8', '#b5541c', '#5d4037', '#7b1fa2'];
 export const COMB_COLORS = ['#e53935', '#ff7043', '#c2185b', '#f9a825', '#6a1b9a'];
@@ -53,31 +54,90 @@ function buildLadder(): Bot[] {
   return bots;
 }
 
-/** Convertit un bot en combattant, stats dérivées de son niveau. */
-export function botToFighter(bot: Bot): Fighter {
-  const rand = mulberry32(bot.id.length * 7919 + bot.level * 104729);
-  const c = CLASSES[bot.classId];
+// ─── Profil d'un bot ──────────────────────────────────────────────────────
+
+/**
+ * Attributs *achetés* d'un bot, hors équipement. Volontairement calqués sur ce
+ * qu'un joueur assidu possède au même niveau : l'adversaire doit être un
+ * miroir, pas une courbe parallèle.
+ */
+const BASE = { main: 2.6, side: 1.1, endurance: 1.6, chance: 0.8 } as const;
+
+/**
+ * Gamme portée selon le niveau. C'est *la* raison d'être de ce fichier : sans
+ * équipement, un bot n'avait que ses attributs de base, et le joueur passait
+ * de 0 % à 100 % de victoires en s'achetant une panoplie kalité — le rond
+ * n'opposait plus aucune résistance passé le premier palier de boutique.
+ */
+function rarityForLevel(level: number, roll: number): Rarity {
+  const tiers: Rarity[] = ['commun', 'korek', 'kalite', 'rar', 'lezand', 'mitik'];
+  const base = level < 7 ? 0 : level < 15 ? 1 : level < 25 ? 2 : level < 34 ? 3 : level < 41 ? 4 : 5;
+  // ±1 palier : deux bots du même niveau ne se ressemblent pas
+  const jitter = roll < 0.22 ? -1 : roll > 0.88 ? 1 : 0;
+  return tiers[Math.max(0, Math.min(5, base + jitter))];
+}
+
+const profileCache = new Map<string, PlayerState>();
+
+/** Équipement et attributs d'un bot — déterministes, donc mémoïsables. */
+export function botProfile(bot: Bot): PlayerState {
+  const cached = profileCache.get(bot.id);
+  if (cached) return cached;
+
+  const rand = mulberry32(hashId(bot.id) ^ (bot.level * 104729));
   const L = bot.level;
-  const main = Math.round(8 + L * 3.2 + rand() * L);
-  const side = Math.round(5 + L * 1.6 + rand() * L * 0.5);
+  const equipment: Partial<Record<SlotId, Item>> = {};
+  for (const slot of SLOT_LIST) {
+    // tout le monde n'est pas équipé de pied en cap — un trou laisse une prise
+    if (slot !== 'arme' && rand() < 0.16) continue;
+    const lvl = Math.max(1, L + Math.round(rand() * 4 - 2));
+    equipment[slot] = generateItem(lvl, slot, rarityForLevel(L, rand()), rand);
+  }
+
+  const main = Math.round(10 + L * BASE.main);
+  const side = Math.round(8 + L * BASE.side);
   const attrs = {
     force: side,
     adresse: side,
     esprit: side,
-    endurance: Math.round(6 + L * 2.4 + rand() * L * 0.5),
-    chance: Math.round(4 + L * 1.2),
+    endurance: Math.round(9 + L * BASE.endurance),
+    chance: Math.round(6 + L * BASE.chance),
   };
-  attrs[c.mainAttr] = main;
-  const wBase = Math.round(2 + L * 2.1);
-  return {
+  attrs[CLASSES[bot.classId].mainAttr] = main;
+
+  const profile: PlayerState = {
     name: bot.name,
-    level: L,
     classId: bot.classId,
-    attrs,
-    weaponMin: wBase,
-    weaponMax: wBase + Math.max(2, Math.round(wBase * 0.4)),
-    armor: Math.round(L * 4.5),
+    level: L,
+    xp: 0,
     appearance: bot.appearance,
+    baseAttrs: attrs,
+    equipment,
+    inventory: [],
+    grains: 0,
+    piments: 0,
+    honor: 100,
+    rank: 1,
+    wins: 0,
+    losses: 0,
+    guildId: null,
+    transport: 0,
+    talents: [],
   };
+  profileCache.set(bot.id, profile);
+  return profile;
 }
 
+/** Le bot est un combattant comme un autre : mêmes formules que le joueur. */
+export function botToFighter(bot: Bot): Fighter {
+  return playerToFighter(botProfile(bot));
+}
+
+function hashId(id: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}

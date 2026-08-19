@@ -9,7 +9,7 @@ import { RARITY_COLORS } from '../game/items';
 import { AttrId, Attributes, ClassId, Item, SlotId } from '../game/types';
 import { C, F, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
-import { Button, Card, Chip, SectionTitle } from './ui';
+import { Button, Card, Chip, GhostButton, SectionTitle } from './ui';
 
 const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
 const SLOTS: SlotId[] = [
@@ -39,9 +39,16 @@ export interface KokProfile {
 export default function KokProfileModal({
   profile,
   onClose,
+  onChallenge,
+  challengeDisabled,
+  challengeHint,
 }: {
   profile: KokProfile | null;
   onClose: () => void;
+  /** absent = fiche en lecture seule (son propre kok, ou hors du rond) */
+  onChallenge?: () => void;
+  challengeDisabled?: boolean;
+  challengeHint?: string;
 }) {
   if (!profile) return null;
   const cls = CLASSES[profile.classId];
@@ -85,16 +92,16 @@ export default function KokProfileModal({
             </View>
 
             <View style={styles.record}>
-              <Chip label={`🏆 ${profile.wins} V`} color={C.cane} />
-              <Chip label={`💀 ${profile.losses} D`} color={C.piment} />
-              <Chip label={`🎖️ ${profile.honor}`} color={C.mystic} />
+              <Chip icon="🏆" label={`${profile.wins} V`} color={C.cane} />
+              <Chip icon="💀" label={`${profile.losses} D`} color={C.piment} />
+              <Chip icon="🎖️" label={`${profile.honor}`} color={C.mystic} />
             </View>
 
             <Card compact>
               <SectionTitle icon="⚔️">Statistiques de combat</SectionTitle>
               <Line label="❤️  PV" value={fmt(hp)} />
               <Line label="🗡️  Dégâts" value={`${profile.weaponMin}–${profile.weaponMax}`} />
-              <Line label="🛡️  Armur" value={`${profile.armor}`} />
+              <Line label="🛡️  Armure" value={`${profile.armor}`} />
             </Card>
 
             <Card compact>
@@ -155,7 +162,23 @@ export default function KokProfileModal({
             )}
           </ScrollView>
 
-          <Button full size="lg" label="Fermer" onPress={onClose} style={{ marginTop: 12 }} />
+          {onChallenge && !profile.isMe ? (
+            <View style={styles.footer}>
+              <Button
+                full
+                size="lg"
+                variant="ember"
+                icon="⚔️"
+                label="Défier"
+                sub={challengeHint}
+                disabled={challengeDisabled}
+                onPress={onChallenge}
+              />
+              <GhostButton label="Fermer" onPress={onClose} style={{ alignSelf: 'center' }} />
+            </View>
+          ) : (
+            <Button full size="lg" label="Fermer" onPress={onClose} style={{ marginTop: 12 }} />
+          )}
         </LinearGradient>
       </View>
     </Modal>
@@ -245,6 +268,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: C.textDim,
   },
+  footer: { marginTop: 12, gap: 8 },
   hint: {
     fontFamily: F.regular,
     fontSize: 12.5,

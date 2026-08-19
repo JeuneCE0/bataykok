@@ -103,11 +103,11 @@ let itemSeq = 0;
  * Tirage de gamme. Les deux derniers paliers restent rares au point d'être un
  * événement : c'est ce qui donne sa valeur au reste (et à l'hôtel des ventes).
  */
-export function rollRarity(luck = 0): Rarity {
+export function rollRarity(luck = 0, rand: () => number = Math.random): Rarity {
   // décaler la plage vers le haut, pas la rétrécir vers le bas : l'ancienne
   // formule faisait disparaître rar, lézandèr et mitik dès luck = 0,1
   const l = Math.min(0.25, Math.max(0, luck));
-  const r = Math.random() * (1 - l) + l;
+  const r = rand() * (1 - l) + l;
   if (r < 0.46) return 'commun';
   if (r < 0.74) return 'korek';
   if (r < 0.90) return 'kalite';
@@ -116,32 +116,79 @@ export function rollRarity(luck = 0): Rarity {
   return 'mitik';
 }
 
-export function generateItem(level: number, slot?: SlotId, rarity?: Rarity): Item {
-  const s: SlotId =
-    slot ??
-    (['arme', 'tete', 'torse', 'pattes', 'amulette', 'anneau', 'ceinture', 'grigri'][
-      rnd(0, 7)
-    ] as SlotId);
-  const r = rarity ?? rollRarity();
+export const SLOT_LIST: SlotId[] = [
+  'arme', 'tete', 'torse', 'pattes', 'amulette', 'anneau', 'ceinture', 'grigri',
+];
+
+/**
+ * `rand` est injectable parce que l'équipement des bots doit être déterministe :
+ * `botToFighter` est appelé à chaque rendu de l'échelle, et un adversaire dont
+ * la puissance change entre deux affichages est un adversaire dont on ne peut
+ * pas évaluer les chances.
+ */
+/**
+ * Valeur intrinsèque d'un objet, indépendante de la classe.
+ *
+ * Le prix en dérivait auparavant du seul niveau (`15 + level * 9`), ce qui
+ * rendait un kolié mitik à 4 bonus moins cher que la moitié d'un point
+ * d'attribut acheté à la Kaz. Le puits de grains était donc inopérant : aucun
+ * joueur rationnel n'achetait jamais d'attribut. Le prix suit désormais ce
+ * que l'objet apporte vraiment.
+ */
+export function itemValue(it: Item): number {
+  let v = 0;
+  if (it.dmgMin && it.dmgMax) v += ((it.dmgMin + it.dmgMax) / 2) * DMG_VALUE;
+  if (it.armor) v += it.armor * ARMOR_VALUE;
+  (Object.keys(it.bonuses) as AttrId[]).forEach((k) => {
+    v += (it.bonuses[k] ?? 0) * (k === 'endurance' ? 1.5 : 1);
+  });
+  return v;
+}
+
+/** Un point de dégât moyen vaut plus qu'un point d'attribut : il frappe à chaque tour. */
+const DMG_VALUE = 3;
+const ARMOR_VALUE = 1.3;
+/** Grains par point de valeur — le levier qui aligne boutique et Kaz. */
+export const GRAINS_PER_VALUE = 3.1;
+
+export function itemPrice(it: Item, rand: () => number = Math.random): number {
+  const setPremium = it.setId ? 1.25 : 1;
+  return Math.max(
+    5,
+    Math.round(itemValue(it) * GRAINS_PER_VALUE * setPremium * (0.88 + rand() * 0.24))
+  );
+}
+
+/** Ce que le marchand rachète — deux écrans en avaient chacun leur copie. */
+export function resaleValue(it: Item): number {
+  return Math.max(1, Math.round(it.price * 0.4));
+}
+
+export function generateItem(
+  level: number,
+  slot?: SlotId,
+  rarity?: Rarity,
+  rand: () => number = Math.random
+): Item {
+  const pick = (n: number) => Math.floor(rand() * n);
+  const s: SlotId = slot ?? SLOT_LIST[pick(8)];
+  const r = rarity ?? rollRarity(0, rand);
   const mult = RARITY_MULT[r];
   const tier = rarityRank(r);
   const baseName = SLOT_NAMES[s][tier];
   const name =
-    tier >= 1 ? `${baseName} ${SUFFIXES[rnd(0, SUFFIXES.length - 1)]}` : baseName;
+    tier >= 1 ? `${baseName} ${SUFFIXES[pick(SUFFIXES.length)]}` : baseName;
 
   const nBonuses = Math.min(4, 1 + Math.floor(tier / 1.4));
-  const pool = [...ATTRS].sort(() => Math.random() - 0.5).slice(0, nBonuses);
+  const pool = [...ATTRS].sort(() => rand() - 0.5).slice(0, nBonuses);
   const bonuses: Partial<Record<AttrId, number>> = {};
   pool.forEach((a) => {
-    bonuses[a] = Math.max(1, Math.round((1 + level * 0.7) * mult * (0.7 + Math.random() * 0.6)));
+    bonuses[a] = Math.max(1, Math.round((1 + level * 0.7) * mult * (0.7 + rand() * 0.6)));
   });
 
   // une pièce sur cinq appartient à une panoplie (jamais sur du commun :
   // les sets doivent rester un objectif, pas un acquis de départ)
-  const set =
-    tier >= 1 && Math.random() < 0.22
-      ? SETS[rnd(0, SETS.length - 1)]
-      : null;
+  const set = tier >= 1 && rand() < 0.22 ? SETS[pick(SETS.length)] : null;
 
   const item: Item = {
     id: `it${Date.now()}_${itemSeq++}`,
@@ -150,9 +197,7 @@ export function generateItem(level: number, slot?: SlotId, rarity?: Rarity): Ite
     rarity: r,
     level,
     bonuses,
-    price: Math.round(
-      (15 + level * 9) * mult * (0.8 + Math.random() * 0.4) * (set ? 1.25 : 1)
-    ),
+    price: 0, // posé plus bas : le prix dérive de la valeur réelle de l'objet
     ...(set ? { setId: set.id } : {}),
   };
 
@@ -161,15 +206,15 @@ export function generateItem(level: number, slot?: SlotId, rarity?: Rarity): Ite
     item.dmgMin = base;
     item.dmgMax = base + Math.max(2, Math.round(base * 0.4));
   } else if (s === 'tete' || s === 'torse' || s === 'pattes' || s === 'ceinture') {
-    item.armor = Math.max(1, Math.round(level * 2.2 * mult * (0.7 + Math.random() * 0.6)));
+    item.armor = Math.max(1, Math.round(level * 2.2 * mult * (0.7 + rand() * 0.6)));
   }
 
+  item.price = itemPrice(item, rand);
   return item;
 }
 
 export function shopRotation(level: number, count = 6): Item[] {
-  const slots: SlotId[] = ['arme', 'tete', 'torse', 'pattes', 'amulette', 'anneau', 'ceinture', 'grigri'];
-  const shuffled = [...slots].sort(() => Math.random() - 0.5).slice(0, count);
+  const shuffled = [...SLOT_LIST].sort(() => Math.random() - 0.5).slice(0, count);
   // toujours au moins une arme en boutique
   if (!shuffled.includes('arme')) shuffled[0] = 'arme';
   return shuffled.map((s) => generateItem(Math.max(1, level + rnd(-1, 2)), s));

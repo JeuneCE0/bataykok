@@ -195,7 +195,14 @@ export default function ArenaScreen() {
             { id: 'palmares', label: '🏆  Palmarès' },
           ]}
         />
-        <RankingScreen />
+        <RankingScreen
+          onChallenge={(botId) => {
+            const bot = LADDER.find((b) => b.id === botId);
+            if (!bot) return;
+            setView('batay');
+            launch(bot);
+          }}
+        />
       </View>
     );
   }
@@ -301,7 +308,7 @@ export default function ArenaScreen() {
                     {bot.name}
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-                    <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
+                    <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
                     <Chip label={`Niv. ${bot.level}`} color={C.textDim} />
                     <Chip label={chance.label} color={chance.color} active />
                   </View>

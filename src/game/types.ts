@@ -101,6 +101,8 @@ export interface Quest {
 
 export interface ActiveQuest {
   quest: Quest;
+  /** date de départ — la progression se mesure entre elle et `endsAt` */
+  startedAt: number;
   endsAt: number; // timestamp ms
 }
 

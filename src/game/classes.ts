@@ -15,8 +15,9 @@ export interface ClassDef {
   /**
    * Multiplicateur de dégâts d'arme. C'est le seul levier d'équilibrage :
    * PV, armure et capacités portent l'identité de la classe et ne bougent pas.
-   * Valeurs issues d'une recherche automatique (scripts/tune-balance.ts) qui
-   * a ramené l'écart entre classes de 32 à moins de 5 points.
+   * Valeurs issues de scripts/tune-balance.ts, qui mesure désormais sur les
+   * profils réels du jeu (joueur équipé contre l'échelle) et non sur un
+   * combattant synthétique : l'écart entre classes passe de 45 à 5 points.
    */
   dmgMult: number;
   emoji: string;
@@ -35,7 +36,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Race légendaire du rond. Li tape for, li tape dur. Oté !",
     hpMult: 5,
     armorCap: 0.5,
-    dmgMult: 1.09,
+    dmgMult: 0.362,
     emoji: '⚔️',
     color: '#c0392b',
   },
@@ -50,7 +51,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Fin malin sa ! Ou tape, li lé déjà pi là.",
     hpMult: 4,
     armorCap: 0.25,
-    dmgMult: 0.91,
+    dmgMult: 0.577,
     emoji: '💨',
     color: '#27ae60',
   },
@@ -65,7 +66,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Élevé aux tisanes péi dans les hauts de Cilaos. Son regard i fé fré dann do.",
     hpMult: 2,
     armorCap: 0.1,
-    dmgMult: 3.34,
+    dmgMult: 2.552,
     emoji: '🌿',
     color: '#8e44ad',
   },
@@ -80,7 +81,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Attrapé dans les ravines de Mafate. Personne i tient dan son chemin.",
     hpMult: 4,
     armorCap: 0.25,
-    dmgMult: 0.89,
+    dmgMult: 0.376,
     emoji: '🔥',
     color: '#d35400',
   },
@@ -95,7 +96,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Nourri au rougail piment depuis poussin. Son bec i brûle.",
     hpMult: 5,
     armorCap: 0.5,
-    dmgMult: 1.07,
+    dmgMult: 0.317,
     emoji: '🌶️',
     color: '#e74c3c',
   },
@@ -110,7 +111,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     flavor: "Star des kabars. Son maloya i fé trembler le gallodrome.",
     hpMult: 3,
     armorCap: 0.1,
-    dmgMult: 2.46,
+    dmgMult: 2.016,
     emoji: '🎵',
     color: '#f39c12',
   },

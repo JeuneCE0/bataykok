@@ -193,7 +193,7 @@ export default function DungeonScreen() {
                   <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                     <Chip label={`Niv. ${boss.level}`} color={C.textDim} />
                     {!locked && (
-                      <Chip label={`${cls.emoji} ${cls.name}`} color={cls.color} />
+                      <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
                     )}
                     {cleared && <Chip label="✓ VINKU" color={C.cane} active />}
                     {current && (

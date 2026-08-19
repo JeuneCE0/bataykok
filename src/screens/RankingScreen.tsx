@@ -15,7 +15,12 @@ const LADDER = generateLadder();
 const botById = new Map(LADDER.map((b) => [b.id, b]));
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-export default function RankingScreen() {
+export default function RankingScreen({
+  onChallenge,
+}: {
+  /** fourni par Le Rond : le palmarès n'a pas de moteur de combat à lui */
+  onChallenge?: (botId: string) => void;
+} = {}) {
   const player = useGame((s) => s.player);
   const ladderOrder = useGame((s) => s.ladderOrder);
   const seasonStart = useGame((s) => s.seasonStart);
@@ -23,9 +28,12 @@ export default function RankingScreen() {
   const seasonPending = useGame((s) => s.seasonPending);
   const claimSeason = useGame((s) => s.claimSeason);
   const [profile, setProfile] = useState<KokProfile | null>(null);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
+  const arenaTickets = useGame((s) => s.arenaTickets);
   if (!player) return null;
 
   const openProfile = (id: string, rank: number) => {
+    setChallengeId(id === 'me' ? null : id);
     if (id === 'me') {
       const f = playerToFighter(player);
       const w = playerWeapon(player);
@@ -177,7 +185,25 @@ export default function RankingScreen() {
         })}
       </Card>
 
-      <KokProfileModal profile={profile} onClose={() => setProfile(null)} />
+      <KokProfileModal
+        profile={profile}
+        onClose={() => setProfile(null)}
+        onChallenge={
+          onChallenge && challengeId
+            ? () => {
+                const id = challengeId;
+                setProfile(null);
+                onChallenge(id);
+              }
+            : undefined
+        }
+        challengeDisabled={arenaTickets <= 0}
+        challengeHint={
+          arenaTickets > 0
+            ? `${arenaTickets} jeton${arenaTickets > 1 ? 's' : ''} de batay`
+            : 'Pu de jeton — atann la recharz'
+        }
+      />
     </ScrollView>
   );
 }

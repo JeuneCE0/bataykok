@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { botProfile, generateLadder } from '../bots';
 import { CLASS_LIST, CLASSES } from '../classes';
 import { simulateCombat } from '../combat';
-import { maxHp } from '../formulas';
+import { maxHp, playerToFighter } from '../formulas';
+import { referencePlayer } from '../reference';
 import { Fighter } from '../types';
 
 function kok(classId: Fighter['classId'], level: number, force = 1): Fighter {
@@ -72,37 +74,59 @@ describe('simulation de combat', () => {
     );
   });
 
-  it('aucune classe ne domine : toutes entre 42 et 58 %', () => {
-    // Un joueur met ses points dans l'attribut de sa classe : mesurer à
-    // attributs plats donnait une image fausse de l'équilibrage.
-    const oriente = (id: Fighter['classId'], lvl: number) => {
-      const f = kok(id, lvl);
-      const main = CLASSES[id].mainAttr;
-      f.attrs[main] = Math.round(f.attrs[main] * 2.2);
-      return f;
-    };
+  it('aucune classe ne domine face à l’échelle réelle', () => {
+    // Mesuré sur le joueur de référence — équipé, attributs orientés — contre
+    // les adversaires que le jeu produit vraiment. La version précédente
+    // opposait deux combattants synthétiques à attributs plats et sans
+    // équipement : elle annonçait 3 points d'écart là où le jeu en avait 45.
+    const ladder = generateLadder();
     const taux: Record<string, number> = {};
-    for (const a of CLASS_LIST) {
+    for (const c of CLASS_LIST) {
       let victoires = 0;
-      const N = 600;
-      for (const b of CLASS_LIST) {
-        for (let i = 0; i < N / CLASS_LIST.length; i++) {
-          if (simulateCombat(oriente(a.id, 20), oriente(b.id, 20)).winner === 0) victoires++;
+      let n = 0;
+      for (const level of [10, 20, 35]) {
+        const moi = playerToFighter(referencePlayer(c.id, level));
+        for (const bot of ladder.filter((b) => Math.abs(b.level - level) <= 3)) {
+          const lui = playerToFighter(botProfile(bot));
+          for (let i = 0; i < 10; i++, n++) {
+            if (simulateCombat(moi, lui).winner === 0) victoires++;
+          }
         }
       }
-      taux[a.id] = (victoires / N) * 100;
-    }
-    for (const a of CLASS_LIST) {
-      assert.ok(
-        taux[a.id] > 42 && taux[a.id] < 58,
-        `${CLASSES[a.id].name} gagne ${taux[a.id].toFixed(0)} % du temps`
-      );
+      taux[c.id] = (victoires / n) * 100;
     }
     const v = Object.values(taux);
+    const ecart = Math.max(...v) - Math.min(...v);
     assert.ok(
-      Math.max(...v) - Math.min(...v) < 14,
-      `${(Math.max(...v) - Math.min(...v)).toFixed(0)} points séparent la meilleure classe de la pire`
+      ecart < 16,
+      `${ecart.toFixed(0)} points séparent la meilleure classe de la pire : ` +
+        CLASS_LIST.map((c) => `${c.id} ${taux[c.id].toFixed(0)} %`).join(', ')
     );
+  });
+
+  it('l’équipement décide du sort du combat', () => {
+    // Sans équipement le joueur doit perdre, bien équipé il doit gagner : c'est
+    // ce qui manquait quand les bots n'avaient aucun objet — le rond passait de
+    // 0 à 100 % de victoires dès la première panoplie achetée.
+    const ladder = generateLadder().filter((b) => Math.abs(b.level - 20) <= 3);
+    const taux = (gamme: Parameters<typeof referencePlayer>[2]) => {
+      let victoires = 0;
+      let n = 0;
+      for (const c of CLASS_LIST) {
+        const moi = playerToFighter(referencePlayer(c.id, 20, gamme));
+        for (const bot of ladder) {
+          const lui = playerToFighter(botProfile(bot));
+          for (let i = 0; i < 6; i++, n++) {
+            if (simulateCombat(moi, lui).winner === 0) victoires++;
+          }
+        }
+      }
+      return (victoires / n) * 100;
+    };
+    const nu = taux(null);
+    const equipe = taux('kalite');
+    assert.ok(nu < 15, `un coq sans équipement gagne ${nu.toFixed(0)} % du temps`);
+    assert.ok(equipe > 45, `un coq bien équipé ne gagne que ${equipe.toFixed(0)} % du temps`);
   });
 
   it('chaque round dit ce qui se passe', () => {

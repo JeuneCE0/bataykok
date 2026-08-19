@@ -100,7 +100,7 @@ export default function CreationScreen() {
         <Text style={styles.classSub}>{cls.subtitle}</Text>
 
         <View style={styles.chipRow}>
-          <Chip label={`★ ${cls.mainAttrLabel}`} color={C.gold} />
+          <Chip icon="★" label={cls.mainAttrLabel} color={C.gold} />
           <Chip label={cls.subtitle} color={cls.color} />
         </View>
 

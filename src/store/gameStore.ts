@@ -19,7 +19,8 @@ import {
 import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
-import { generateItem, shopRotation } from '../game/items';
+import { Lang } from '../i18n';
+import { generateItem, resaleValue, shopRotation } from '../game/items';
 import { compareToEquipped } from '../game/power';
 import {
   arenaReward,
@@ -165,6 +166,8 @@ interface GameState {
   /** réglages audio (persistés) */
   sfxOn: boolean;
   musicOn: boolean;
+  /** langue de l'interface (persistée) */
+  lang: Lang;
   /** coffre gratuit : date de la prochaine ouverture */
   chestNextAt: number;
   /** Zalbum : clés emplacement:rareté déjà rencontrées */
@@ -232,6 +235,7 @@ interface GameState {
   setCombatActive: (v: boolean) => void;
   setOnlineState: (v: GameState['onlineState']) => void;
   setSfxOn: (v: boolean) => void;
+  setLang: (v: Lang) => void;
   setMusicOn: (v: boolean) => void;
   /** coupe ou rétablit tout d'un geste */
   toggleMute: () => boolean;
@@ -383,6 +387,8 @@ export const useGame = create<GameState>()(
         onlineState: 'off',
         sfxOn: true,
         musicOn: true,
+        // le jeu se passe à La Réunion : le kréol est la langue par défaut
+        lang: 'rcf',
         chestNextAt: 0,
         album: [],
         passUntil: 0,
@@ -583,7 +589,7 @@ export const useGame = create<GameState>()(
           );
           if (!junk.length) return { count: 0, grains: 0 };
           const grains = junk.reduce(
-            (sum, it) => sum + Math.round(it.price * 0.4),
+            (sum, it) => sum + resaleValue(it),
             0
           );
           const ids = new Set(junk.map((i) => i.id));
@@ -628,9 +634,10 @@ export const useGame = create<GameState>()(
           const reduction = TRANSPORTS[s.player.transport].reduction;
           const speed = talentEffects(s.player.talents ?? []).questSpeed;
           const dur = Math.round(q.durationSec * (1 - reduction) * (1 - speed));
+          const now = Date.now();
           set({
             motivation: s.motivation - q.motivationCost,
-            activeQuest: { quest: q, endsAt: Date.now() + dur * 1000 },
+            activeQuest: { quest: q, startedAt: now, endsAt: now + dur * 1000 },
           });
         },
 
@@ -889,7 +896,7 @@ export const useGame = create<GameState>()(
           set({
             player: {
               ...s.player,
-              grains: s.player.grains + Math.round(item.price * 0.4),
+              grains: s.player.grains + resaleValue(item),
               inventory: s.player.inventory.filter((i) => i.id !== item.id),
             },
           });
@@ -1082,6 +1089,8 @@ export const useGame = create<GameState>()(
         setCombatActive: (v) => set({ combatActive: v }),
 
         setOnlineState: (v) => set({ onlineState: v }),
+
+        setLang: (v) => set({ lang: v }),
 
         setSfxOn: (v) => set({ sfxOn: v }),
         setMusicOn: (v) => set({ musicOn: v }),

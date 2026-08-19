@@ -74,6 +74,7 @@ type BtnSize = 'sm' | 'md' | 'lg';
 
 export function Button({
   label,
+  sub,
   onPress,
   disabled,
   variant = 'gold',
@@ -83,6 +84,8 @@ export function Button({
   style,
 }: {
   label: string;
+  /** seconde ligne : le coût, le gain — ce qui allongeait le libellé principal */
+  sub?: string;
   onPress: () => void;
   disabled?: boolean;
   variant?: GradientKey;
@@ -132,20 +135,45 @@ export function Button({
             { marginBottom: pressed && !disabled ? 0 : size === 'sm' ? 2 : 3 },
           ]}
         >
-          <Text
-            style={[
-              styles.btnText,
-              {
-                fontSize: font,
-                lineHeight: font * 1.25,
-                color: disabled ? C.textDim : light ? C.ink : '#FFF8F0',
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {icon ? `${icon}  ` : ''}
-            {label}
-          </Text>
+          <View style={styles.btnRow}>
+            {/* l'emoji garde sa propre boîte de ligne : mêlé au libellé, ses
+                métriques faisaient dériver le texte vers le haut du bouton */}
+            {icon ? (
+              <Text style={[styles.btnIcon, { fontSize: font, lineHeight: font * 1.25 }]}>
+                {icon}
+              </Text>
+            ) : null}
+            <View style={styles.btnLabels}>
+              <Text
+                style={[
+                  styles.btnText,
+                  {
+                    fontSize: font,
+                    lineHeight: font * 1.25,
+                    color: disabled ? C.textDim : light ? C.ink : '#FFF8F0',
+                  },
+                ]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+              {sub ? (
+                <Text
+                  style={[
+                    styles.btnSub,
+                    {
+                      fontSize: font * 0.78,
+                      lineHeight: font * 1.02,
+                      color: disabled ? C.textFaint : light ? 'rgba(42,18,6,0.72)' : 'rgba(255,248,240,0.8)',
+                    },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {sub}
+                </Text>
+              ) : null}
+            </View>
+          </View>
         </LinearGradient>
       )}
     </Pressable>
@@ -284,12 +312,15 @@ export function SectionTitle({
 }
 
 export function Chip({
+  icon,
   label,
   color = C.textDim,
   active,
   onPress,
   style,
 }: {
+  /** rendu dans son propre Text : mêler un emoji au libellé décentre la pilule */
+  icon?: string;
   label: string;
   color?: string;
   active?: boolean;
@@ -306,6 +337,7 @@ export function Chip({
         style,
       ]}
     >
+      {icon ? <Text style={styles.chipIcon}>{icon}</Text> : null}
       <Text
         style={[styles.chipText, { color: active ? C.ink : color }]}
         numberOfLines={1}
@@ -340,6 +372,36 @@ export function StatRow({
         <View key={i} style={styles.stat}>
           <Text style={{ fontSize: 13.5 }}>{it.icon}</Text>
           <Text style={[styles.statValue, it.color ? { color: it.color } : null]}>
+            {it.value}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/**
+ * Grille de statistiques à cellules égales. `StatRow` aligne à gauche avec des
+ * écarts fixes : les largeurs d'emoji étant inégales, les colonnes ne tombaient
+ * jamais en face les unes des autres d'une carte à l'autre. Ici chaque cellule
+ * occupe la même fraction de la largeur et centre son contenu.
+ */
+export function StatGrid({
+  items,
+  style,
+}: {
+  items: { icon: string; value: string; color?: string }[];
+  style?: ViewStyle;
+}) {
+  return (
+    <View style={[styles.statGrid, style]}>
+      {items.map((it, i) => (
+        <View key={i} style={styles.statCell}>
+          <Text style={styles.statCellIcon}>{it.icon}</Text>
+          <Text
+            style={[styles.statCellValue, it.color ? { color: it.color } : null]}
+            numberOfLines={1}
+          >
             {it.value}
           </Text>
         </View>
@@ -440,7 +502,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     includeFontPadding: false,
   },
+  btnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  btnIcon: { includeFontPadding: false },
+  btnLabels: { alignItems: 'center', flexShrink: 1 },
+  btnSub: {
+    fontFamily: F.semi,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginTop: 1,
+  },
   barOuter: {
+    // sans cela, un parent en `alignItems: 'center'` réduit la barre à sa
+    // largeur de contenu — c'est-à-dire zéro, ses enfants étant absolus
+    alignSelf: 'stretch',
     backgroundColor: 'rgba(6,3,12,0.6)',
     overflow: 'hidden',
     justifyContent: 'center',
@@ -479,6 +553,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chip: {
+    flexDirection: 'row',
+    gap: 5,
     paddingHorizontal: 11,
     // Baloo 2 assoit sa ligne de base très bas : avec un lineHeight généreux
     // le glyphe remonte et le texte paraît collé au bord haut. On centre donc
@@ -498,7 +574,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     includeFontPadding: false,
   },
+  // l'emoji porte sa propre police : sa boîte de ligne doit rester la sienne
+  chipIcon: { fontSize: 12, lineHeight: 15, includeFontPadding: false },
   statRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
+  statGrid: {
+    flexDirection: 'row',
+    borderRadius: R.md,
+    backgroundColor: 'rgba(6,3,12,0.4)',
+    borderWidth: 1,
+    borderColor: C.hairlineSoft,
+    paddingVertical: 9,
+  },
+  statCell: { flex: 1, alignItems: 'center', gap: 3 },
+  statCellIcon: { fontSize: 14, lineHeight: 18, includeFontPadding: false },
+  statCellValue: {
+    fontFamily: F.black,
+    fontSize: 13.5,
+    lineHeight: 18,
+    color: C.text,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statValue: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.text },
   segWrap: {

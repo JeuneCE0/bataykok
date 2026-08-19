@@ -8,7 +8,7 @@ import DailyMissions from '../components/DailyMissions';
 import DayEventBanner from '../components/DayEventBanner';
 import FreeChest from '../components/FreeChest';
 import ReferralCard from '../components/ReferralCard';
-import SoundSettings from '../components/SoundSettings';
+import SettingsModal from '../components/SettingsModal';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
 import Rooster from '../components/Rooster';
 import {
@@ -34,11 +34,12 @@ import {
   SLOT_LABELS,
   totalAttrs,
 } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS, itemStats } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemStats, resaleValue } from '../game/items';
 import { compareToEquipped, kokPower } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { TALENT_BY_ID } from '../game/talents';
 import { AttrId, Item, SlotId } from '../game/types';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
 
@@ -62,11 +63,13 @@ const SLOTS: SlotId[] = [
 ];
 
 export default function CharacterScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const buyAttr = useGame((s) => s.buyAttr);
   const equipItem = useGame((s) => s.equipItem);
   const sellItem = useGame((s) => s.sellItem);
   const [selected, setSelected] = useState<Item | null>(null);
+  const [settings, setSettings] = useState(false);
   const [bulk, setBulk] = useState(1);
   const [view, setView] = useState<'kok' | 'kaz'>('kok');
   const onlineState = useGame((s) => s.onlineState);
@@ -137,7 +140,19 @@ export default function CharacterScreen() {
           <BattleLog />
           <ReferralCard />
           <Collection />
-          <SoundSettings />
+          <Card>
+            <SectionTitle icon="⚙️">{t('settings.title')}</SectionTitle>
+            <Text style={styles.settingsHint}>{t('settings.sub')}</Text>
+            <Button
+              full
+              variant="slate"
+              icon="⚙️"
+              label={t('settings.title')}
+              onPress={() => setSettings(true)}
+              style={{ marginTop: 10 }}
+            />
+          </Card>
+          <SettingsModal visible={settings} onClose={() => setSettings(false)} />
         </ScrollView>
       </View>
     );
@@ -176,8 +191,8 @@ export default function CharacterScreen() {
         </View>
 
         <View style={styles.recordRow}>
-          <Chip label={`🏆 ${player.wins} V`} color={C.cane} />
-          <Chip label={`💀 ${player.losses} D`} color={C.piment} />
+          <Chip icon="🏆" label={`${player.wins} V`} color={C.cane} />
+          <Chip icon="💀" label={`${player.losses} D`} color={C.piment} />
           <Chip label={`#${player.rank} au rond`} color={C.gold} />
         </View>
         <Text style={styles.classDesc}>{cls.description}</Text>
@@ -357,7 +372,7 @@ export default function CharacterScreen() {
                   onPress={() => equipItem(it)}
                 />
                 <GhostButton
-                  label={`🌽${fmt(Math.round(it.price * 0.4))}`}
+                  label={`🌽${fmt(resaleValue(it))}`}
                   onPress={() => sellItem(it)}
                 />
               </View>
@@ -429,6 +444,13 @@ function StatTile({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  settingsHint: {
+    fontFamily: F.regular,
+    fontSize: 13,
+    lineHeight: 18,
+    color: C.textDim,
+    marginTop: 2,
+  },
   content: { padding: 14, paddingBottom: 40 },
   sectionHead: {
     flexDirection: 'row',
