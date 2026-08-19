@@ -73,6 +73,3 @@ export function eventOfDay(day: string): DayEvent {
   return EVENTS[Math.abs(h) % EVENTS.length];
 }
 
-export function eventMult(ev: DayEvent, kind: EventKind): number {
-  return ev.kind === kind ? ev.mult : 1;
-}

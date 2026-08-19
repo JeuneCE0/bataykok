@@ -149,3 +149,16 @@ export const TYPO = {
     color: C.text,
   } as TextStyle,
 } as const;
+
+/**
+ * Éclaircit (amt > 0) ou assombrit (amt < 0) une couleur hexadécimale.
+ * Sert au coq paramétrique et aux médaillons de classe.
+ */
+export function shade(hex: string, amt: number): string {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const cl = (v: number) => Math.max(0, Math.min(255, v));
+  const r = cl((num >> 16) + amt);
+  const g = cl(((num >> 8) & 0xff) + amt);
+  const b = cl((num & 0xff) + amt);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+}

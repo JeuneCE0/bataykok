@@ -34,7 +34,7 @@ import {
   SLOT_LABELS,
   totalAttrs,
 } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemStats } from '../game/items';
 import { compareToEquipped, kokPower } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { TALENT_BY_ID } from '../game/talents';
@@ -425,16 +425,6 @@ function StatTile({
       <Text style={styles.tileValue}>{value}</Text>
     </View>
   );
-}
-
-function itemStats(it: Item): string {
-  const parts: string[] = [];
-  if (it.dmgMin) parts.push(`Dégâts ${it.dmgMin}–${it.dmgMax}`);
-  if (it.armor) parts.push(`Armure +${it.armor}`);
-  (Object.keys(it.bonuses) as AttrId[]).forEach((k) => {
-    parts.push(`${ATTR_LABELS[k]} +${it.bonuses[k]}`);
-  });
-  return parts.join(' · ');
 }
 
 const styles = StyleSheet.create({

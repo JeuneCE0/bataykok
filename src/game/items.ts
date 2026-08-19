@@ -1,3 +1,4 @@
+import { ATTR_LABELS } from './classes';
 import { rnd } from './formulas';
 import { SETS } from './sets';
 import { AttrId, Item, Rarity, SlotId } from './types';
@@ -169,4 +170,18 @@ export function shopRotation(level: number, count = 6): Item[] {
   // toujours au moins une arme en boutique
   if (!shuffled.includes('arme')) shuffled[0] = 'arme';
   return shuffled.map((s) => generateItem(Math.max(1, level + rnd(-1, 2)), s));
+}
+
+/**
+ * Résumé lisible d'un objet : « Dégâts 12–18 · Armure +9 · Force +4 ».
+ * Trois écrans en avaient chacun leur copie.
+ */
+export function itemStats(it: Item): string {
+  const parts: string[] = [];
+  if (it.dmgMin) parts.push(`Dégâts ${it.dmgMin}–${it.dmgMax}`);
+  if (it.armor) parts.push(`Armure +${it.armor}`);
+  (Object.keys(it.bonuses) as AttrId[]).forEach((k) =>
+    parts.push(`${ATTR_LABELS[k]} +${it.bonuses[k]}`)
+  );
+  return parts.join(' · ');
 }

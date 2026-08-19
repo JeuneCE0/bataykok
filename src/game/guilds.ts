@@ -41,7 +41,7 @@ export const GUILDS: GuildDef[] = [
 /** Bonus par niveau d'amélioration de guilde */
 export const GUILD_XP_BONUS_PER_LEVEL = 2; // % XP
 export const GUILD_GOLD_BONUS_PER_LEVEL = 2; // % grains
-export const GUILD_UPGRADE_BASE_COST = 80;
+const GUILD_UPGRADE_BASE_COST = 80;
 
 export function guildUpgradeCost(level: number): number {
   return Math.round(GUILD_UPGRADE_BASE_COST * Math.pow(1.6, level));

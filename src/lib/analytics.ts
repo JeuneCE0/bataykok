@@ -61,8 +61,3 @@ export async function flushEvents(): Promise<void> {
   }
 }
 
-export function stopAnalytics() {
-  if (timer) clearInterval(timer);
-  timer = null;
-  void flushEvents();
-}

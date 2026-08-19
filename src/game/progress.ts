@@ -192,13 +192,6 @@ export function isStepComplete(id: StepId, c: StepContext): boolean {
   }
 }
 
-export const STEP_BY_ID: Record<StepId, StepDef> = STEPS.reduce(
-  (acc, s) => {
-    acc[s.id] = s;
-    return acc;
-  },
-  {} as Record<StepId, StepDef>
-);
 
 // ─── Défis du jour ───────────────────────────────────────────────────────
 

@@ -14,6 +14,7 @@ import Svg, {
 
 import { TAIL_PALETTES } from '../game/bots';
 import { Appearance } from '../game/types';
+import { shade } from '../theme';
 
 interface Props {
   appearance: Appearance;
@@ -342,15 +343,4 @@ export default function Rooster({
       {svg}
     </Animated.View>
   );
-}
-
-/** assombrit (amt < 0) ou éclaircit (amt > 0) une couleur hex */
-function shade(hex: string, amt: number): string {
-  const h = hex.replace('#', '');
-  const num = parseInt(h, 16);
-  const clamp = (v: number) => Math.max(0, Math.min(255, v));
-  const r = clamp((num >> 16) + amt);
-  const g = clamp(((num >> 8) & 0xff) + amt);
-  const b = clamp((num & 0xff) + amt);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
 }

@@ -18,7 +18,7 @@ import {
 } from '../components/ui';
 import { ATTR_LABELS } from '../game/classes';
 import { fmt, grainsPerPiment, SLOT_ICONS } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemStats } from '../game/items';
 import { eventOfDay } from '../game/events';
 import { compareToEquipped } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
@@ -346,16 +346,6 @@ export default function ShopScreen() {
     </ScrollView>
     </View>
   );
-}
-
-function itemStats(it: Item): string {
-  const parts: string[] = [];
-  if (it.dmgMin) parts.push(`Dégâts ${it.dmgMin}–${it.dmgMax}`);
-  if (it.armor) parts.push(`Armure +${it.armor}`);
-  (Object.keys(it.bonuses) as AttrId[]).forEach((k) =>
-    parts.push(`${ATTR_LABELS[k]} +${it.bonuses[k]}`)
-  );
-  return parts.join(' · ');
 }
 
 const styles = StyleSheet.create({

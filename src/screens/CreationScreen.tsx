@@ -21,7 +21,7 @@ import { CLASS_LIST } from '../game/classes';
 import { randomKokName } from '../game/names';
 import { Appearance } from '../game/types';
 import { useGame } from '../store/gameStore';
-import { C, F, R, SHADOW } from '../theme';
+import { C, F, R, SHADOW, shade } from '../theme';
 
 export default function CreationScreen() {
   const createPlayer = useGame((s) => s.createPlayer);
@@ -224,15 +224,6 @@ function Swatch({
       style={[styles.swatch, { backgroundColor: color }, active ? styles.swatchOn : null]}
     />
   );
-}
-
-function shade(hex: string, amt: number): string {
-  const num = parseInt(hex.replace('#', ''), 16);
-  const cl = (v: number) => Math.max(0, Math.min(255, v));
-  const r = cl((num >> 16) + amt);
-  const g = cl(((num >> 8) & 0xff) + amt);
-  const b = cl((num & 0xff) + amt);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
 }
 
 const styles = StyleSheet.create({

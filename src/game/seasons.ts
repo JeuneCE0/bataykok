@@ -3,7 +3,7 @@
  * Sans reset du classement (frustrant tant que les adversaires sont simulés) —
  * l'enjeu est la récompense de fin, pas la remise à zéro.
  */
-export const SEASON_DAYS = 14;
+const SEASON_DAYS = 14;
 export const SEASON_MS = SEASON_DAYS * 86_400_000;
 
 export interface SeasonTier {
@@ -26,10 +26,4 @@ export function tierForRank(rank: number): SeasonTier {
   return SEASON_TIERS.find((t) => rank <= t.maxRank) ?? SEASON_TIERS[SEASON_TIERS.length - 1];
 }
 
-export function seasonNumber(start: number, now: number): number {
-  return 1 + Math.max(0, Math.floor((now - start) / SEASON_MS));
-}
 
-export function seasonEndsAt(start: number): number {
-  return start + SEASON_MS;
-}

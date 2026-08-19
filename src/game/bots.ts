@@ -23,8 +23,18 @@ export function randomAppearance(rand: () => number = Math.random): Appearance {
   };
 }
 
-/** Génère l'échelle de 60 adversaires simulés (déterministe). */
+let ladderCache: Bot[] | null = null;
+
+/**
+ * L'échelle des 60 adversaires simulés. Déterministe, donc calculée une fois
+ * pour toutes : deux écrans l'importaient et la reconstruisaient chacun.
+ */
 export function generateLadder(): Bot[] {
+  if (ladderCache) return ladderCache;
+  return (ladderCache = buildLadder());
+}
+
+function buildLadder(): Bot[] {
   const rand = mulberry32(974974);
   const names = botNames();
   const bots: Bot[] = [];
@@ -71,6 +81,3 @@ export function botToFighter(bot: Bot): Fighter {
   };
 }
 
-export function classIdSafe(id: string): ClassId {
-  return (id in CLASSES ? id : 'gep') as ClassId;
-}
