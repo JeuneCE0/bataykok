@@ -26,22 +26,4 @@ export function formatUntil(ms: number): string {
   return `${s} s`;
 }
 
-/** « 45 s », « 2 min 30 », « 1 h 05 » — pour les comptes à rebours courts. */
-export function formatDuration(sec: number): string {
-  if (sec <= 0) return 'maintenant';
-  if (sec < 60) return `${sec} s`;
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  if (m < 60) return s === 0 ? `${m} min` : `${m} min ${String(s).padStart(2, '0')}`;
-  return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
-}
 
-/** « il y a 3 h » — pour les journaux et historiques. */
-export function timeAgo(at: number): string {
-  const m = Math.max(0, Math.round((Date.now() - at) / 60000));
-  if (m < 1) return "à l'instant";
-  if (m < 60) return `il y a ${m} min`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `il y a ${h} h`;
-  return `il y a ${Math.round(h / 24)} j`;
-}

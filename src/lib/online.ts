@@ -187,18 +187,6 @@ export async function fetchRivals(limit = 3): Promise<OnlineKok[]> {
   return data.map(toOnlineKok);
 }
 
-export async function fetchTopLadder(limit = 30): Promise<OnlineKok[]> {
-  if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('ladder')
-    .select(
-      'id, name, class_id, level, appearance, attrs, weapon_min, weapon_max, armor, power, honor, rank'
-    )
-    .order('rank', { ascending: true })
-    .limit(limit);
-  if (error || !data) return [];
-  return data.map(toOnlineKok);
-}
 
 /** Enregistre l'issue d'une batay et renvoie le nouvel honneur. */
 export async function submitResult(

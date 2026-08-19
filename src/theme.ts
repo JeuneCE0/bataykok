@@ -51,8 +51,6 @@ export type GradientKey = keyof typeof G;
 
 export const R = { sm: 10, md: 14, lg: 20, xl: 28, pill: 999 } as const;
 
-export const SP = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 } as const;
-
 /** Ombres portées — la profondeur fait 80 % du « premium » sur mobile. */
 export const SHADOW = {
   card: {

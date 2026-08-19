@@ -1555,7 +1555,3 @@ export function currentStep(s: {
   return { def, ready: isStepComplete(def.id, s) };
 }
 
-export function playerPower(p: PlayerState): number {
-  const a = totalAttrs(p);
-  return a.force + a.adresse + a.esprit + a.endurance + a.chance;
-}
