@@ -87,3 +87,15 @@ export async function donateToGuild(amount: number): Promise<DonateResult | null
     leveled: row.leveled,
   };
 }
+
+/** Niveau partagé de l'écurie d'un joueur — `null` s'il n'en a pas. */
+export async function fetchMyGuildLevel(guildKey: string | null): Promise<number | null> {
+  if (!supabase || !guildKey) return null;
+  const { data, error } = await supabase
+    .from('guild_board')
+    .select('level')
+    .eq('guild_key', guildKey)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data.level as number;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useGame } from '../store/gameStore';
+import { fetchMyGuildLevel } from './guild';
 import { claimDefenses, fetchMyHonor, isOnlineEnabled, pushSnapshot } from './online';
 
 /**
@@ -13,6 +14,7 @@ export function useOnlineSync() {
   const albumSize = useGame((s) => s.album.length);
   const setOnlineState = useGame((s) => s.setOnlineState);
   const applyDefenses = useGame((s) => s.applyDefenses);
+  const setGuildLevel = useGame((s) => s.setGuildLevel);
   const claimed = useRef(false);
   // L'écurie fait partie de la signature : sans elle, rejoindre une écurie ne
   // remontait pas au serveur avant le prochain changement de niveau ou de
@@ -47,8 +49,24 @@ export function useOnlineSync() {
       // sinon le serveur ne sait pas encore qui nous sommes
       if (claimed.current) return;
       claimed.current = true;
-      const [logs, honor] = await Promise.all([claimDefenses(), fetchMyHonor()]);
+      // Le niveau d'écurie est partagé et sert de bonus aux quêtes : le lire
+      // seulement à l'ouverture de l'écran laissait le bonus périmé pour qui
+      // n'y va jamais.
+      const [logs, honor, guildLevel] = await Promise.all([
+        claimDefenses(),
+        fetchMyHonor(),
+        fetchMyGuildLevel(player.guildId),
+      ]);
       applyDefenses(logs, honor);
+      if (guildLevel !== null) setGuildLevel(guildLevel);
     });
-  }, [signature, player, dungeonFloor, albumSize, setOnlineState, applyDefenses]);
+  }, [
+    signature,
+    player,
+    dungeonFloor,
+    albumSize,
+    setOnlineState,
+    applyDefenses,
+    setGuildLevel,
+  ]);
 }
