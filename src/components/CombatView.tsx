@@ -20,6 +20,10 @@ import { Button, GhostButton, Well } from './ui';
 import { useT } from '../i18n/useT';
 
 const ROUND_MS = 720;
+/** Un critique fige l'image : c'est ce qui donne du poids au coup. */
+const HITSTOP_MS = 150;
+/** Le coup final s'étire — on doit voir tomber l'adversaire. */
+const FINAL_MS = 1150;
 
 // ─── Scène de combat, partagée par le rond et les donjons ────────────────
 
@@ -73,15 +77,24 @@ export default function CombatView({
   const tagScale = useRef(new Animated.Value(0)).current;
   const winScale = useRef(new Animated.Value(0)).current;
   const [burst, setBurst] = useState<{ side: 0 | 1; token: number } | null>(null);
+  /** secousse de la scène — seul le combattant touché tremblait jusqu'ici */
+  const quake = useRef(new Animated.Value(0)).current;
 
+  // Cadence variable plutôt qu'un intervalle fixe : chaque round dure selon ce
+  // qu'il vaut. Un `setInterval` régulier donnait à tous les coups le même
+  // poids, y compris au dernier.
   useEffect(() => {
     if (finished) return;
-    const t = setInterval(
+    const r = result.rounds[Math.max(0, idx)];
+    const dernier = idx >= result.rounds.length - 2;
+    const dur =
+      dernier ? FINAL_MS : r && (r.kind === 'crit' || r.kind === 'comet') ? ROUND_MS + HITSTOP_MS : ROUND_MS;
+    const t = setTimeout(
       () => setIdx((i) => Math.min(i + 1, result.rounds.length - 1)),
-      ROUND_MS
+      dur
     );
-    return () => clearInterval(t);
-  }, [finished, result.rounds.length]);
+    return () => clearTimeout(t);
+  }, [finished, idx, result.rounds]);
 
   // Chorégraphie d'un round : bond → impact → recul + dégâts flottants
   useEffect(() => {
@@ -103,6 +116,27 @@ export default function CombatView({
 
     const missed = r.kind === 'block' || r.kind === 'dodge';
     play(missed ? 'dodge' : hard ? 'crit' : 'hit', missed ? 0.7 : 1);
+
+    // l'amplitude suit la part de vie emportée : un coup qui compte se sent
+    const part = r.damage / Math.max(1, maxHp(def === 0 ? me : op));
+    const force = missed ? 0 : Math.min(1, 0.25 + part * 3.2) * (hard ? 1.35 : 1);
+    if (force > 0) {
+      quake.setValue(0);
+      Animated.sequence([
+        Animated.timing(quake, {
+          toValue: force,
+          duration: 45,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.spring(quake, {
+          toValue: 0,
+          friction: 3.6,
+          tension: 220,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
 
     Animated.sequence([
       Animated.timing(anim[att].lunge, {
@@ -197,7 +231,27 @@ export default function CombatView({
         colors={['rgba(255,90,31,0.16)', 'rgba(10,7,19,0)']}
         style={styles.stageGlow}
       />
-      <View style={styles.scene}>
+      <Animated.View
+        style={[
+          styles.scene,
+          {
+            transform: [
+              {
+                translateX: quake.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 9],
+                }),
+              },
+              {
+                translateY: quake.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -5],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
       <View style={styles.stageHead}>
         <Text style={styles.stageTitle}>⚔️ BATAY DANN ROND</Text>
         <Text style={styles.roundCount}>
@@ -281,7 +335,7 @@ export default function CombatView({
           </Text>
         )}
       </View>
-      </View>
+      </Animated.View>
 
       {/* Journal */}
       <Well style={{ flex: 1, minHeight: 130, maxHeight: 230, marginBottom: 12 }}>
