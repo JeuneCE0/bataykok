@@ -45,7 +45,7 @@ export default function CosmeticsShop() {
   if (!player) return null;
 
   const shown: Appearance = { ...player.appearance, ...(tryOn ?? {}) };
-  const owned = player.cosmetics;
+  const owned = player.cosmetics ?? [];
 
   /** Le cosmétique correspondant à une valeur, s'il est payant. */
   const defFor = (kind: CosmeticKind, value: string | number) =>

@@ -20,7 +20,7 @@ import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventLuck, eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
-import { COSMETIC_BY_ID } from '../game/cosmetics';
+import { COSMETIC_BY_ID, cosmeticsForLook } from '../game/cosmetics';
 import { honorFloor } from '../game/ranks';
 import { DonateResult, donateToGuild } from '../lib/guild';
 import {
@@ -1018,10 +1018,17 @@ export const useGame = create<GameState>()(
               equipment,
               inventory: [...s.player.inventory, ...displaced],
               appearance: { ...s.player.appearance, ...def.look },
-              // le look de la panoplie reste acquis même si on la démonte
-              cosmetics: s.player.cosmetics.includes(`set.${def.id}`)
-                ? s.player.cosmetics
-                : [...s.player.cosmetics, `set.${def.id}`],
+              // Le look reste acquis même si on démonte la panoplie — et il
+              // faut accorder les pièces d'apparence elles-mêmes, sinon le
+              // joueur porte un casque affiché en même temps comme « porté »
+              // et « à vendre ».
+              cosmetics: [
+                ...new Set([
+                  ...(s.player.cosmetics ?? []),
+                  `set.${def.id}`,
+                  ...cosmeticsForLook(def.look),
+                ]),
+              ],
             },
           });
           trackEvent('set_kit_bought', { setId, price });
@@ -1032,7 +1039,7 @@ export const useGame = create<GameState>()(
           const s = get();
           const c = COSMETIC_BY_ID[id];
           if (!s.player || !c) return false;
-          if (s.player.cosmetics.includes(id)) return false;
+          if ((s.player.cosmetics ?? []).includes(id)) return false;
           const grains = c.grains ?? 0;
           const piments = c.piments ?? 0;
           if (s.player.grains < grains || s.player.piments < piments) return false;
@@ -1041,7 +1048,7 @@ export const useGame = create<GameState>()(
               ...s.player,
               grains: s.player.grains - grains,
               piments: s.player.piments - piments,
-              cosmetics: [...s.player.cosmetics, id],
+              cosmetics: [...(s.player.cosmetics ?? []), id],
             },
           });
           trackEvent('cosmetic_bought', { id, rarity: c.rarity });
@@ -1532,11 +1539,45 @@ export const useGame = create<GameState>()(
     },
     {
       name: 'batay-kok-save',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
-      // les sauvegardes d'avant la progression restent valides : le merge
-      // shallow de zustand complète les nouveaux champs avec leurs défauts.
-      migrate: (persisted) => persisted as GameState,
+      /**
+       * Le merge de zustand est **shallow**.
+       *
+       * Un commentaire affirmait ici que les nouveaux champs recevaient leurs
+       * défauts — c'est vrai au premier niveau seulement. `player` est un objet
+       * imbriqué : celui de la sauvegarde remplace le défaut en entier, si bien
+       * que tout champ ajouté *à l'intérieur* de `player` arrivait à
+       * `undefined`. L'écran des cosmétiques plantait sur toutes les
+       * sauvegardes existantes (`player.cosmetics.includes` sur `undefined`).
+       *
+       * Même chose pour les objets stockés qui ont changé de forme : une quête
+       * en cours d'avant l'i18n porte un `title` et non un `titleKey`, et
+       * s'afficherait vide. On les laisse repartir plutôt que de les traduire
+       * à rebours — une quête dure quelques minutes.
+       */
+      migrate: (persisted) => {
+        const s = persisted as GameState;
+        if (!s) return s;
+
+        if (s.player) {
+          s.player = {
+            ...s.player,
+            talents: s.player.talents ?? [],
+            cosmetics: s.player.cosmetics ?? [],
+            honorPeak: s.player.honorPeak ?? s.player.honor ?? 100,
+          };
+        }
+
+        const questObsolete = (q: { titleKey?: unknown } | null | undefined) =>
+          !!q && q.titleKey === undefined;
+        if (questObsolete(s.activeQuest?.quest)) s.activeQuest = null;
+        if (s.quests?.some(questObsolete)) s.quests = [];
+        if (s.dailyMissions?.some((m) => m?.def?.titleKey === undefined)) {
+          s.dailyMissions = rollDailyMissions(today());
+        }
+        return s;
+      },
       partialize: ({ combatActive, onlineState, pendingDefenses, ...rest }) =>
         rest as GameState,
     }

@@ -102,7 +102,7 @@ export const COSMETIC_BY_ID: Record<string, CosmeticDef> = COSMETICS.reduce(
 export function ownsValue(
   kind: CosmeticKind,
   value: string | number,
-  owned: string[]
+  owned: string[] = []
 ): boolean {
   const free =
     kind === 'body'
@@ -111,5 +111,32 @@ export function ownsValue(
         ? COMB_COLORS.slice(0, FREE_COUNTS.comb).includes(value as string)
         : (value as number) < FREE_COUNTS[kind];
   if (free) return true;
-  return COSMETICS.some((c) => c.kind === kind && c.value === value && owned.includes(c.id));
+  return COSMETICS.some(
+    (c) => c.kind === kind && c.value === value && (owned ?? []).includes(c.id)
+  );
+}
+
+/**
+ * Cosmétiques correspondant à un look de panoplie.
+ *
+ * Acheter une panoplie applique son look, mais n'accordait pas les pièces
+ * d'apparence : le joueur se retrouvait à porter un casque affiché en même
+ * temps comme « porté » et « à vendre à 6 000 grains ». Un look offert doit
+ * être un look possédé.
+ */
+export function cosmeticsForLook(look: {
+  bodyColor: string;
+  combColor: string;
+  tailPalette: number;
+  accessory: number;
+}): string[] {
+  const paires: [CosmeticKind, string | number][] = [
+    ['body', look.bodyColor],
+    ['comb', look.combColor],
+    ['tail', look.tailPalette],
+    ['accessory', look.accessory],
+  ];
+  return COSMETICS.filter((c) =>
+    paires.some(([kind, valeur]) => c.kind === kind && c.value === valeur)
+  ).map((c) => c.id);
 }

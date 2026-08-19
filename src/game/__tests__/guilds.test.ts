@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { COSMETIC_BY_ID, cosmeticsForLook, ownsValue } from '../cosmetics';
 import { GUILDS, GUILD_BONUS_SCALE, donationTiers } from '../guilds';
+import { SETS } from '../sets';
 
 describe('écurie', () => {
   it('les cinq écuries ont un nom, une devise et un emblème', () => {
@@ -46,5 +48,43 @@ describe('écurie', () => {
     // l'écurie semblait ne rien apporter.
     assert.ok(2 / GUILD_BONUS_SCALE > 0.05, 'le niveau 1 ne se voit pas');
     assert.ok(GUILD_BONUS_SCALE <= 60, 'l’échelle dépasse le bonus maximal');
+  });
+});
+
+describe('look des panoplies', () => {
+  it('un look offert est un look possédé', () => {
+    // Acheter une panoplie appliquait son look sans accorder les pièces
+    // d'apparence : le casque s'affichait à la fois « porté » et « à vendre à
+    // 6 000 grains ».
+    for (const def of SETS) {
+      const ids = cosmeticsForLook(def.look);
+      const acquis = [`set.${def.id}`, ...ids];
+      for (const [kind, valeur] of [
+        ['body', def.look.bodyColor],
+        ['comb', def.look.combColor],
+        ['tail', def.look.tailPalette],
+        ['accessory', def.look.accessory],
+      ] as const) {
+        assert.ok(
+          ownsValue(kind, valeur, acquis),
+          `${def.id} : ${kind} ${valeur} porté sans être acquis`
+        );
+      }
+    }
+  });
+
+  it('le look n’accorde rien de plus que ce qu’il montre', () => {
+    for (const def of SETS) {
+      for (const id of cosmeticsForLook(def.look)) {
+        const c = COSMETIC_BY_ID[id];
+        const valeurs = [
+          def.look.bodyColor,
+          def.look.combColor,
+          def.look.tailPalette,
+          def.look.accessory,
+        ];
+        assert.ok(valeurs.includes(c.value as never), `${def.id} accorde ${id} en trop`);
+      }
+    }
   });
 });
