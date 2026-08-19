@@ -49,10 +49,13 @@ export async function fetchListings(filter?: {
 }): Promise<Listing[]> {
   if (!supabase) return [];
   const me = await ensureSession();
+  // `koks` n'est lisible que par son propriétaire depuis la migration 0010 :
+  // la jointure d'origine renvoyait un nom nul pour toutes les annonces des
+  // autres. `market_board` expose les annonces ouvertes et le nom du vendeur,
+  // rien d'autre.
   let q = supabase
-    .from('market_listings')
-    .select('id, item, price, seller_id, created_at, koks!market_listings_seller_id_fkey(name)')
-    .eq('status', 'open')
+    .from('market_board')
+    .select('id, item, price, seller_id, seller_name, created_at')
     .order('created_at', { ascending: false })
     .limit(60);
   if (filter?.slot) q = q.eq('slot', filter.slot);
@@ -65,7 +68,7 @@ export async function fetchListings(filter?: {
     id: r.id,
     item: r.item,
     price: r.price,
-    sellerName: r.koks?.name ?? 'in kok',
+    sellerName: r.seller_name ?? 'in kok',
     isMine: r.seller_id === me,
     createdAt: r.created_at,
   }));
@@ -137,5 +140,5 @@ interface ListingRow {
   price: number;
   seller_id: string;
   created_at: string;
-  koks: { name: string } | null;
+  seller_name: string | null;
 }
