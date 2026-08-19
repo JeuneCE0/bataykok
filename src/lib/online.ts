@@ -112,7 +112,10 @@ function snapshotRow(id: string, p: PlayerState, extra?: SnapshotExtra) {
     weapon_max: f.weaponMax,
     armor: playerArmor(p),
     power: kokPower(p),
-    honor: p.honor,
+    // `honor` est absent volontairement : il appartient au serveur depuis la
+    // migration 0010. Le publier écrasait la perte d'honneur inscrite par
+    // `submit_arena_result` pendant qu'on était hors ligne — aucune défense
+    // perdue n'a jamais coûté un point à personne.
     wins: p.wins,
     losses: p.losses,
     // pilotage : économie et progression, rien de personnel

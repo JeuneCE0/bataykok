@@ -31,8 +31,10 @@ export async function fetchReferralState(): Promise<ReferralState | null> {
 
   let referredBy: string | null = null;
   if (parent.data?.referrer_id) {
+    // `koks` n'est plus lisible que par son propriétaire : le nom d'un autre
+    // joueur passe par la vue publique du classement
     const { data } = await supabase
-      .from('koks')
+      .from('ladder')
       .select('name')
       .eq('id', parent.data.referrer_id)
       .maybeSingle();
