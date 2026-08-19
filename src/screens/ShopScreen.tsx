@@ -116,6 +116,8 @@ export default function ShopScreen() {
         sub={t('shop.sub')}
       />
 
+      <SetKits />
+
       <AdButton kind="grains" full />
 
       {shopWithCompare.map(({ it, cmp }, si) => {
