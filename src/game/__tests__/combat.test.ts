@@ -5,6 +5,7 @@ import { botProfile, generateLadder } from '../bots';
 import { CLASS_LIST, CLASSES } from '../classes';
 import { simulateCombat } from '../combat';
 import { maxHp, playerToFighter } from '../formulas';
+import { fighterPower } from '../power';
 import { referencePlayer } from '../reference';
 import { Fighter } from '../types';
 
@@ -169,5 +170,40 @@ describe('combats qui n’aboutissent pas', () => {
         'le combat au plafond est attribué à l’index 0'
       );
     }
+  });
+});
+
+describe('l’échelle du rond', () => {
+  it('monte vraiment : aucune inversion de puissance', () => {
+    // Elle était ordonnée par niveau, mais la puissance dépend aussi de la
+    // classe et du tirage d'équipement : 25 fois sur 59, le voisin du dessus
+    // était plus faible que celui du dessous.
+    const puissances = generateLadder().map((b) =>
+      fighterPower(playerToFighter(botProfile(b)))
+    );
+    for (let i = 1; i < puissances.length; i++) {
+      assert.ok(
+        puissances[i] <= puissances[i - 1],
+        `rang ${i + 1} (${puissances[i]}) plus fort que le rang ${i} (${puissances[i - 1]})`
+      );
+    }
+  });
+
+  it('chaque adversaire est distinct', () => {
+    // La graine était `id.length * 7919 + level * 104729` : « bot0 » à « bot9 »
+    // partageaient la même longueur, donc deux tiers de l'échelle avait les
+    // mêmes statistiques.
+    const signatures = new Set(
+      generateLadder().map((b) => {
+        const p = botProfile(b);
+        return (
+          JSON.stringify(p.baseAttrs) +
+          Object.values(p.equipment)
+            .map((i) => `${i!.name}${i!.level}`)
+            .join(',')
+        );
+      })
+    );
+    assert.equal(signatures.size, 60, `${60 - signatures.size} adversaires en double`);
   });
 });

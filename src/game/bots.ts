@@ -3,6 +3,7 @@ import { BODY_COLORS, COMB_COLORS, FREE_COUNTS } from './cosmetics';
 import { mulberry32, playerToFighter } from './formulas';
 import { SLOT_LIST, generateItem } from './items';
 import { botNames } from './names';
+import { fighterPower } from './power';
 import { REFERENCE_CURVE, curveAttr } from './reference';
 import { Appearance, Bot, ClassId, Fighter, Item, PlayerState, Rarity, SlotId } from './types';
 
@@ -43,7 +44,13 @@ function buildLadder(): Bot[] {
       appearance: randomAppearance(rand),
     });
   }
-  return bots;
+  // Le classement était ordonné par niveau, mais la puissance dépend aussi de
+  // la classe et du tirage d'équipement : 25 fois sur 59, le voisin du dessus
+  // était plus faible que celui du dessous. On grimpe désormais une échelle
+  // qui monte vraiment.
+  return bots.sort(
+    (a, b) => fighterPower(botToFighter(b)) - fighterPower(botToFighter(a))
+  );
 }
 
 // ─── Profil d'un bot ──────────────────────────────────────────────────────
