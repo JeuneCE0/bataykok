@@ -22,6 +22,7 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
+import { honorFloor } from '../game/ranks';
 import { SLOT_LIST, generateItem, resaleValue, rollRarity, shopRotation } from '../game/items';
 import { expectedRarity } from '../game/reference';
 import { SET_BY_ID } from '../game/sets';
@@ -251,7 +252,7 @@ interface GameState {
   /** encaisse les défenses relevées au serveur et réaligne l'honneur */
   applyDefenses: (
     logs: DefenseLog[],
-    serverHonor: number | null
+    serverHonor: { honor: number; peak: number } | null
   ) => { gold: number; xp: number; levels: number } | null;
   clearDefenses: () => void;
   /** crédit direct (parrainage, offres) — le serveur ne tient pas la bourse */
@@ -426,6 +427,7 @@ export const useGame = create<GameState>()(
             grains: 120,
             piments: 15,
             honor: 100,
+            honorPeak: 100,
             rank: ladder.length,
             wins: 0,
             losses: 0,
@@ -781,7 +783,8 @@ export const useGame = create<GameState>()(
 
           p.grains += gold;
           const levels = applyXp(p, xp);
-          p.honor = Math.max(0, p.honor + reward.honor);
+          p.honorPeak = Math.max(p.honorPeak ?? 100, p.honor + reward.honor);
+          p.honor = Math.max(honorFloor(p.honorPeak), p.honor + reward.honor);
           if (won) p.wins += 1;
           else p.losses += 1;
 
@@ -1202,8 +1205,8 @@ export const useGame = create<GameState>()(
         applyDefenses: (logs, serverHonor) => {
           const s = get();
           if (!s.player || logs.length === 0) {
-            if (s.player && serverHonor !== null && serverHonor !== s.player.honor) {
-              set({ player: { ...s.player, honor: serverHonor } });
+            if (s.player && serverHonor && serverHonor.honor !== s.player.honor) {
+              set({ player: { ...s.player, honor: serverHonor.honor, honorPeak: Math.max(s.player.honorPeak ?? 100, serverHonor.peak) } });
             }
             return null;
           }
@@ -1238,7 +1241,10 @@ export const useGame = create<GameState>()(
           p.grains += gold;
           const levels = applyXp(p, xp);
           // le serveur fait foi sur l'honneur : il a arbitré ces combats
-          if (serverHonor !== null) p.honor = serverHonor;
+          if (serverHonor) {
+            p.honor = serverHonor.honor;
+            p.honorPeak = Math.max(p.honorPeak ?? 100, serverHonor.peak);
+          }
 
           set({
             player: p,

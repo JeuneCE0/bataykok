@@ -108,6 +108,7 @@ export function botProfile(bot: Bot): PlayerState {
     grains: 0,
     piments: 0,
     honor: 100,
+    honorPeak: 100,
     rank: 1,
     wins: 0,
     losses: 0,

@@ -38,6 +38,7 @@ import { useT } from '../i18n/useT';
 import { maxArenaTickets, useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import RankingScreen from './RankingScreen';
+import HonorTier from '../components/HonorTier';
 
 const LADDER = generateLadder();
 const ARENA_TICKET_SEC = 120;
@@ -228,6 +229,7 @@ export default function ArenaScreen() {
 
       <RewardOverlay reward={reward} onClose={() => setReward(null)} />
 
+      <HonorTier />
       <View style={styles.rankBanner}>
         <Chip label={t('rond.myRank', { n: myIdx + 1 })} color={C.gold} active />
         <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />

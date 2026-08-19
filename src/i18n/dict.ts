@@ -64,6 +64,44 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Paliers d'honneur ─────────────────────────────────────────────────
+  'rank.tikok': {
+    fr: 'Ti coq',
+    rcf: 'Ti Kok',
+  },
+  'rank.batayer': {
+    fr: 'Batailleur',
+    rcf: 'Batayèr',
+  },
+  'rank.konu': {
+    fr: 'Coq connu',
+    rcf: 'Kok Konu',
+  },
+  'rank.respekte': {
+    fr: 'Coq respecté',
+    rcf: 'Kok Respekté',
+  },
+  'rank.lezand': {
+    fr: 'Légende',
+    rcf: 'Lézand',
+  },
+  'rank.roi': {
+    fr: 'Roi du rond',
+    rcf: 'Roi du Rond',
+  },
+  'rank.secured': {
+    fr: 'Palier acquis — tu ne redescendras pas sous {n}',
+    rcf: 'Palié aki — ou sar pa redésann anba {n}',
+  },
+  'rank.next': {
+    fr: 'Prochain palier : {name} à {n}',
+    rcf: 'Proshin palié : {name} a {n}',
+  },
+  'rank.top': {
+    fr: 'Sommet atteint',
+    rcf: 'Ou lé o somé',
+  },
+
   // ─── Composants ────────────────────────────────────────────────────────
   'ad.badge': {
     fr: 'PUBLICITÉ · SIMULATION PROTOTYPE',

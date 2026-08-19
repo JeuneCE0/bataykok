@@ -11,6 +11,7 @@ import { playerArmor, playerToFighter, playerWeapon, totalAttrs } from '../game/
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
+import HonorTier from '../components/HonorTier';
 
 const LADDER = generateLadder();
 const botById = new Map(LADDER.map((b) => [b.id, b]));
@@ -91,6 +92,7 @@ export default function RankingScreen({
         title={t('ranking.title')}
         sub={t('ranking.sub')}
       />
+      <HonorTier />
       <View style={styles.badges}>
         <Chip label={t('rond.myRank', { n: myIdx + 1 })} color={C.gold} active />
         <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />

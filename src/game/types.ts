@@ -83,6 +83,8 @@ export interface PlayerState {
   grains: number; // monnaie principale (or)
   piments: number; // monnaie premium (champignons)
   honor: number;
+  /** sommet d'honneur atteint — fixe le palier acquis (voir game/ranks.ts) */
+  honorPeak: number;
   rank: number; // position au classement (1 = meilleur)
   wins: number;
   losses: number;

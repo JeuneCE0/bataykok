@@ -254,18 +254,21 @@ export async function claimDefenses(): Promise<DefenseLog[]> {
   }));
 }
 
-/** L'honneur fait autorité côté serveur : il faut réaligner le local. */
-export async function fetchMyHonor(): Promise<number | null> {
+/**
+ * L'honneur fait autorité côté serveur : il faut réaligner le local. Le sommet
+ * vient avec, sinon le palier acquis se perdrait à chaque reconnexion.
+ */
+export async function fetchMyHonor(): Promise<{ honor: number; peak: number } | null> {
   if (!supabase) return null;
   const id = await ensureSession();
   if (!id) return null;
   const { data, error } = await supabase
     .from('koks')
-    .select('honor')
+    .select('honor, honor_peak')
     .eq('id', id)
     .maybeSingle();
   if (error || !data) return null;
-  return data.honor as number;
+  return { honor: data.honor as number, peak: (data.honor_peak as number) ?? data.honor };
 }
 
 export function onlineToFighter(k: OnlineKok): Fighter {
