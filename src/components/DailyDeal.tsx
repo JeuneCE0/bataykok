@@ -31,7 +31,8 @@ export default function DailyDeal({
   }, []);
 
   if (!player || shop.length === 0) return null;
-  const idx = dealIndex(shop.length);
+  // l'affaire tombe sur ce qui sert le plus au joueur, pas sur un tirage
+  const idx = dealIndex(shop.map((x) => compareToEquipped(x, player).diff));
   const it = shop[idx];
   if (!it) return null;
 

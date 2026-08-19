@@ -18,6 +18,7 @@ import {
 import { compareToEquipped, itemScore } from '../power';
 import { countSets, SETS, setBonuses } from '../sets';
 import { AttrId, Item, PlayerState, Rarity, SlotId } from '../types';
+import { referencePlayer } from '../reference';
 import { dealIndex } from '../shop';
 
 const SLOTS: SlotId[] = [
@@ -341,29 +342,83 @@ describe('comparaison et panoplies', () => {
 });
 
 describe('affaire du jour', () => {
-  it('le même jour désigne toujours le même objet', () => {
+  it('l’affaire tombe sur le meilleur objet de la rotation', () => {
+    // Tirée au sort, elle tombait le plus souvent sur une pièce moins bonne que
+    // l'équipement porté — et une « affaire » affichée en rouge n'en est pas une.
+    assert.equal(dealIndex([-10, -3, 40, -8, 12, -1]), 2);
+    assert.equal(dealIndex([5, 5, 5, 90]), 3);
+  });
+
+  it('à égalité, le même jour désigne toujours le même objet', () => {
     // Sinon l'affaire changerait à chaque rendu, et le compte à rebours ne
     // voudrait plus rien dire.
-    const a = dealIndex(6, '2026-08-19');
-    for (let i = 0; i < 20; i++) assert.equal(dealIndex(6, '2026-08-19'), a);
+    const a = dealIndex([0, 0, 0, 0, 0, 0], '2026-08-19');
+    for (let i = 0; i < 20; i++) {
+      assert.equal(dealIndex([0, 0, 0, 0, 0, 0], '2026-08-19'), a);
+    }
   });
 
   it('l’indice reste dans la boutique', () => {
     for (const taille of [1, 3, 6, 8]) {
       for (const jour of ['2026-01-01', '2026-06-15', '2026-12-31']) {
-        const i = dealIndex(taille, jour);
+        const i = dealIndex(new Array(taille).fill(0), jour);
         assert.ok(i >= 0 && i < taille, `indice ${i} hors de [0,${taille})`);
       }
     }
   });
 
   it('une boutique vide n’a pas d’affaire', () => {
-    assert.equal(dealIndex(0), -1);
+    assert.equal(dealIndex([]), -1);
   });
 
-  it('l’affaire tourne d’un jour à l’autre', () => {
+  it('à égalité parfaite, l’affaire tourne d’un jour à l’autre', () => {
     const jours = ['2026-08-19', '2026-08-20', '2026-08-21', '2026-08-22', '2026-08-23'];
-    const vus = new Set(jours.map((j) => dealIndex(6, j)));
+    const vus = new Set(jours.map((j) => dealIndex([0, 0, 0, 0, 0, 0], j)));
     assert.ok(vus.size > 1, 'la même affaire cinq jours de suite');
+  });
+});
+
+describe('rotation du Bazar', () => {
+  it('la boutique reste pertinente à tous les niveaux', () => {
+    // Elle tirait `rollRarity()` sans égard au niveau : 74 % de commun ou
+    // korek, du niveau 1 au niveau 50. Passé les premiers paliers, le Bazar ne
+    // proposait plus rien qui vaille l'équipement porté — et l'affaire du jour
+    // tombait forcément sur une pièce en dessous.
+    for (const lvl of [5, 10, 20, 35]) {
+      const p = referencePlayer('gep', lvl);
+      let mieux = 0;
+      let n = 0;
+      for (let i = 0; i < 80; i++) {
+        for (const it of shopRotation(lvl)) {
+          n++;
+          if (compareToEquipped(it, p).diff > 0) mieux++;
+        }
+      }
+      const part = (mieux / n) * 100;
+      assert.ok(part > 20, `niveau ${lvl} : ${part.toFixed(0)} % d’objets utiles`);
+      assert.ok(part < 85, `niveau ${lvl} : ${part.toFixed(0)} % — la boutique donne tout`);
+    }
+  });
+
+  it('la gamme proposée suit le niveau', () => {
+    for (const [lvl, attendue] of [[5, 'commun'], [20, 'kalite'], [35, 'lezand']] as const) {
+      const gammes = new Map<string, number>();
+      for (let i = 0; i < 120; i++) {
+        for (const it of shopRotation(lvl)) {
+          gammes.set(it.rarity, (gammes.get(it.rarity) ?? 0) + 1);
+        }
+      }
+      const dominante = [...gammes.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      assert.equal(dominante, attendue, `niveau ${lvl} : gamme dominante ${dominante}`);
+    }
+  });
+
+  it('la boutique ne vend jamais d’unique', () => {
+    // Les zanset se trouvent, ils ne se distribuent pas au comptoir.
+    for (let i = 0; i < 200; i++) {
+      for (const it of shopRotation(45)) {
+        assert.notEqual(it.rarity, 'zanset', 'un unique en boutique');
+      }
+    }
   });
 });

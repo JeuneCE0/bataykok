@@ -1,6 +1,7 @@
 import { TransKey } from '../i18n';
 import { ATTR_LABELS } from './classes';
 import { rnd } from './formulas';
+import { expectedRarity } from './reference';
 import { SETS } from './sets';
 import { rollUnique } from './uniques';
 import { AttrId, Item, Rarity, SlotId } from './types';
@@ -256,11 +257,32 @@ export function generateItem(
   return item;
 }
 
+/**
+ * Gamme d'un objet de boutique.
+ *
+ * La rotation tirait `rollRarity()` sans le moindre égard au niveau : 74 % de
+ * commun ou korek, du niveau 1 au niveau 50. Passé les premiers paliers, le
+ * Bazar ne proposait plus rien qui vaille l'équipement porté — et l'affaire du
+ * jour tombait forcément sur une pièce en dessous. La gamme tourne désormais
+ * autour de celle du niveau : le plus souvent la sienne, parfois un cran en
+ * dessous, parfois un cran au-dessus (ce qui donne son sel à la rotation).
+ */
+function shopRarity(level: number): Rarity {
+  const cible = rarityRank(expectedRarity(level));
+  const r = Math.random();
+  const decalage = r < 0.3 ? -1 : r < 0.85 ? 0 : 1;
+  return RARITY_ORDER[
+    Math.max(0, Math.min(RARITY_ORDER.length - 2, cible + decalage))
+  ];
+}
+
 export function shopRotation(level: number, count = 6): Item[] {
   const shuffled = [...SLOT_LIST].sort(() => Math.random() - 0.5).slice(0, count);
   // toujours au moins une arme en boutique
   if (!shuffled.includes('arme')) shuffled[0] = 'arme';
-  return shuffled.map((s) => generateItem(Math.max(1, level + rnd(-1, 2)), s));
+  return shuffled.map((s) =>
+    generateItem(Math.max(1, level + rnd(-1, 2)), s, shopRarity(level))
+  );
 }
 
 /**
