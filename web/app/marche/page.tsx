@@ -66,7 +66,7 @@ export default async function Page() {
         <Table head={['Objet', 'Gamme', 'Emplacement', 'Niv.', 'Prix', 'État', 'Déposée']}>
           {listings.map((l) => (
             <tr key={l.id}>
-              <td className="name">{l.item?.name ?? '—'}</td>
+              <td className="name">{l.itemName}</td>
               <td>{RARITY_LABELS[l.rarity] ?? l.rarity}</td>
               <td>{l.slot}</td>
               <td className="num">{l.item_level}</td>

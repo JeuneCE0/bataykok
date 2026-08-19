@@ -1,4 +1,4 @@
-import { Badge, Bars, CLASS_LABELS, Panel, Table, Tile, ago, n } from '@/components/ui';
+import { Badge, Bars, CLASS_LABELS, Panel, Table, Tile, ago, dayLabel, n } from '@/components/ui';
 import { configured, NotConfigured } from '@/lib/guard';
 import { getBattlesDaily, getClasses, getOverview, getRecentBattles } from '@/lib/queries';
 
@@ -41,9 +41,9 @@ export default async function Page() {
       <Panel title="Batays par jour — 30 jours">
         <Bars
           data={daily}
-          labelOf={(d: { day: string }) => String(new Date(d.day).getDate())}
-          valueOf={(d: { battles: number }) => d.battles}
-          titleOf={(d: { day: string; battles: number; attacker_wins: number }) =>
+          labelOf={(d) => dayLabel(d.day)}
+          valueOf={(d) => d.battles}
+          titleOf={(d) =>
             `${d.day} · ${d.battles} batays · ${d.attacker_wins} gagnées par l'attaquant`}
         />
       </Panel>

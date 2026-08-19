@@ -101,7 +101,9 @@ export function Button({
   // un bouton éteint doit rester lisible : on change de couleur plutôt que
   // de baisser l'opacité, qui délavait le texte sur les fonds clairs
   const grad = disabled ? G.slate : G[variant];
-  const light = !disabled && (variant === 'gold' || variant === 'cane');
+  // Le blanc ne passe que sur les dégradés sombres. Sur ember, piment, mystic
+  // et lagoon il tombait sous 3,4:1 — l'encre foncée y donne 5 à 8,7:1.
+  const light = !disabled && variant !== 'slate';
 
   return (
     <Pressable

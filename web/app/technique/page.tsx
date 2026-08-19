@@ -1,4 +1,4 @@
-import { Badge, Panel, Table, Tile, ago, n } from '@/components/ui';
+import { Badge, Panel, Table, Tile, ago, fmtDateTime, n } from '@/components/ui';
 import { configured, NotConfigured } from '@/lib/guard';
 import { getEvents, getOverview, getPlatforms, getPlayers } from '@/lib/queries';
 
@@ -76,7 +76,7 @@ export default async function Page() {
               <td className="name">{e.name}</td>
               <td className="num">{n(e.total)}</td>
               <td className="num">{n(e.sessions)}</td>
-              <td>{new Date(e.last_seen).toLocaleString('fr-FR')}</td>
+              <td>{fmtDateTime(e.last_seen)}</td>
             </tr>
           ))}
           {events.length === 0 && (

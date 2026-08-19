@@ -3,7 +3,37 @@ import Link from 'next/link';
 /** Briques partagées du tableau de bord. */
 
 const nf = new Intl.NumberFormat('fr-FR');
-export const n = (v: number | null | undefined) => nf.format(v ?? 0);
+
+/** `NaN` s'affichait littéralement « NaN » dans les tuiles. */
+export const n = (v: number | null | undefined) =>
+  Number.isFinite(Number(v)) ? nf.format(Number(v)) : '—';
+
+/** Un fuseau unique : le tableau de bord annonce l'heure Réunion, il doit la tenir. */
+const TZ = 'Indian/Reunion';
+const dt = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: TZ });
+const dtLong = new Intl.DateTimeFormat('fr-FR', {
+  dateStyle: 'short', timeStyle: 'short', timeZone: TZ,
+});
+
+export function fmtDate(v: string | null | undefined): string {
+  if (!v) return '—';
+  const d = new Date(v);
+  return Number.isFinite(d.getTime()) ? dt.format(d) : '—';
+}
+
+export function fmtDateTime(v: string | null | undefined): string {
+  if (!v) return '—';
+  const d = new Date(v);
+  return Number.isFinite(d.getTime()) ? dtLong.format(d) : '—';
+}
+
+/** Le jour du mois, en heure Réunion, pour les étiquettes d'axe. */
+export function dayLabel(v: string | null | undefined): string {
+  if (!v) return '';
+  const d = new Date(v);
+  if (!Number.isFinite(d.getTime())) return '';
+  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', timeZone: TZ }).format(d);
+}
 
 export function Tile({
   label,
@@ -55,35 +85,53 @@ export function Empty({ children }: { children: React.ReactNode }) {
 }
 
 /** Histogramme simple : pas de librairie pour dessiner des rectangles. */
-export function Bars({
+export function Bars<T>({
   data,
   labelOf,
   valueOf,
   titleOf,
 }: {
-  data: unknown[];
-  labelOf: (d: never, i: number) => string;
-  valueOf: (d: never) => number;
-  titleOf?: (d: never) => string;
+  data: T[];
+  labelOf: (d: T, i: number) => string;
+  valueOf: (d: T) => number;
+  titleOf?: (d: T) => string;
 }) {
-  const rows = data as never[];
-  const max = Math.max(1, ...rows.map(valueOf));
+  // une seule valeur nulle rendait `max` NaN, donc toutes les hauteurs
+  // « NaN% » : barres à zéro, sans la moindre erreur
+  const safe = (d: T) => (Number.isFinite(Number(valueOf(d))) ? Number(valueOf(d)) : 0);
+  const rows = data;
+  const max = Math.max(1, ...rows.map(safe));
   if (rows.length === 0) return <Empty>Rien à afficher sur la période.</Empty>;
+  const total = rows.reduce((acc, d) => acc + safe(d), 0);
   return (
     <>
-      <div className="bars">
+      <div
+        className="bars"
+        role="img"
+        aria-label={`Histogramme de ${rows.length} valeurs, total ${total}, maximum ${max}`}
+      >
         {rows.map((d, i) => (
           <div
             key={i}
             className="bar"
-            style={{ height: `${Math.max(2, (valueOf(d) / max) * 100)}%` }}
-            title={titleOf ? titleOf(d) : `${labelOf(d, i)} · ${valueOf(d)}`}
+            style={{ height: `${Math.max(2, (safe(d) / max) * 100)}%` }}
+            title={titleOf ? titleOf(d) : `${labelOf(d, i)} · ${safe(d)}`}
           >
             <span>{labelOf(d, i)}</span>
           </div>
         ))}
       </div>
       <p className="axis">Maximum : {n(max)}</p>
+      <table className="sr-only">
+        <tbody>
+          {rows.map((d, i) => (
+            <tr key={i}>
+              <th scope="row">{labelOf(d, i)}</th>
+              <td>{safe(d)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }
@@ -137,9 +185,11 @@ export const RARITY_LABELS: Record<string, string> = {
   mitik: 'Mitik',
 };
 
-export function ago(iso: string): string {
-  const ms = Date.now() - new Date(iso).getTime();
-  const m = Math.round(ms / 60000);
+export function ago(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return '—';
+  const m = Math.round((Date.now() - t) / 60000);
   if (m < 1) return "à l'instant";
   if (m < 60) return `il y a ${m} min`;
   const h = Math.round(m / 60);

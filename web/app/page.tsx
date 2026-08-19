@@ -1,4 +1,4 @@
-import { Bars, Badge, Panel, Table, Tile, n } from '@/components/ui';
+import { Badge, Bars, Panel, Table, Tile, dayLabel, fmtDate, fmtDateTime, n } from '@/components/ui';
 import { configured, NotConfigured } from '@/lib/guard';
 import {
   getBattlesDaily,
@@ -49,9 +49,9 @@ export default async function Page() {
       <Panel title="Trafic — 30 derniers jours">
         <Bars
           data={daily}
-          labelOf={(d: { day: string }) => String(new Date(d.day).getDate())}
-          valueOf={(d: { events: number }) => d.events}
-          titleOf={(d: { day: string; events: number; sessions: number }) =>
+          labelOf={(d) => dayLabel(d.day)}
+          valueOf={(d) => d.events}
+          titleOf={(d) =>
             `${d.day} · ${d.events} événements · ${d.sessions} sessions`
           }
         />
@@ -62,7 +62,7 @@ export default async function Page() {
           <Table head={['Jour', 'Inscrits', 'J+1', 'J+7']}>
             {r7.map((x) => (
               <tr key={x.day}>
-                <td>{new Date(x.day).toLocaleDateString('fr-FR')}</td>
+                <td>{fmtDate(x.day)}</td>
                 <td className="num">{n(x.signups)}</td>
                 <td className="num">{n(x.d1)}</td>
                 <td className="num">{n(x.d7)}</td>
@@ -84,9 +84,9 @@ export default async function Page() {
         <Panel title="Batays par jour">
           <Bars
             data={battles}
-            labelOf={(d: { day: string }) => String(new Date(d.day).getDate())}
-            valueOf={(d: { battles: number }) => d.battles}
-            titleOf={(d: { day: string; battles: number; attacker_wins: number }) =>
+            labelOf={(d) => dayLabel(d.day)}
+            valueOf={(d) => d.battles}
+            titleOf={(d) =>
               `${d.day} · ${d.battles} batays · ${d.attacker_wins} gagnées par l'attaquant`
             }
           />
@@ -100,7 +100,7 @@ export default async function Page() {
               <td className="name">{e.name}</td>
               <td className="num">{n(e.total)}</td>
               <td className="num">{n(e.sessions)}</td>
-              <td>{new Date(e.last_seen).toLocaleString('fr-FR')}</td>
+              <td>{fmtDateTime(e.last_seen)}</td>
             </tr>
           ))}
           {events.length === 0 && (

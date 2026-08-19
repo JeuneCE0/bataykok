@@ -5,17 +5,42 @@ import { admin } from './supabase';
  * on ne charge jamais plus que ce que la page affiche.
  */
 
-async function view<T>(name: string, limit?: number): Promise<T[]> {
+/**
+ * Une vue absente, une permission refusée ou un réseau coupé rendaient
+ * exactement la même chose qu'un produit sans activité : des tableaux vides
+ * et des tuiles à zéro. Sur un outil de décision, c'est le pire des bugs.
+ */
+export class QueryError extends Error {
+  constructor(readonly view: string, message: string) {
+    super(`${view} : ${message}`);
+  }
+}
+
+async function view<T>(
+  name: string,
+  opts: { limit?: number; order?: { column: string; ascending?: boolean } } = {}
+): Promise<T[]> {
   if (!admin) return [];
   let q = admin.from(name).select('*');
-  if (limit) q = q.limit(limit);
-  const { data } = await q;
+  // sans ORDER BY, Postgres ne garantit aucun ordre : un « top N » tiré d'un
+  // LIMIT sans tri est arbitraire et change avec le plan d'exécution
+  if (opts.order) q = q.order(opts.order.column, { ascending: opts.order.ascending ?? false });
+  if (opts.limit) q = q.limit(opts.limit);
+  const { data, error } = await q;
+  if (error) {
+    console.error(`[dashboard] lecture de ${name} :`, error.message);
+    throw new QueryError(name, error.message);
+  }
   return (data ?? []) as T[];
 }
 
 async function single<T>(name: string): Promise<T | null> {
   if (!admin) return null;
-  const { data } = await admin.from(name).select('*').maybeSingle();
+  const { data, error } = await admin.from(name).select('*').maybeSingle();
+  if (error) {
+    console.error(`[dashboard] lecture de ${name} :`, error.message);
+    throw new QueryError(name, error.message);
+  }
   return (data ?? null) as T | null;
 }
 
@@ -49,45 +74,67 @@ export interface HourRow { hour: number; events: number; sessions: number }
 export interface LevelRow { level: number; players: number }
 
 export const getOverview = () => single<Overview>('stats_overview');
-export const getDaily = () => view<DailyRow>('stats_daily');
-export const getEvents = () => view<EventRow>('stats_events', 40);
-export const getSignups = () => view<SignupRow>('stats_signups');
-export const getRetention = () => view<RetentionRow>('stats_retention', 30);
-export const getClasses = () => view<ClassRow>('stats_classes');
-export const getPlayers = () => view<PlayerRow>('stats_players', 300);
-export const getEconomy = () => view<EconomyRow>('stats_economy');
-export const getMarket = () => view<MarketRow>('stats_market');
-export const getDungeon = () => view<DungeonRow>('stats_dungeon');
-export const getTalents = () => view<TalentRow>('stats_talents');
-export const getPlatforms = () => view<PlatformRow>('stats_platforms');
-export const getBattlesDaily = () => view<BattleDayRow>('stats_battles_daily');
+export const getDaily = () =>
+  view<DailyRow>('stats_daily', { order: { column: 'day', ascending: true }, limit: 30 });
+export const getEvents = () =>
+  view<EventRow>('stats_events', { order: { column: 'total' }, limit: 40 });
+export const getSignups = () =>
+  view<SignupRow>('stats_signups', { order: { column: 'day', ascending: true }, limit: 30 });
+export const getRetention = () =>
+  view<RetentionRow>('stats_retention', { order: { column: 'day' }, limit: 30 });
+export const getClasses = () =>
+  view<ClassRow>('stats_classes', { order: { column: 'players' }, limit: 12 });
+export const getPlayers = () =>
+  view<PlayerRow>('stats_players', { order: { column: 'honor' }, limit: 300 });
+export const getEconomy = () =>
+  view<EconomyRow>('stats_economy', { order: { column: 'level_bucket', ascending: true }, limit: 12 });
+export const getMarket = () =>
+  view<MarketRow>('stats_market', { order: { column: 'vendus' }, limit: 12 });
+export const getDungeon = () =>
+  view<DungeonRow>('stats_dungeon', { order: { column: 'floor', ascending: true }, limit: 20 });
+export const getTalents = () =>
+  view<TalentRow>('stats_talents', { order: { column: 'picks' }, limit: 20 });
+export const getPlatforms = () =>
+  view<PlatformRow>('stats_platforms', { order: { column: 'players' }, limit: 20 });
+export const getBattlesDaily = () =>
+  view<BattleDayRow>('stats_battles_daily', { order: { column: 'day', ascending: true }, limit: 30 });
 export const getMonetisation = () => single<MonetisationRow>('stats_monetisation');
-export const getHourly = () => view<HourRow>('stats_hourly');
-export const getLevels = () => view<LevelRow>('stats_levels');
+export const getHourly = () =>
+  view<HourRow>('stats_hourly', { order: { column: 'hour', ascending: true }, limit: 24 });
+export const getLevels = () =>
+  view<LevelRow>('stats_levels', { order: { column: 'level', ascending: true }, limit: 60 });
 
 /** Annonces en cours, pour la page Marché. */
 export async function getListings() {
   if (!admin) return [];
-  const { data } = await admin
+  const { data, error } = await admin
     .from('market_listings')
     .select('id, item, price, status, rarity, slot, item_level, created_at, sold_at')
     .order('created_at', { ascending: false })
     .limit(60);
-  return (data ?? []) as {
-    id: string; item: { name: string }; price: number; status: string;
+  if (error) throw new QueryError('market_listings', error.message);
+  type Row = {
+    id: string; item: unknown; price: number; status: string;
     rarity: string; slot: string; item_level: number;
-    created_at: string; sold_at: string | null;
-  }[];
+    created_at: string | null; sold_at: string | null;
+  };
+  // `item` est du jsonb : un nom qui serait un objet ferait tomber tout le
+  // rendu React (« Objects are not valid as a React child »)
+  return ((data ?? []) as Row[]).map((r) => {
+    const name = (r.item as { name?: unknown } | null)?.name;
+    return { ...r, itemName: typeof name === 'string' ? name : '—' };
+  });
 }
 
 /** Derniers combats, pour la page Combats. */
 export async function getRecentBattles() {
   if (!admin) return [];
-  const { data } = await admin
+  const { data, error } = await admin
     .from('arena_results')
     .select('id, attacker_won, honor_delta, created_at, attacker_id, defender_id')
     .order('created_at', { ascending: false })
     .limit(40);
+  if (error) throw new QueryError('arena_results', error.message);
   const rows = (data ?? []) as {
     id: string; attacker_won: boolean; honor_delta: number; created_at: string;
     attacker_id: string; defender_id: string;

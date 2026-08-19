@@ -16,15 +16,30 @@ export function middleware(req: NextRequest) {
     );
   }
 
-  const header = req.headers.get('authorization');
-  if (header?.startsWith('Basic ')) {
-    const [u, p] = atob(header.slice(6)).split(':');
-    if (u === user && p === password) return NextResponse.next();
+  const header = req.headers.get('authorization') ?? '';
+  // RFC 7617 : le schéma est insensible à la casse, et le mot de passe peut
+  // contenir des « : » — un split naïf le tronquait sans rien expliquer
+  if (header.slice(0, 6).toLowerCase() === 'basic ') {
+    try {
+      const decoded = atob(header.slice(6));
+      const sep = decoded.indexOf(':');
+      if (sep > 0) {
+        const u = decoded.slice(0, sep);
+        const p = decoded.slice(sep + 1);
+        if (u === user && p === password) return NextResponse.next();
+      }
+    } catch {
+      // en-tête malformé : un atob non protégé répondait 500, déclenchable
+      // par n'importe qui sur toutes les routes
+    }
   }
 
   return new NextResponse('Authentification requise', {
     status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="Batay Kok"' },
+    headers: {
+      'WWW-Authenticate': 'Basic realm="Batay Kok"',
+      'Cache-Control': 'no-store',
+    },
   });
 }
 

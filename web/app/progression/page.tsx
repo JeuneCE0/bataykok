@@ -52,9 +52,9 @@ export default async function Page() {
       <Panel title="Où s'arrête la Route des Cirques">
         <Bars
           data={dungeon}
-          labelOf={(d: { floor: number }) => `${d.floor}`}
-          valueOf={(d: { players: number }) => d.players}
-          titleOf={(d: { floor: number; players: number }) =>
+          labelOf={(d) => `${d.floor}`}
+          valueOf={(d) => d.players}
+          titleOf={(d) =>
             `${d.players} joueurs bloqués après l'étage ${d.floor}`}
         />
         <p className="axis">

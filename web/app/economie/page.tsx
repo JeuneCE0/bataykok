@@ -35,9 +35,9 @@ export default async function Page() {
       <Panel title="Répartition des niveaux">
         <Bars
           data={levels}
-          labelOf={(d: { level: number }) => `${d.level}`}
-          valueOf={(d: { players: number }) => d.players}
-          titleOf={(d: { level: number; players: number }) =>
+          labelOf={(d) => `${d.level}`}
+          valueOf={(d) => d.players}
+          titleOf={(d) =>
             `niveau ${d.level} · ${d.players} joueurs`}
         />
       </Panel>

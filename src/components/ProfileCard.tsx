@@ -65,7 +65,7 @@ export default function ProfileCard({
           <Text style={styles.codeLabel}>CODE DE PARRAINAGE</Text>
           <Text style={styles.code}>{code}</Text>
           <Text style={styles.codeHint}>
-            Rentre sé kod-là : tu reçois 🌶️40 + 🌽500
+            Entre ce code : tu reçois 🌶️40 + 🌽500
           </Text>
         </View>
       )}

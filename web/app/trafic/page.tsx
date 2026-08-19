@@ -1,4 +1,4 @@
-import { Bars, Panel, Table, Tile, n } from '@/components/ui';
+import { Bars, Panel, Table, Tile, dayLabel, fmtDate, fmtDateTime, n } from '@/components/ui';
 import { configured, NotConfigured } from '@/lib/guard';
 import { getDaily, getEvents, getHourly, getOverview, getRetention, getSignups } from '@/lib/queries';
 
@@ -53,9 +53,9 @@ export default async function Page() {
       <Panel title="Événements par jour — 30 jours">
         <Bars
           data={daily}
-          labelOf={(d: { day: string }) => String(new Date(d.day).getDate())}
-          valueOf={(d: { events: number }) => d.events}
-          titleOf={(d: { day: string; events: number; sessions: number; players: number }) =>
+          labelOf={(d) => dayLabel(d.day)}
+          valueOf={(d) => d.events}
+          titleOf={(d) =>
             `${d.day} · ${d.events} événements · ${d.sessions} sessions · ${d.players} joueurs`}
         />
       </Panel>
@@ -63,9 +63,9 @@ export default async function Page() {
       <Panel title="Quand on joue — 7 jours, heure Réunion">
         <Bars
           data={hourly}
-          labelOf={(d: { hour: number }) => `${d.hour}`}
-          valueOf={(d: { events: number }) => d.events}
-          titleOf={(d: { hour: number; events: number; sessions: number }) =>
+          labelOf={(d) => `${d.hour}`}
+          valueOf={(d) => d.events}
+          titleOf={(d) =>
             `${d.hour} h · ${d.events} événements · ${d.sessions} sessions`}
         />
       </Panel>
@@ -75,7 +75,7 @@ export default async function Page() {
           <Table head={['Jour', 'Inscrits', 'J+1', 'J+7']}>
             {retention.map((x) => (
               <tr key={x.day}>
-                <td>{new Date(x.day).toLocaleDateString('fr-FR')}</td>
+                <td>{fmtDate(x.day)}</td>
                 <td className="num">{n(x.signups)}</td>
                 <td className="num">{n(x.d1)}</td>
                 <td className="num">{n(x.d7)}</td>
@@ -94,7 +94,7 @@ export default async function Page() {
                 <td className="name">{e.name}</td>
                 <td className="num">{n(e.total)}</td>
                 <td className="num">{n(e.sessions)}</td>
-                <td>{new Date(e.last_seen).toLocaleString('fr-FR')}</td>
+                <td>{fmtDateTime(e.last_seen)}</td>
               </tr>
             ))}
             {events.length === 0 && (
