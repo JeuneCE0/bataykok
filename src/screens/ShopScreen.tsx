@@ -31,6 +31,7 @@ import { localDay } from '../game/day';
 import { C, F, G, R } from '../theme';
 import { itemLabel } from '../game/items';
 import SetKits from '../components/SetKits';
+import DailyDeal from '../components/DailyDeal';
 
 const PIMENT_PACKS = [
   { piments: 50, price: '0,99 €', tag: null, bonus: 0 },
@@ -116,6 +117,7 @@ export default function ShopScreen() {
         sub={t('shop.sub')}
       />
 
+      <DailyDeal onBuy={(it, prix) => buyItem({ ...it, price: prix })} />
       <SetKits />
 
       <AdButton kind="grains" full />

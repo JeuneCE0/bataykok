@@ -18,6 +18,7 @@ import {
 import { compareToEquipped, itemScore } from '../power';
 import { countSets, SETS, setBonuses } from '../sets';
 import { AttrId, Item, PlayerState, Rarity, SlotId } from '../types';
+import { dealIndex } from '../shop';
 
 const SLOTS: SlotId[] = [
   'arme', 'tete', 'torse', 'pattes', 'amulette', 'anneau', 'ceinture', 'grigri',
@@ -336,5 +337,33 @@ describe('comparaison et panoplies', () => {
     const cmp = compareToEquipped(quatrieme, p);
     assert.equal(cmp.verdict, 'empty', 'l’emplacement pattes devrait être vide');
     assert.ok(cmp.diff > 0, `compléter la panoplie ne rapporte rien (${cmp.diff})`);
+  });
+});
+
+describe('affaire du jour', () => {
+  it('le même jour désigne toujours le même objet', () => {
+    // Sinon l'affaire changerait à chaque rendu, et le compte à rebours ne
+    // voudrait plus rien dire.
+    const a = dealIndex(6, '2026-08-19');
+    for (let i = 0; i < 20; i++) assert.equal(dealIndex(6, '2026-08-19'), a);
+  });
+
+  it('l’indice reste dans la boutique', () => {
+    for (const taille of [1, 3, 6, 8]) {
+      for (const jour of ['2026-01-01', '2026-06-15', '2026-12-31']) {
+        const i = dealIndex(taille, jour);
+        assert.ok(i >= 0 && i < taille, `indice ${i} hors de [0,${taille})`);
+      }
+    }
+  });
+
+  it('une boutique vide n’a pas d’affaire', () => {
+    assert.equal(dealIndex(0), -1);
+  });
+
+  it('l’affaire tourne d’un jour à l’autre', () => {
+    const jours = ['2026-08-19', '2026-08-20', '2026-08-21', '2026-08-22', '2026-08-23'];
+    const vus = new Set(jours.map((j) => dealIndex(6, j)));
+    assert.ok(vus.size > 1, 'la même affaire cinq jours de suite');
   });
 });

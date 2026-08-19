@@ -64,6 +64,20 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Affaire du jour ───────────────────────────────────────────────────
+  'deal.badge': {
+    fr: 'AFFAIRE DU JOUR',
+    rcf: 'AFÈR DU ZOUR',
+  },
+  'deal.onlyOne': {
+    fr: 'un seul exemplaire',
+    rcf: 'in sèl egzanplèr',
+  },
+  'deal.off': {
+    fr: '−{n} %',
+    rcf: '−{n} %',
+  },
+
   // ─── Paliers d'honneur ─────────────────────────────────────────────────
   'rank.tikok': {
     fr: 'Ti coq',
