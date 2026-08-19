@@ -42,8 +42,13 @@ alter table public.guild_donations enable row level security;
 drop policy if exists guild_stats_read on public.guild_stats;
 create policy guild_stats_read on public.guild_stats for select using (true);
 
+-- Le client ne lit jamais cette table directement : il passe par
+-- `guild_roster`, qui n'expose que le cumul par membre. Ouverte, elle laissait
+-- remonter le détail horodaté de chaque versement associé à un compte, sans
+-- aucun usage.
 drop policy if exists guild_don_read on public.guild_donations;
-create policy guild_don_read on public.guild_donations for select using (true);
+create policy guild_don_read_own on public.guild_donations
+  for select using ((select auth.uid()) = kok_id);
 
 /** Palier à atteindre pour passer au niveau suivant. */
 create or replace function public.guild_threshold(p_level int)
