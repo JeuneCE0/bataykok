@@ -129,7 +129,7 @@ scène (bond, secousse, flash d'impact, dégâts flottants, gerbe de plumes, KO 
 ## Tests
 
 ```bash
-npm test        # 65 tests du moteur, ~0,3 s
+npm test        # 74 tests du moteur, ~0,4 s
 npm run typecheck
 ```
 
@@ -171,7 +171,9 @@ src/
     names.ts       # générateur de noms créoles
     rewards.ts     # récompenses de batay (défaite comprise), bonus, consolation
     day.ts         # jour de jeu en heure locale
-    __tests__/     # 65 tests : progression, combat, récompenses, objets, formules
+    tickets.ts     # jetons de batay (recharge, plafond, consommation)
+    __tests__/     # 74 tests : progression, combat, récompenses, objets,
+                   #   formules, jetons
   store/
     gameStore.ts   # état global zustand + persistance
     alerts.ts      # pastilles d'appel à l'action par onglet

@@ -28,6 +28,11 @@ import {
   defenseReward,
 } from '../game/rewards';
 import { SEASON_MS, tierForRank } from '../game/seasons';
+import {
+  BASE_ARENA_TICKETS,
+  consume as consumeTicket,
+  regenerate as regenerateTickets,
+} from '../game/tickets';
 import { pendingTier, talentEffects } from '../game/talents';
 import {
   AD_COOLDOWN_MS,
@@ -62,17 +67,12 @@ import {
 import { trackEvent } from '../lib/analytics';
 import { DefenseLog } from '../lib/online';
 
-/**
- * Jetons de batay plutôt qu'un cooldown sec : le joueur peut enchaîner trois
- * combats d'affilée (le pic de plaisir du jeu) et la recharge ne bloque que
- * les sessions longues. Même friction à l'heure, bien meilleur ressenti.
- */
-export const BASE_ARENA_TICKETS = 3;
-export const ARENA_TICKET_MS = 2 * 60 * 1000;
+export { ARENA_TICKET_MS, BASE_ARENA_TICKETS } from '../game/tickets';
 export const CHEST_MS = 4 * 60 * 60 * 1000;
 export const PASS_DAYS = 30;
 export const PASS_DAILY_PIMENTS = 20;
 
+/** plafond de jetons : base + talents + événement du jour */
 /** plafond de jetons : base + talents + événement du jour */
 export function maxArenaTickets(
   talents: string[] | undefined,
@@ -604,15 +604,13 @@ export const useGame = create<GameState>()(
             s.player?.talents,
             eventOfDay(today()).kind === 'batay' ? 2 : 0
           );
-          if (s.arenaTickets >= max) return;
-          const now = Date.now();
-          if (!s.nextTicketAt || now < s.nextTicketAt) return;
-          const gained = 1 + Math.floor((now - s.nextTicketAt) / ARENA_TICKET_MS);
-          const tickets = Math.min(max, s.arenaTickets + gained);
-          set({
-            arenaTickets: tickets,
-            nextTicketAt: tickets >= max ? 0 : now + ARENA_TICKET_MS,
-          });
+          const next = regenerateTickets(
+            { tickets: s.arenaTickets, nextAt: s.nextTicketAt },
+            max,
+            Date.now()
+          );
+          if (next.tickets === s.arenaTickets && next.nextAt === s.nextTicketAt) return;
+          set({ arenaTickets: next.tickets, nextTicketAt: next.nextAt });
         },
 
         rerollQuests: () => {
@@ -787,13 +785,16 @@ export const useGame = create<GameState>()(
 
           const streak = won ? s.winStreak + 1 : 0;
           const max = maxArenaTickets(p.talents, ev.kind === 'batay' ? 2 : 0);
-          const tickets = Math.max(0, s.arenaTickets - 1);
+          const spent = consumeTicket(
+            { tickets: s.arenaTickets, nextAt: s.nextTicketAt },
+            max,
+            Date.now()
+          );
           set({
             player: p,
             ladderOrder: order,
-            arenaTickets: tickets,
-            nextTicketAt:
-              tickets >= max ? 0 : s.nextTicketAt || Date.now() + ARENA_TICKET_MS,
+            arenaTickets: spent.tickets,
+            nextTicketAt: spent.nextAt,
             winStreak: streak,
             album: drop ? addToAlbum(s.album, drop) : s.album,
             foundMitik: s.foundMitik || drop?.rarity === 'mitik',
