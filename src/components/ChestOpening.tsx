@@ -97,7 +97,11 @@ export default function ChestOpening({
     ).start();
   }, [loot, shake, chest, burst, reveal, halo]);
 
-  if (!loot) return null;
+  // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
+  // l'instance au lieu de la démonter. Démonter une Modal encore présentée
+  // laissait sur iOS un fragment visible en filigrane sous tout le jeu.
+  if (!loot)
+    return <Modal visible={false} transparent animationType="fade" />;
 
   const rare = loot.item ? RARITY_COLORS[loot.item.rarity] : C.gold;
   const label = loot.item

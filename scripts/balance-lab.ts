@@ -7,7 +7,7 @@
  * mêmes objets que le jeu — joueur équipé par `generateItem`, adversaires
  * issus de `generateLadder`.
  */
-import { CLASS_LIST } from '../src/game/classes';
+import { CLASSES, CLASS_LIST } from '../src/game/classes';
 import { simulateCombat } from '../src/game/combat';
 import { botProfile, generateLadder } from '../src/game/bots';
 import { referencePlayer } from '../src/game/reference';

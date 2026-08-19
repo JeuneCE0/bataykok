@@ -33,6 +33,8 @@ import {
   onlineToFighter,
   submitResult,
 } from '../lib/online';
+import { TransKey } from '../i18n';
+import { useT } from '../i18n/useT';
 import { maxArenaTickets, useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import RankingScreen from './RankingScreen';
@@ -47,15 +49,16 @@ function formatSec(sec: number): string {
 }
 
 /** Lecture immédiate du rapport de force, pour choisir sa cible. */
-function odds(mine: number, theirs: number) {
+function odds(mine: number, theirs: number): { key: TransKey; color: string } {
   const r = theirs > 0 ? mine / theirs : 2;
-  if (r >= 1.25) return { label: 'FACILE', color: C.cane };
-  if (r >= 0.95) return { label: 'SERRÉ', color: C.gold };
-  if (r >= 0.75) return { label: 'DUR', color: C.ember };
-  return { label: 'TRÈS DUR', color: C.piment };
+  if (r >= 1.25) return { key: 'rond.odds.easy', color: C.cane };
+  if (r >= 0.95) return { key: 'rond.odds.even', color: C.gold };
+  if (r >= 0.75) return { key: 'rond.odds.hard', color: C.ember };
+  return { key: 'rond.odds.brutal', color: C.piment };
 }
 
 export default function ArenaScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const ladderOrder = useGame((s) => s.ladderOrder);
   const arenaTickets = useGame((s) => s.arenaTickets);
@@ -191,8 +194,8 @@ export default function ArenaScreen() {
           value={view}
           onChange={setView}
           options={[
-            { id: 'batay', label: '⚔️  Batay' },
-            { id: 'palmares', label: '🏆  Palmarès' },
+            { id: 'batay', label: `⚔️  ${t('rond.tab.fight')}` },
+            { id: 'palmares', label: `🏆  ${t('rond.tab.ranking')}` },
           ]}
         />
         <RankingScreen
@@ -213,21 +216,21 @@ export default function ArenaScreen() {
         value={view}
         onChange={setView}
         options={[
-          { id: 'batay', label: '⚔️  Batay' },
-          { id: 'palmares', label: '🏆  Palmarès' },
+          { id: 'batay', label: `⚔️  ${t('rond.tab.fight')}` },
+          { id: 'palmares', label: `🏆  ${t('rond.tab.ranking')}` },
         ]}
       />
       <ScreenTitle
-        title="Le Rond"
-        sub="Le gallodrome où les légendes i naît"
+        title={t('rond.title')}
+        sub={t('rond.sub')}
         accent={C.ember}
       />
 
       <RewardOverlay reward={reward} onClose={() => setReward(null)} />
 
       <View style={styles.rankBanner}>
-        <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
-        <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
+        <Chip label={t('rond.myRank', { n: myIdx + 1 })} color={C.gold} active />
+        <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />
       </View>
 
       <Card compact>
@@ -250,15 +253,15 @@ export default function ArenaScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.ticketTitle}>
               {arenaTickets > 0
-                ? `${arenaTickets} combats disponibles`
-                : 'Plus de combat pour le moment'}
+                ? t('rond.ticketsLeft', { n: arenaTickets })
+                : t('rond.noFight')}
             </Text>
             <Text style={styles.ticketSub}>
               {arenaTickets >= maxTickets
-                ? 'Jetons au maximum — allons-y !'
+                ? t('rond.ticketsFull')
                 : arenaTickets === 0
-                  ? `Prochain jeton dans ${formatSec(refill)} · ou une pub / 🌶️1`
-                  : `Prochain jeton dans ${formatSec(refill)}`}
+                  ? t('rond.nextTicketOr', { t: formatSec(refill) })
+                  : t('rond.nextTicket', { t: formatSec(refill) })}
             </Text>
           </View>
         </View>
@@ -266,17 +269,18 @@ export default function ArenaScreen() {
 
       {arenaTickets <= 0 ? (
         <Card>
-          <Text style={styles.cooldownLabel}>😤 Ton kok i reprend son souffle</Text>
+          <Text style={styles.cooldownLabel}>😤 {t('rond.catchBreath')}</Text>
           <Well style={{ alignItems: 'center' }}>
             <Text style={styles.cooldownTime}>{formatSec(refill)}</Text>
           </Well>
           <View style={{ gap: 8, marginTop: 12 }}>
-            <AdButton kind="arena" full label="Un combat tout de suite (pub)" />
+            <AdButton kind="arena" full label={t('rond.adFight')} />
             <Button
               variant="piment"
               size="sm"
               icon="⏩"
-              label="Jeton immédiat · 🌶️1"
+              label={t('rond.instantTicket')}
+              sub="🌶️ 1"
               onPress={buyArenaTicket}
               disabled={player.piments < 1}
             />
@@ -284,8 +288,8 @@ export default function ArenaScreen() {
         </Card>
       ) : targets.length === 0 ? (
         <Card glow={C.gold}>
-          <Text style={styles.rewardTitle}>👑 Ou lé NUMÉRO UN !</Text>
-          <Text style={T.body}>Le roi du rond sé ou. Personne i pé pi monte.</Text>
+          <Text style={styles.rewardTitle}>👑 {t('rond.numberOne')}</Text>
+          <Text style={T.body}>{t('rond.numberOneSub')}</Text>
         </Card>
       ) : (
         targets.map((bot, bi) => {
@@ -310,14 +314,14 @@ export default function ArenaScreen() {
                   <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                     <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
                     <Chip label={`Niv. ${bot.level}`} color={C.textDim} />
-                    <Chip label={chance.label} color={chance.color} active />
+                    <Chip label={t(chance.key)} color={chance.color} active />
                   </View>
                 </View>
                 <Button
                   variant="ember"
                   size="sm"
                   icon="⚔️"
-                  label="Batay !"
+                  label={t('rond.fight')}
                   onPress={() => launch(bot)}
                   disabled={arenaTickets <= 0}
                 />

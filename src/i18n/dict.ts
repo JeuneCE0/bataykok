@@ -112,6 +112,43 @@ export const DICT = {
   'rond.tickets': { fr: '{n} jeton{s} de combat', rcf: '{n} zeton{s} batay' },
   'rond.noTickets': { fr: 'Plus de jeton — attends la recharge', rcf: 'Pu de zeton — atann la reshaz' },
 
+  // ─── Le Rond (suite) ───────────────────────────────────────────────────
+  'rond.ticketsLeft': { fr: '{n} combat disponible', rcf: '{n} batay dispo' },
+  'rond.ticketsLeft_n': { fr: '{n} combats disponibles', rcf: '{n} batay dispo' },
+  'rond.noFight': { fr: 'Plus de combat pour le moment', rcf: 'Pu de batay pou lo momen' },
+  'rond.ticketsFull': { fr: 'Jetons au maximum — allons-y !', rcf: 'Zeton o maksimom — anon !' },
+  'rond.nextTicket': { fr: 'Prochain jeton dans {t}', rcf: 'Proshin zeton dan {t}' },
+  'rond.nextTicketOr': {
+    fr: 'Prochain jeton dans {t} · ou une pub / 🌶️1',
+    rcf: 'Proshin zeton dan {t} · oubien in pib / 🌶️1',
+  },
+  'rond.catchBreath': { fr: 'Ton coq reprend son souffle', rcf: 'Out kok i reprann son souf' },
+  'rond.adFight': { fr: 'Un combat tout de suite (pub)', rcf: 'In batay tout suit (pib)' },
+  'rond.instantTicket': { fr: 'Jeton immédiat', rcf: 'Zeton toudsuit' },
+  'rond.numberOne': { fr: 'Tu es NUMÉRO UN !', rcf: 'Ou lé NIMÉRO IN !' },
+  'rond.numberOneSub': {
+    fr: 'Le roi du rond, c’est toi. Personne ne peut plus monter.',
+    rcf: 'Le roi du rond sé ou. Personn i pé pi monté.',
+  },
+  'rond.fight': { fr: 'Combattre !', rcf: 'Batay !' },
+  'rond.odds.easy': { fr: 'FACILE', rcf: 'FASIL' },
+  'rond.odds.even': { fr: 'SERRÉ', rcf: 'SERÉ' },
+  'rond.odds.hard': { fr: 'DUR', rcf: 'DIR' },
+  'rond.odds.brutal': { fr: 'SUICIDE', rcf: 'SWISID' },
+
+  // ─── Palmarès & saison ─────────────────────────────────────────────────
+  'ranking.title': { fr: 'Palmarès', rcf: 'Palmarès' },
+  'ranking.sub': {
+    fr: 'Les meilleurs coqs batailleurs de l’île',
+    rcf: 'Bann meyèr kok batayèr lo péi',
+  },
+  'season.over': { fr: 'Saison {n} terminée !', rcf: 'Saizon {n} lé fini !' },
+  'season.finished': { fr: 'Tu finis #{n} — {tier}', rcf: 'Ou la fini #{n} — {tier}' },
+  'season.claim': { fr: 'Récupérer', rcf: 'Ramas' },
+  'season.current': { fr: 'Saison {n} · {d} jour restant', rcf: 'Saizon {n} · {d} zour restan' },
+  'season.current_n': { fr: 'Saison {n} · {d} jours restants', rcf: 'Saizon {n} · {d} zour restan' },
+  'season.atYourRank': { fr: 'À ton rang : {tier}', rcf: 'A out ran : {tier}' },
+
   // ─── Profil d'un coq ───────────────────────────────────────────────────
   'profile.combatStats': { fr: 'Statistiques de combat', rcf: 'Statistik batay' },
   'profile.hp': { fr: 'PV', rcf: 'PV' },

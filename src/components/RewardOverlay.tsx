@@ -68,11 +68,11 @@ export default function RewardOverlay({
     }
   }, [reward, pop, shine, coins]);
 
-  if (!reward) return null;
-  const accent = reward.won ? C.gold : C.piment;
+  const accent = reward?.won ? C.gold : C.piment;
 
   return (
-    <Modal visible transparent animationType="fade">
+    <Modal visible={!!reward} transparent animationType="fade" onRequestClose={onClose}>
+      {reward ? (
       <View style={styles.root}>
         {reward.won && (
           <Animated.View
@@ -222,6 +222,7 @@ export default function RewardOverlay({
           </LinearGradient>
         </Animated.View>
       </View>
+      ) : null}
     </Modal>
   );
 }

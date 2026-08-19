@@ -7,6 +7,7 @@ import { fmt, maxHp, SLOT_ICONS, SLOT_LABELS } from '../game/formulas';
 import { GUILDS } from '../game/guilds';
 import { RARITY_COLORS } from '../game/items';
 import { AttrId, Attributes, ClassId, Item, SlotId } from '../game/types';
+import { useT } from '../i18n/useT';
 import { C, F, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
 import { Button, Card, Chip, GhostButton, SectionTitle } from './ui';
@@ -50,7 +51,12 @@ export default function KokProfileModal({
   challengeDisabled?: boolean;
   challengeHint?: string;
 }) {
-  if (!profile) return null;
+  const t = useT();
+  // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
+  // l'instance au lieu de la démonter. Démonter une Modal encore présentée
+  // laissait sur iOS un fragment visible en filigrane sous tout le jeu.
+  if (!profile)
+    return <Modal visible={false} transparent animationType="fade" />;
   const cls = CLASSES[profile.classId];
   const guild = profile.guildId
     ? GUILDS.find((g) => g.id === profile.guildId)
@@ -79,13 +85,13 @@ export default function KokProfileModal({
               <View style={{ flex: 1, gap: 6 }}>
                 <Text style={styles.name} numberOfLines={1}>
                   {profile.name}
-                  {profile.isMe ? ' (ou !)' : ''}
+                  {profile.isMe ? ` ${t('profile.me')}` : ''}
                 </Text>
                 <Text style={[styles.cls, { color: cls.color }]} numberOfLines={1}>
                   {cls.emoji} {cls.name}
                 </Text>
                 <View style={styles.chips}>
-                  <Chip label={`Niv. ${profile.level}`} color={C.gold} active />
+                  <Chip label={t('common.level', { n: profile.level })} color={C.gold} active />
                   <Chip label={`#${profile.rank}`} color={C.textDim} />
                 </View>
               </View>
@@ -98,14 +104,14 @@ export default function KokProfileModal({
             </View>
 
             <Card compact>
-              <SectionTitle icon="⚔️">Statistiques de combat</SectionTitle>
-              <Line label="❤️  PV" value={fmt(hp)} />
-              <Line label="🗡️  Dégâts" value={`${profile.weaponMin}–${profile.weaponMax}`} />
-              <Line label="🛡️  Armure" value={`${profile.armor}`} />
+              <SectionTitle icon="⚔️">{t('profile.combatStats')}</SectionTitle>
+              <Line label={`❤️  ${t('profile.hp')}`} value={fmt(hp)} />
+              <Line label={`🗡️  ${t('profile.damage')}`} value={`${profile.weaponMin}–${profile.weaponMax}`} />
+              <Line label={`🛡️  ${t('profile.armor')}`} value={`${profile.armor}`} />
             </Card>
 
             <Card compact>
-              <SectionTitle icon="💪">Attributs</SectionTitle>
+              <SectionTitle icon="💪">{t('kok.attrs')}</SectionTitle>
               {ATTRS.map((a) => (
                 <Line
                   key={a}
@@ -118,7 +124,7 @@ export default function KokProfileModal({
 
             {profile.equipment && (
               <Card compact>
-                <SectionTitle icon="🎽">Ékipman</SectionTitle>
+                <SectionTitle icon="🎽">{t('kok.equipment')}</SectionTitle>
                 <View style={styles.slots}>
                   {SLOTS.map((sl) => {
                     const it = profile.equipment?.[sl];
@@ -146,7 +152,7 @@ export default function KokProfileModal({
 
             {guild && (
               <Card compact>
-                <SectionTitle icon="🏠">Écurie</SectionTitle>
+                <SectionTitle icon="🏠">{t('profile.guild')}</SectionTitle>
                 <Text style={styles.guild}>
                   {guild.emblem} {guild.name}
                 </Text>
@@ -156,8 +162,7 @@ export default function KokProfileModal({
 
             {!profile.equipment && !profile.isMe && (
               <Text style={styles.hint}>
-                L’ékipman d’un adversaire reste secret — tu ne vois que ce qu’il vaut
-                au combat.
+                {t('profile.secret')}
               </Text>
             )}
           </ScrollView>
@@ -169,15 +174,15 @@ export default function KokProfileModal({
                 size="lg"
                 variant="ember"
                 icon="⚔️"
-                label="Défier"
+                label={t('rond.challenge')}
                 sub={challengeHint}
                 disabled={challengeDisabled}
                 onPress={onChallenge}
               />
-              <GhostButton label="Fermer" onPress={onClose} style={{ alignSelf: 'center' }} />
+              <GhostButton label={t('common.close')} onPress={onClose} style={{ alignSelf: 'center' }} />
             </View>
           ) : (
-            <Button full size="lg" label="Fermer" onPress={onClose} style={{ marginTop: 12 }} />
+            <Button full size="lg" label={t('common.close')} onPress={onClose} style={{ marginTop: 12 }} />
           )}
         </LinearGradient>
       </View>

@@ -27,7 +27,11 @@ export default function TalentModal() {
     }).start();
   }, [tier, pop]);
 
-  if (!player || !tier) return null;
+  // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
+  // l'instance au lieu de la démonter. Démonter une Modal encore présentée
+  // laissait sur iOS un fragment visible en filigrane sous tout le jeu.
+  if (!player || !tier)
+    return <Modal visible={false} transparent animationType="fade" />;
 
   return (
     <Modal visible transparent animationType="fade">

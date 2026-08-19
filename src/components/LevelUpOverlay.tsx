@@ -41,7 +41,11 @@ export default function LevelUpOverlay() {
     ]).start(() => setShow(false));
   }, [show, pop]);
 
-  if (!show) return null;
+  // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
+  // l'instance au lieu de la démonter. Démonter une Modal encore présentée
+  // laissait sur iOS un fragment visible en filigrane sous tout le jeu.
+  if (!show)
+    return <Modal visible={false} transparent animationType="none" />;
 
   return (
     <Modal visible transparent animationType="none">

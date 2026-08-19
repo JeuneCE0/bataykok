@@ -28,7 +28,13 @@ function fill(s: string, p?: Params): string {
 }
 
 export function translate(lang: Lang, key: TransKey, p?: Params): string {
-  const entry = DICT[key] as { fr: string; rcf?: string } | undefined;
+  // Pluriel : si `n` vaut 2 ou plus et qu'une clé `<key>_n` existe, elle prime.
+  // « 1 combats disponibles » traînait à l'écran faute de ce branchement.
+  const n = p?.n;
+  const plural = typeof n === 'number' && Math.abs(n) >= 2 ? `${key}_n` : null;
+  const entry = ((plural && DICT[plural as TransKey]) || DICT[key]) as
+    | { fr: string; rcf?: string }
+    | undefined;
   if (!entry) {
     if (__DEV__) console.warn(`[i18n] clé absente : ${key}`);
     return key;
@@ -42,5 +48,16 @@ export type TFn = (key: TransKey, p?: Params) => string;
 export function missingKeys(): string[] {
   return Object.entries(DICT)
     .filter(([, v]) => !(v as { rcf?: string }).rcf)
+    .map(([k]) => k);
+}
+
+/** Jetons `{x}` présents dans une langue et absents de l'autre — piège muet. */
+export function mismatchedTokens(): string[] {
+  const tokens = (s: string) => (s.match(/\{(\w+)\}/g) ?? []).sort().join(',');
+  return Object.entries(DICT)
+    .filter(([, v]) => {
+      const e = v as { fr: string; rcf?: string };
+      return e.rcf !== undefined && tokens(e.fr) !== tokens(e.rcf);
+    })
     .map(([k]) => k);
 }

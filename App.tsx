@@ -31,18 +31,20 @@ import { flushEvents, trackEvent } from './src/lib/analytics';
 import { initSound, releaseSound } from './src/lib/sound';
 import { useOnlineSync } from './src/lib/useOnlineSync';
 import { useAlerts } from './src/store/alerts';
+import { TransKey } from './src/i18n';
+import { useT } from './src/i18n/useT';
 import { useGame } from './src/store/gameStore';
 import { C, F, G, R } from './src/theme';
 
 type Tab = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'kok', label: 'Mon Kok', icon: '🐓' },
-  { id: 'quetes', label: 'Quêtes', icon: '🗺️' },
-  { id: 'rond', label: 'Le Rond', icon: '⚔️' },
-  { id: 'donjon', label: 'Donjon', icon: '🗝️' },
-  { id: 'ecurie', label: 'Écurie', icon: '🏠' },
-  { id: 'bazar', label: 'Bazar', icon: '🛒' },
+const TABS: { id: Tab; key: TransKey; icon: string }[] = [
+  { id: 'kok', key: 'tab.kok', icon: '🐓' },
+  { id: 'quetes', key: 'tab.quetes', icon: '🗺️' },
+  { id: 'rond', key: 'tab.rond', icon: '⚔️' },
+  { id: 'donjon', key: 'tab.donjon', icon: '🗝️' },
+  { id: 'ecurie', key: 'tab.ecurie', icon: '🏠' },
+  { id: 'bazar', key: 'tab.bazar', icon: '🛒' },
 ];
 
 export default function App() {
@@ -131,17 +133,18 @@ function TabBar({
   onChange: (t: Tab) => void;
 }) {
   const alerts = useAlerts();
+  const t = useT();
   return (
     <LinearGradient
       colors={['rgba(12,7,20,0.5)', 'rgba(12,7,20,0.97)']}
       style={styles.tabBar}
     >
-      {TABS.map((t) => {
-        const on = t.id === active;
+      {TABS.map((item) => {
+        const on = item.id === active;
         return (
           <Pressable
-            key={t.id}
-            onPress={() => onChange(t.id)}
+            key={item.id}
+            onPress={() => onChange(item.id)}
             style={({ pressed }) => [
               styles.tab,
               pressed && !on ? { opacity: 0.6 } : null,
@@ -154,19 +157,19 @@ function TabBar({
                 end={{ x: 0, y: 1 }}
                 style={styles.tabPill}
               >
-                <Text style={styles.tabIcon}>{t.icon}</Text>
+                <Text style={styles.tabIcon}>{item.icon}</Text>
               </LinearGradient>
             ) : (
               <View style={styles.tabPillOff}>
-                <Text style={[styles.tabIcon, { opacity: 0.55 }]}>{t.icon}</Text>
+                <Text style={[styles.tabIcon, { opacity: 0.55 }]}>{item.icon}</Text>
               </View>
             )}
-            {alerts[t.id] && !on && <View style={styles.tabDot} />}
+            {alerts[item.id] && !on && <View style={styles.tabDot} />}
             <Text
               style={[styles.tabLabel, on ? styles.tabLabelOn : null]}
               numberOfLines={1}
             >
-              {t.label}
+              {t(item.key)}
             </Text>
           </Pressable>
         );

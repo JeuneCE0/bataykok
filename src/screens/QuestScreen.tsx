@@ -25,10 +25,12 @@ import {
   cancelQuestReminder,
   scheduleQuestDone,
 } from '../lib/notifications';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F } from '../theme';
 
 export default function QuestScreen() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const quests = useGame((s) => s.quests);
   const activeQuest = useGame((s) => s.activeQuest);
@@ -68,14 +70,14 @@ export default function QuestScreen() {
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
-        title="Chez Mémé Zizine"
-        sub="Le snack-bar des koks batayeurs — quêtes péi"
+        title={t('quest.title')}
+        sub={t('quest.sub')}
       />
 
       {/* Motivation */}
       <Card>
         <View style={styles.motivHead}>
-          <SectionTitle icon="⚡">Motivation</SectionTitle>
+          <SectionTitle icon="⚡">{t('quest.motivation')}</SectionTitle>
           <Text style={styles.motivValue}>
             {motivation}
             <Text style={styles.motivMax}> / {MAX_MOTIVATION}</Text>
@@ -85,8 +87,8 @@ export default function QuestScreen() {
 
         <Text style={styles.refillNote}>
           {motivation >= MAX_MOTIVATION
-            ? 'Plin ! Le rond i attend a ou.'
-            : `Plein refé dan ${formatUntil(nextDailyReset() - now)} (minui)`}
+            ? t('quest.full')
+            : t('quest.refillAt', { t: formatUntil(nextDailyReset() - now) })}
         </Text>
 
         <View style={styles.actions}>
@@ -96,8 +98,8 @@ export default function QuestScreen() {
             icon="🍺"
             label={
               dodosToday >= MAX_DODOS_PER_DAY
-                ? 'Pu de Dodo zordi'
-                : `Dodo · ${MAX_DODOS_PER_DAY - dodosToday} restantes`
+                ? t('quest.dodoNone')
+                : t('quest.dodo', { n: MAX_DODOS_PER_DAY - dodosToday })
             }
             sub={dodosToday >= MAX_DODOS_PER_DAY ? undefined : '🌶️ 1 · +20'}
             onPress={drinkDodo}
@@ -108,7 +110,7 @@ export default function QuestScreen() {
             size="sm"
             variant="ember"
             icon="🫗"
-            label="Plein d'un coup"
+            label={t('quest.refill')}
             sub={`🌶️ 5 · +${MAX_MOTIVATION - motivation}`}
             onPress={refillMotivation}
             disabled={player.piments < 5 || motivation >= MAX_MOTIVATION}
@@ -117,7 +119,7 @@ export default function QuestScreen() {
         <AdButton kind="dodo" full />
 
         <View style={styles.transportRow}>
-          <Text style={styles.transportLabel}>Transport</Text>
+          <Text style={styles.transportLabel}>{t('quest.transport')}</Text>
           <Chip
             icon={transport.emoji}
             label={`${transport.name}${
@@ -132,7 +134,7 @@ export default function QuestScreen() {
 
       {activeQuest ? (
         <Card glow={C.gold}>
-          <SectionTitle icon="⏳">Quête en cours</SectionTitle>
+          <SectionTitle icon="⏳">{t('quest.active')}</SectionTitle>
           <Text style={styles.questTitle}>{activeQuest.quest.title}</Text>
           <Chip
             icon="📍"
@@ -144,7 +146,7 @@ export default function QuestScreen() {
           {remaining > 0 ? (
             <>
               <Well style={styles.timerWell}>
-                <Text style={styles.timerCap}>Tan ki rest</Text>
+                <Text style={styles.timerCap}>{t('quest.timeLeft')}</Text>
                 <Text style={styles.countdown}>{formatTime(remaining)}</Text>
                 <Bar
                   value={questDuration - remaining}
@@ -153,12 +155,13 @@ export default function QuestScreen() {
                   height={12}
                 />
                 <Text style={styles.timerSub}>
-                  {Math.round(((questDuration - remaining) / questDuration) * 100)} % ·
-                  {' '}récompense à l’arrivée
+                  {t('quest.progress', {
+                    pct: Math.round(((questDuration - remaining) / questDuration) * 100),
+                  })}
                 </Text>
               </Well>
               <GhostButton
-                label="Abandonner"
+                label={t('quest.abandon')}
                 onPress={() => {
                   cancelQuest();
                   cancelQuestReminder();
@@ -172,7 +175,7 @@ export default function QuestScreen() {
               size="lg"
               variant="cane"
               icon="🎁"
-              label="Récupérer la récompense !"
+              label={t('quest.collect')}
               onPress={() => {
                 collectQuest();
                 cancelQuestReminder();
@@ -185,7 +188,7 @@ export default function QuestScreen() {
         <>
           {lastOutcome && (
             <Card glow={C.cane}>
-              <SectionTitle icon="✅">Dernière quête</SectionTitle>
+              <SectionTitle icon="✅">{t('quest.last')}</SectionTitle>
               <StatRow
                 items={[
                   { icon: '🌽', value: `+${fmt(lastOutcome.gold)}`, color: C.gold },
@@ -236,14 +239,15 @@ export default function QuestScreen() {
                 ]}
               />
               <Text style={styles.yield}>
-                {Math.round(
-                  (q.gold / Math.max(1, q.durationSec * (1 - transport.reduction))) * 60
-                )}{' '}
-                🌽 par minute
+                {t('quest.perMinute', {
+                  n: Math.round(
+                    (q.gold / Math.max(1, q.durationSec * (1 - transport.reduction))) * 60
+                  ),
+                })}
               </Text>
               <Button
                 full
-                label="Partir en quête"
+                label={t('quest.go')}
                 onPress={async () => {
                   startQuest(q);
                   await askNotificationPermission();
@@ -260,7 +264,7 @@ export default function QuestScreen() {
 
           <GhostButton
             icon="🔄"
-            label="Autres quêtes"
+            label={t('quest.reroll')}
             onPress={rerollQuests}
             style={{ alignSelf: 'center', marginTop: 6 }}
           />

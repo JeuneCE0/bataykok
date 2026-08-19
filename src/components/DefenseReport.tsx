@@ -28,7 +28,11 @@ export default function DefenseReport() {
     }).start();
   }, [defenses.length, pop]);
 
-  if (defenses.length === 0) return null;
+  // Rendre la *même* Modal fermée plutôt que `null` : React réutilise alors
+  // l'instance au lieu de la démonter. Démonter une Modal encore présentée
+  // laissait sur iOS un fragment visible en filigrane sous tout le jeu.
+  if (defenses.length === 0)
+    return <Modal visible={false} transparent animationType="fade" />;
 
   const won = defenses.filter((d) => d.defended).length;
   const gold = defenses.reduce((s, d) => s + d.gold, 0);

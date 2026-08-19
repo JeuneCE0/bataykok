@@ -8,6 +8,7 @@ import { SEASON_MS, tierForRank } from '../game/seasons';
 import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { playerArmor, playerToFighter, playerWeapon, totalAttrs } from '../game/formulas';
+import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 
@@ -27,6 +28,7 @@ export default function RankingScreen({
   const seasonNo = useGame((s) => s.seasonNo);
   const seasonPending = useGame((s) => s.seasonPending);
   const claimSeason = useGame((s) => s.claimSeason);
+  const t = useT();
   const [profile, setProfile] = useState<KokProfile | null>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const arenaTickets = useGame((s) => s.arenaTickets);
@@ -86,27 +88,30 @@ export default function RankingScreen({
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <ScreenTitle
-        title="Palmarès"
-        sub="Les meilleurs koks batayeurs de l'île"
+        title={t('ranking.title')}
+        sub={t('ranking.sub')}
       />
       <View style={styles.badges}>
-        <Chip label={`Ton rang · #${myIdx + 1}`} color={C.gold} active />
-        <Chip label={`Honneur ${player.honor}`} color={C.mystic} />
+        <Chip label={t('rond.myRank', { n: myIdx + 1 })} color={C.gold} active />
+        <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />
       </View>
 
       {seasonPending && (
         <Card glow={C.gold}>
           <Text style={styles.seasonTitle}>
-            🏁 Saizon {seasonPending.season} lé fini !
+            🏁 {t('season.over', { n: seasonPending.season })}
           </Text>
           <Text style={styles.seasonSub}>
-            Ou la fini #{seasonPending.rank} —{' '}
-            {tierForRank(seasonPending.rank).label}
+            {t('season.finished', {
+              n: seasonPending.rank,
+              tier: tierForRank(seasonPending.rank).label,
+            })}
           </Text>
           <Button
             full
             style={{ marginTop: 10 }}
-            label={`Récupérer 🌽${fmt(tierForRank(seasonPending.rank).grains)} · 🌶️${
+            label={t('season.claim')}
+            sub={`🌽 ${fmt(tierForRank(seasonPending.rank).grains)} · 🌶️ ${
               tierForRank(seasonPending.rank).piments
             }`}
             onPress={claimSeason}
@@ -119,10 +124,11 @@ export default function RankingScreen({
           <Text style={{ fontSize: 20 }}>{tier.icon}</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.seasonTitle}>
-              Saizon {seasonNo} · {daysLeft} jour restan
+              {t('season.current', { n: seasonNo, d: daysLeft })}
             </Text>
             <Text style={styles.seasonSub}>
-              À ton rang : {tier.label} → 🌽{fmt(tier.grains)} · 🌶️{tier.piments}
+              {t('season.atYourRank', { tier: tier.label })} → 🌽{fmt(tier.grains)} · 🌶️
+              {tier.piments}
             </Text>
           </View>
         </View>
@@ -175,7 +181,7 @@ export default function RankingScreen({
                 numberOfLines={1}
               >
                 {name}
-                {isMe ? ' (ou !)' : ''}
+                {isMe ? ` ${t('profile.me')}` : ''}
               </Text>
               <Text style={[styles.cls, { color: cls.color }]}>{cls.emoji}</Text>
               <Text style={styles.level}>niv. {level}</Text>
@@ -200,8 +206,8 @@ export default function RankingScreen({
         challengeDisabled={arenaTickets <= 0}
         challengeHint={
           arenaTickets > 0
-            ? `${arenaTickets} jeton${arenaTickets > 1 ? 's' : ''} de batay`
-            : 'Pu de jeton — atann la recharz'
+            ? t('rond.tickets', { n: arenaTickets, s: arenaTickets > 1 ? 's' : '' })
+            : t('rond.noTickets')
         }
       />
     </ScrollView>
