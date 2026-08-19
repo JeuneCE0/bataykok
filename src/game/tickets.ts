@@ -22,7 +22,10 @@ export function regenerate(
   now: number
 ): TicketState {
   if (state.tickets >= max) return { tickets: state.tickets, nextAt: 0 };
-  if (!state.nextAt || now < state.nextAt) return state;
+  // un talent ou l'événement du jour peut relever le plafond alors qu'on était
+  // plein : sans amorçage, on restait bloqué à 3/5 jusqu'au prochain combat
+  if (!state.nextAt) return { tickets: state.tickets, nextAt: now + ARENA_TICKET_MS };
+  if (now < state.nextAt) return state;
 
   // plusieurs jetons peuvent être dus si l'app est restée fermée
   const gained = 1 + Math.floor((now - state.nextAt) / ARENA_TICKET_MS);

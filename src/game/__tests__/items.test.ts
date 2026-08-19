@@ -176,3 +176,23 @@ describe('panoplies', () => {
     }
   });
 });
+
+describe('bonus de chance sur le tirage de gamme', () => {
+  it('la chance augmente les hautes gammes au lieu de les supprimer', () => {
+    const part = (luck: number) => {
+      let hautes = 0;
+      const N = 20_000;
+      for (let i = 0; i < N; i++) {
+        const r = rollRarity(luck);
+        if (r === 'rar' || r === 'lezand' || r === 'mitik') hautes++;
+      }
+      return (hautes / N) * 100;
+    };
+    const sans = part(0);
+    const avec = part(0.2);
+    assert.ok(
+      avec > sans,
+      `la chance fait baisser les hautes gammes : ${sans.toFixed(1)} % → ${avec.toFixed(1)} %`
+    );
+  });
+});

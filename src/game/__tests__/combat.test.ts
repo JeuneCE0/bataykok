@@ -121,3 +121,29 @@ describe('simulation de combat', () => {
     assert.deepEqual(r.maxHp, [maxHp(a), maxHp(b)]);
   });
 });
+
+describe('combats qui n’aboutissent pas', () => {
+  it('un mur de PV ne gagne pas par forfait', () => {
+    // Deux tortues identiques atteignent le plafond de tours. L'index 0 étant
+    // toujours le joueur, renvoyer 0 par défaut lui offrait la victoire —
+    // donc un étage de donjon et son butin garanti.
+    const tortue = (nom: string): Fighter => ({
+      name: nom, level: 40, classId: 'gep',
+      attrs: { force: 10, adresse: 10, esprit: 10, endurance: 400, chance: 10 },
+      weaponMin: 1, weaponMax: 1, armor: 800,
+      appearance: { bodyColor: '#8d5524', combColor: '#e53935', tailPalette: 0, accessory: 0 },
+    });
+    const r = simulateCombat(tortue('gauche'), tortue('droite'));
+    const last = r.rounds[r.rounds.length - 1];
+    if (last.hpAfter[0] > 0 && last.hpAfter[1] > 0) {
+      // départage aux PV restants, pas à la position dans le tableau
+      const partGauche = last.hpAfter[0] / r.maxHp[0];
+      const partDroite = last.hpAfter[1] / r.maxHp[1];
+      assert.equal(
+        r.winner,
+        partGauche >= partDroite ? 0 : 1,
+        'le combat au plafond est attribué à l’index 0'
+      );
+    }
+  });
+});

@@ -153,3 +153,13 @@ describe('série de connexions', () => {
     }
   });
 });
+
+describe('série de connexions — cas limites', () => {
+  it('une série à zéro ne donne pas le jackpot du septième jour', () => {
+    assert.notEqual(
+      streakRewardFor(0).day,
+      7,
+      'une série à 0 rapporte la récompense du jour 7'
+    );
+  });
+});

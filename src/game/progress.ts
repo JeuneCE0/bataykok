@@ -274,7 +274,8 @@ export const STREAK_REWARDS: StreakReward[] = [
 ];
 
 export function streakRewardFor(streak: number): StreakReward {
-  const idx = ((streak - 1) % 7 + 7) % 7;
+  // une série à 0 tombait sur l'index 6, soit la récompense du jour 7
+  const idx = ((Math.max(1, streak) - 1) % 7 + 7) % 7;
   return STREAK_REWARDS[idx];
 }
 

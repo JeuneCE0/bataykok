@@ -57,3 +57,13 @@ describe('jetons de batay', () => {
     assert.equal(consume({ tickets: 0, nextAt: T0 }, 3, T0).tickets, 0);
   });
 });
+
+describe('plafond relevé en cours de partie', () => {
+  it('un talent qui relève le max amorce la recharge même au repos', () => {
+    // 3/3 sans recharge en attente, puis « Sof rapid » porte le max à 5 :
+    // sans amorçage on restait bloqué à 3/5 jusqu'au prochain combat
+    const s = regenerate({ tickets: 3, nextAt: 0 }, 5, T0);
+    assert.equal(s.tickets, 3);
+    assert.equal(s.nextAt, T0 + ARENA_TICKET_MS, 'la recharge ne démarre pas');
+  });
+});

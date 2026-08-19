@@ -104,7 +104,10 @@ let itemSeq = 0;
  * événement : c'est ce qui donne sa valeur au reste (et à l'hôtel des ventes).
  */
 export function rollRarity(luck = 0): Rarity {
-  const r = Math.random() * (1 - Math.min(0.25, luck));
+  // décaler la plage vers le haut, pas la rétrécir vers le bas : l'ancienne
+  // formule faisait disparaître rar, lézandèr et mitik dès luck = 0,1
+  const l = Math.min(0.25, Math.max(0, luck));
+  const r = Math.random() * (1 - l) + l;
   if (r < 0.46) return 'commun';
   if (r < 0.74) return 'korek';
   if (r < 0.90) return 'kalite';

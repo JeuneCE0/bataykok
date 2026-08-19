@@ -42,7 +42,10 @@ function baseDamage(attacker: Fighter, defender: Fighter): number {
   const main = attacker.attrs[c.mainAttr];
   let dmg = weapon * c.dmgMult * (1 + main / 10);
   // réduction par l'armure (plafonnée par la classe du défenseur)
-  const reduction = Math.min(cd.armorCap, defender.armor / (attacker.level * 12));
+  const reduction = Math.min(
+    cd.armorCap,
+    defender.armor / (Math.max(1, attacker.level) * 12)
+  );
   dmg *= 1 - reduction;
   return Math.max(1, dmg);
 }
@@ -86,8 +89,7 @@ export function simulateCombat(a: Fighter, b: Fighter): CombatResult {
     const defIdx = (1 - turn) as 0 | 1;
     const atk = fighters[atkIdx];
     const def = fighters[defIdx];
-    const atkClass = CLASSES[atk.classId];
-    const defClass = CLASSES[def.classId];
+
 
     // Séga : buff tous les 4 tours
     if (atk.classId === 'sega') {
@@ -157,15 +159,21 @@ export function simulateCombat(a: Fighter, b: Fighter): CombatResult {
         chainCount++;
         attacking = true;
       }
-      void atkClass;
-      void defClass;
     }
     turn = defIdx;
   }
 
-  return {
-    winner: hp[0] > 0 ? 0 : 1,
-    rounds,
-    maxHp: maxHpArr,
-  };
+  // Si les deux tiennent encore au plafond de tours, on départage sur la part
+  // de vie restante. Renvoyer 0 par défaut donnait la victoire au joueur —
+  // l'index 0 est toujours lui — et un build très défensif gagnait par forfait.
+  const winner: 0 | 1 =
+    hp[0] > 0 && hp[1] > 0
+      ? hp[0] / maxHpArr[0] >= hp[1] / maxHpArr[1]
+        ? 0
+        : 1
+      : hp[0] > 0
+        ? 0
+        : 1;
+
+  return { winner, rounds, maxHp: maxHpArr };
 }

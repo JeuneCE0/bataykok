@@ -623,8 +623,11 @@ export const useGame = create<GameState>()(
           const s = get();
           if (!s.player || s.activeQuest) return;
           if (s.motivation < q.motivationCost) return;
+          // le talent « Pié lézé » était déclaré mais jamais consommé :
+          // un joueur sur trois s'amputait d'un choix définitif au palier 15
           const reduction = TRANSPORTS[s.player.transport].reduction;
-          const dur = Math.round(q.durationSec * (1 - reduction));
+          const speed = talentEffects(s.player.talents ?? []).questSpeed;
+          const dur = Math.round(q.durationSec * (1 - reduction) * (1 - speed));
           set({
             motivation: s.motivation - q.motivationCost,
             activeQuest: { quest: q, endsAt: Date.now() + dur * 1000 },
