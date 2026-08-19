@@ -1,6 +1,8 @@
+import { TransKey } from '../i18n';
 import { ATTR_LABELS } from './classes';
 import { rnd } from './formulas';
 import { SETS } from './sets';
+import { rollUnique } from './uniques';
 import { AttrId, Item, Rarity, SlotId } from './types';
 
 export const RARITY_LABELS: Record<Rarity, string> = {
@@ -10,6 +12,7 @@ export const RARITY_LABELS: Record<Rarity, string> = {
   rar: 'Rar',
   lezand: 'Lézandèr',
   mitik: 'Mitik',
+  zanset: 'Zanset',
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
@@ -19,6 +22,7 @@ export const RARITY_COLORS: Record<Rarity, string> = {
   rar: '#B06BFF',
   lezand: '#FF8A3D',
   mitik: '#FFC93C',
+  zanset: '#FF2E63',
 };
 
 /** L'ordre fait foi : tri, comparaison, progression du Zalbum. */
@@ -29,6 +33,7 @@ export const RARITY_ORDER: Rarity[] = [
   'rar',
   'lezand',
   'mitik',
+  'zanset',
 ];
 
 export function rarityRank(r: Rarity): number {
@@ -42,6 +47,7 @@ const RARITY_MULT: Record<Rarity, number> = {
   rar: 2.4,
   lezand: 3.2,
   mitik: 4.4,
+  zanset: 6.5,
 };
 
 /** Un nom par gamme : la rareté doit s'entendre avant même de lire la couleur. */
@@ -49,34 +55,42 @@ const SLOT_NAMES: Record<SlotId, string[]> = {
   arme: [
     'Zéprons', 'Lames de patte', 'Zéprons forgés',
     'Grif volkanik', 'Zéprons du Gran Brilé', 'Grif de Sitarane',
+    'Zéprons dé Zanset',
   ],
   tete: [
     'Kasket', 'Bandana', 'Chapo payanké',
     'Kask la fournèz', 'Kouronn de Mafate', 'Kask du Maloya Mistik',
+    'Kouronn dé Zanset',
   ],
   torse: [
     'Gilet plimé', 'Plastron koko', 'Armure vakoa',
     'Plimaz doré', 'Kirass du Piton', 'Plimaz de Grand-Mèr Kal',
+    'Plimaz dé Zanset',
   ],
   pattes: [
     'Zergos', 'Bot la boue', 'Pat renforcées',
     'Zergos siklone', 'Zergos du Papang Roi', 'Pat de la Fournèz',
+    'Pat dé Zanset',
   ],
   amulette: [
     'Kolié koki', 'Kolié bwa de santal', 'Kolié perle noire',
     'Kolié volkan', 'Kolié dé Sèt Kaskad', 'Kolié du Gran-Basin',
+    'Kolié dé Zanset',
   ],
   anneau: [
     'Bag laiton', 'Bag larzan', 'Bag lor',
     'Bag mitik', 'Bag du Vié Tisanèr', 'Bag dé Anset',
+    'Bag dé Zanset',
   ],
   ceinture: [
     'Sintir chanvre', 'Sintir kuir', 'Sintir géranium',
     'Sintir gran-mèr kal', 'Sintir du Kabar', 'Sintir dé Sirk',
+    'Sintir dé Zanset',
   ],
   grigri: [
     'Ti gri-gri', 'Gri-gri tisanèr', 'Gri-gri sitarane',
     'Gri-gri gramoune', 'Gri-gri du Volkan', 'Gri-gri dé Zanset',
+    'Gri-gri dé Zanset',
   ],
 };
 
@@ -113,7 +127,10 @@ export function rollRarity(luck = 0, rand: () => number = Math.random): Rarity {
   if (r < 0.90) return 'kalite';
   if (r < 0.968) return 'rar';
   if (r < 0.995) return 'lezand';
-  return 'mitik';
+  // Zanset : un tirage sur mille. Assez rare pour qu'un joueur s'en souvienne,
+  // assez atteignable pour que le palier ne soit pas décoratif.
+  if (r < 0.999) return 'mitik';
+  return 'zanset';
 }
 
 export const SLOT_LIST: SlotId[] = [
@@ -173,6 +190,14 @@ export function generateItem(
   const pick = (n: number) => Math.floor(rand() * n);
   const s: SlotId = slot ?? SLOT_LIST[pick(8)];
   const r = rarity ?? rollRarity(0, rand);
+
+  // Un tirage `zanset` ne produit pas un objet de plus : il produit *un* des
+  // uniques, nommé et taillé à la main.
+  if (r === 'zanset') {
+    const item = rollUnique(level, rand, slot);
+    item.price = itemPrice(item, rand);
+    return item;
+  }
   const mult = RARITY_MULT[r];
   const tier = rarityRank(r);
   const baseName = SLOT_NAMES[s][tier];
@@ -232,4 +257,12 @@ export function itemStats(it: Item): string {
     parts.push(`${ATTR_LABELS[k]} +${it.bonuses[k]}`)
   );
   return parts.join(' · ');
+}
+
+/**
+ * Libellé d'un objet. Les uniques portent une clé de traduction dans `name` —
+ * leur nom est du texte, il doit suivre la langue comme le reste.
+ */
+export function itemLabel(it: Item, t: (k: TransKey) => string): string {
+  return it.uniqueId ? t(`unique.${it.uniqueId}.name` as TransKey) : it.name;
 }

@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { ATTR_LABELS, CLASSES } from '../classes';
+import { UNIQUE_BY_ID, forgeUnique } from '../uniques';
 import {
   generateItem,
   RARITY_COLORS,
   RARITY_LABELS,
   RARITY_ORDER,
   rarityRank,
+  itemValue,
   rollRarity,
   shopRotation,
 } from '../items';
@@ -25,7 +27,7 @@ function joueur(equipment: Partial<Record<SlotId, Item>> = {}): PlayerState {
     appearance: { bodyColor: '#8d5524', combColor: '#e53935', tailPalette: 0, accessory: 0 },
     baseAttrs: { force: 40, adresse: 20, esprit: 20, endurance: 30, chance: 15 },
     equipment, inventory: [], grains: 0, piments: 0, honor: 100,
-    rank: 1, wins: 0, losses: 0, guildId: null, transport: 0, talents: [],
+    rank: 1, wins: 0, losses: 0, guildId: null, transport: 0, talents: [], cosmetics: [],
   };
 }
 
@@ -104,7 +106,8 @@ describe('gammes d’ékipman', () => {
 
   it('rarityRank suit l’ordre déclaré', () => {
     assert.equal(rarityRank('commun'), 0);
-    assert.equal(rarityRank('mitik'), RARITY_ORDER.length - 1);
+    assert.equal(rarityRank('zanset'), RARITY_ORDER.length - 1);
+    assert.ok(rarityRank('zanset') > rarityRank('mitik'));
   });
 });
 
@@ -194,5 +197,40 @@ describe('bonus de chance sur le tirage de gamme', () => {
       avec > sans,
       `la chance fait baisser les hautes gammes : ${sans.toFixed(1)} % → ${avec.toFixed(1)} %`
     );
+  });
+});
+
+describe('objets uniques', () => {
+  it('un tirage zanset produit toujours un unique nommé', () => {
+    for (let i = 0; i < 40; i++) {
+      const it = generateItem(30, undefined, 'zanset');
+      assert.ok(it.uniqueId, 'objet zanset sans identité d’unique');
+      assert.equal(it.rarity, 'zanset');
+      assert.ok(UNIQUE_BY_ID[it.uniqueId!], `unique inconnu : ${it.uniqueId}`);
+    }
+  });
+
+  it('un unique bat largement le mitik du même niveau', () => {
+    // Sinon le palier n'apporte qu'une couleur de plus.
+    const mitik = Array.from({ length: 30 }, () => itemValue(generateItem(30, 'amulette', 'mitik')));
+    const moyMitik = mitik.reduce((a, b) => a + b, 0) / mitik.length;
+    const uq = itemValue(forgeUnique(UNIQUE_BY_ID.kolie_grandbasin, 30, 0));
+    assert.ok(uq > moyMitik * 1.3, `unique ${uq} vs mitik moyen ${moyMitik.toFixed(0)}`);
+  });
+
+  it('deux exemplaires du même unique au même niveau sont identiques', () => {
+    // C'est ce qui permet d'en parler entre joueurs : « le Kolié niveau 30 ».
+    const a = forgeUnique(UNIQUE_BY_ID.bag_gramoune, 24, 0);
+    const b = forgeUnique(UNIQUE_BY_ID.bag_gramoune, 24, 1);
+    assert.deepEqual(a.bonuses, b.bonuses);
+    assert.equal(a.armor, b.armor);
+  });
+
+  it('le zanset reste un tirage sur mille', () => {
+    let n = 0;
+    const N = 200_000;
+    for (let i = 0; i < N; i++) if (rollRarity() === 'zanset') n++;
+    const taux = n / N;
+    assert.ok(taux > 0.0004 && taux < 0.0018, `taux de zanset : ${(taux * 100).toFixed(3)} %`);
   });
 });

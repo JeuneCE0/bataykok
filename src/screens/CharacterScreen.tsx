@@ -43,6 +43,7 @@ import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
 import { auraColor } from '../game/power';
+import { itemLabel } from '../game/items';
 
 const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
   off: '📴 Hors ligne',
@@ -350,7 +351,7 @@ export default function CharacterScreen() {
               </Pressable>
               <View style={{ flex: 1, gap: 3 }}>
                 <Text style={[styles.invName, { color: RARITY_COLORS[it.rarity] }]} numberOfLines={1}>
-                  {it.name} <Text style={styles.invLevel}>niv.{it.level}</Text>
+                  {itemLabel(it, t)} <Text style={styles.invLevel}>niv.{it.level}</Text>
                 </Text>
                 <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                   <VerdictBadge cmp={cmp} />

@@ -64,6 +64,124 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Panoplies ─────────────────────────────────────────────────────────
+  'setkit.title': {
+    fr: 'Panoplies complètes',
+    rcf: 'Panopli konplèt',
+  },
+  'setkit.sub': {
+    fr: 'Huit pièces d’un coup, plus le look assorti.',
+    rcf: 'Uit pyès dun kou, ek le look ki va avèk.',
+  },
+  'setkit.lookIncluded': {
+    fr: 'Look inclus',
+    rcf: 'Look konpri',
+  },
+  'setkit.replaces': {
+    fr: 'Remplace tout ton équipement actuel — les pièces retirées partent au sac.',
+    rcf: 'I ranplas tout out ékipman — bann pyès ôté i part dann sak.',
+  },
+
+  // ─── Comparaison d'objets ──────────────────────────────────────────────
+  'compare.better': {
+    fr: 'MIEUX',
+    rcf: 'MIÉ',
+  },
+  'compare.worse': {
+    fr: 'MOINS BON',
+    rcf: 'MOIN BON',
+  },
+  'compare.equal': {
+    fr: 'ÉGAL',
+    rcf: 'PARÈY',
+  },
+  'compare.empty': {
+    fr: 'EMPLACEMENT VIDE',
+    rcf: 'PLAS VID',
+  },
+  'compare.identical': {
+    fr: 'Identique à ce que porte ton coq.',
+    rcf: 'Parèy sak out kok i port.',
+  },
+  'compare.emptySlot': {
+    fr: 'Aucun équipement sur cet emplacement',
+    rcf: 'Okin ékipman su sèt plas',
+  },
+
+  // ─── Objets uniques ────────────────────────────────────────────────────
+  'unique.zepron_sitarane.name': {
+    fr: 'Éperons de Sitarane',
+    rcf: 'Zéprons de Sitarane',
+  },
+  'unique.zepron_sitarane.lore': {
+    fr: 'Forgés dans le fer d’une grille de cimetière. Ils trouvent la gorge dans le noir.',
+    rcf: 'Forzé dann fèr in gri simityèr. Zot i trouv la gorz dann fénoir.',
+  },
+  'unique.kouronn_papang.name': {
+    fr: 'Couronne du Papangue',
+    rcf: 'Kouronn du Papang',
+  },
+  'unique.kouronn_papang.lore': {
+    fr: 'Le roi des airs ne l’a jamais posée. On la lui a prise en vol.',
+    rcf: 'Le roi lèr la zamé poz a li. Nou la pran su li an plin vol.',
+  },
+  'unique.plimaz_fournez.name': {
+    fr: 'Plumage de la Fournaise',
+    rcf: 'Plimaz la Fournèz',
+  },
+  'unique.plimaz_fournez.lore': {
+    fr: 'Tombé dans le cratère, ressorti trois jours après. Plus dur qu’avant.',
+    rcf: 'Tonbé dann kratèr, ressorti troi zour apré. Pli dir kavan.',
+  },
+  'unique.pat_mafate.name': {
+    fr: 'Pattes de Mafate',
+    rcf: 'Pat Mafate',
+  },
+  'unique.pat_mafate.lore': {
+    fr: 'Elles connaissent tous les sentiers du cirque. Même ceux qui n’existent pas.',
+    rcf: 'Zot i koné tout sanmin lo sirk. Mèm sak i egziste pa.',
+  },
+  'unique.kolie_grandbasin.name': {
+    fr: 'Collier de Grand-Bassin',
+    rcf: 'Kolié Gran-Basin',
+  },
+  'unique.kolie_grandbasin.lore': {
+    fr: 'Sept perles, sept cascades. Celui qui le porte entend l’eau même au sec.',
+    rcf: 'Sèt pèrl, sèt kaskad. Sak i port a li i tann dolo mèm o sèk.',
+  },
+  'unique.bag_gramoune.name': {
+    fr: 'Bague du Gramoune',
+    rcf: 'Bag du Gramoune',
+  },
+  'unique.bag_gramoune.lore': {
+    fr: 'Le vieux l’a portée soixante ans. Il n’a jamais perdu au bœuf-moka.',
+    rcf: 'Le vyé la port a li swasant an. Li la zamé perd o bèf-moka.',
+  },
+  'unique.sintir_kabar.name': {
+    fr: 'Ceinture du Kabar',
+    rcf: 'Sintir du Kabar',
+  },
+  'unique.sintir_kabar.lore': {
+    fr: 'Nouée un soir de maloya qui n’a pas fini. Elle bat encore la mesure.',
+    rcf: 'Noué in swar maloya ki la pa fini. Li bat ankor la mizir.',
+  },
+  'unique.grigri_zanset.name': {
+    fr: 'Gri-gri des Ancêtres',
+    rcf: 'Gri-gri dé Zanset',
+  },
+  'unique.grigri_zanset.lore': {
+    fr: 'Personne ne sait ce qu’il y a dedans. Personne n’a osé l’ouvrir.',
+    rcf: 'Personn i koné sak nana andan. Personn la pa ozé ouvèr a li.',
+  },
+  'unique.badge': {
+    fr: 'UNIQUE',
+    rcf: 'INIK',
+  },
+  'rarity.zanset.hint': {
+    fr: 'Un objet sur mille. Il porte un nom.',
+    rcf: 'In zafèr su mil. Li port in non.',
+  },
+
   // ─── Cosmétiques ───────────────────────────────────────────────────────
   'cosmetic.body.gold': {
     fr: 'Plumage doré',

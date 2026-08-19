@@ -32,6 +32,7 @@ import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
+import { itemLabel } from '../game/items';
 
 export default function MarketScreen() {
   const t = useT();
@@ -138,7 +139,7 @@ export default function MarketScreen() {
                       </View>
                       <View style={{ flex: 1, gap: 4 }}>
                         <Text style={[styles.name, { color: col }]} numberOfLines={1}>
-                          {l.item.name}
+                          {itemLabel(l.item, t)}
                         </Text>
                         <View style={styles.chips}>
                           <Chip label={RARITY_LABELS[l.item.rarity]} color={col} />
@@ -180,7 +181,7 @@ export default function MarketScreen() {
                                 grantBonus({ grains: r.price });
                                 setMsg('Ton sak est plein — achat annulé.');
                               } else {
-                                setMsg(`✅ ${r.item.name} est dans ton sak !`);
+                                setMsg(`✅ ${itemLabel(r.item, t)} — dan out sak !`);
                               }
                               setBusy(false);
                               void reload();
@@ -214,7 +215,7 @@ export default function MarketScreen() {
                     <Text style={{ fontSize: 18 }}>{SLOT_ICONS[it.slot]}</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.name, { color: col }]} numberOfLines={1}>
-                        {it.name}
+                        {itemLabel(it, t)}
                       </Text>
                       <Text style={styles.stats}>
                         {RARITY_LABELS[it.rarity]} · niv. {it.level}

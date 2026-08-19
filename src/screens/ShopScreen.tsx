@@ -29,6 +29,8 @@ import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { localDay } from '../game/day';
 import { C, F, G, R } from '../theme';
+import { itemLabel } from '../game/items';
+import SetKits from '../components/SetKits';
 
 const PIMENT_PACKS = [
   { piments: 50, price: '0,99 €', tag: null, bonus: 0 },
@@ -130,7 +132,7 @@ export default function ShopScreen() {
                 onPress={() => setOpen(open === it.id ? null : it.id)}
               >
                 <Text style={[styles.itemName, { color: col }]} numberOfLines={1}>
-                  {it.name}
+                  {itemLabel(it, t)}
                 </Text>
                 <View style={styles.chipLine}>
                   <VerdictBadge cmp={cmp} />

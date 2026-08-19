@@ -10,6 +10,7 @@ import {
   grainsPerPiment,
   totalAttrs,
   xpForLevel,
+  mulberry32,
 } from '../game/formulas';
 import {
   GUILD_GOLD_BONUS_PER_LEVEL,
@@ -21,7 +22,9 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
-import { generateItem, resaleValue, shopRotation } from '../game/items';
+import { SLOT_LIST, generateItem, resaleValue, shopRotation } from '../game/items';
+import { expectedRarity } from '../game/reference';
+import { SET_BY_ID } from '../game/sets';
 import { compareToEquipped } from '../game/power';
 import {
   arenaReward,
@@ -226,6 +229,9 @@ interface GameState {
   donateGuild: (grains: number) => void;
   buyTransport: (index: number) => void;
   buyCosmetic: (id: string) => boolean;
+  /** achète une panoplie complète : huit pièces + le look assorti */
+  buySetKit: (setId: string) => boolean;
+  setKitPrice: (setId: string) => number;
   setAppearance: (a: Partial<Appearance>) => void;
   buyGrains: (piments: number) => void;
   addPiments: (n: number) => void;
@@ -934,6 +940,60 @@ export const useGame = create<GameState>()(
          * c'est le seul poste de dépense qui ne déséquilibre rien, donc le seul
          * qu'on puisse laisser cher sans fermer la porte aux joueurs gratuits.
          */
+        setKitPrice: (setId) => {
+          const s = get();
+          if (!s.player) return 0;
+          const def = SET_BY_ID[setId];
+          if (!def) return 0;
+          // huit pièces de la gamme attendue au niveau du joueur, plus la prime
+          // de commodité : on paie de ne pas farmer chaque emplacement
+          const gamme = expectedRarity(s.player.level);
+          const unit = SLOT_LIST.map(
+            (sl) => generateItem(s.player!.level, sl, gamme, mulberry32(7 + sl.length)).price
+          ).reduce((a, b) => a + b, 0);
+          return Math.round(unit * 1.15);
+        },
+
+        buySetKit: (setId) => {
+          const s = get();
+          const def = SET_BY_ID[setId];
+          if (!s.player || !def) return false;
+          const price = get().setKitPrice(setId);
+          if (s.player.grains < price) return false;
+
+          const gamme = expectedRarity(s.player.level);
+          const pieces = SLOT_LIST.map((sl) => {
+            const it = generateItem(s.player!.level, sl, gamme);
+            it.setId = def.id;
+            it.name = `${it.name.split(' ')[0]} ${def.name}`;
+            return it;
+          });
+          // les pièces remplacées partent au sac : personne ne doit perdre un
+          // objet en achetant, surtout si c'était un unique
+          const equipment = { ...s.player.equipment };
+          const displaced: Item[] = [];
+          pieces.forEach((it) => {
+            const old = equipment[it.slot];
+            if (old) displaced.push(old);
+            equipment[it.slot] = it;
+          });
+          set({
+            player: {
+              ...s.player,
+              grains: s.player.grains - price,
+              equipment,
+              inventory: [...s.player.inventory, ...displaced],
+              appearance: { ...s.player.appearance, ...def.look },
+              // le look de la panoplie reste acquis même si on la démonte
+              cosmetics: s.player.cosmetics.includes(`set.${def.id}`)
+                ? s.player.cosmetics
+                : [...s.player.cosmetics, `set.${def.id}`],
+            },
+          });
+          trackEvent('set_kit_bought', { setId, price });
+          return true;
+        },
+
         buyCosmetic: (id) => {
           const s = get();
           const c = COSMETIC_BY_ID[id];

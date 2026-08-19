@@ -1,14 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { itemLabel } from '../game/items';
 import { ItemComparison } from '../game/power';
+import { useT } from '../i18n/useT';
 import { C, F, R } from '../theme';
 
 const VERDICT = {
-  better: { label: 'MIEUX', color: C.cane, arrow: '▲' },
-  worse: { label: 'MOINS BON', color: C.piment, arrow: '▼' },
-  equal: { label: 'ÉGAL', color: C.textFaint, arrow: '=' },
-  empty: { label: 'EMPLACEMENT VIDE', color: C.gold, arrow: '＋' },
+  better: { key: 'compare.better', color: C.cane, arrow: '▲' },
+  worse: { key: 'compare.worse', color: C.piment, arrow: '▼' },
+  equal: { key: 'compare.equal', color: C.textFaint, arrow: '=' },
+  empty: { key: 'compare.empty', color: C.gold, arrow: '＋' },
 } as const;
 
 /** Pastille de verdict : le joueur doit savoir en un coup d'œil. */
@@ -19,12 +21,13 @@ export function VerdictBadge({
   cmp: ItemComparison;
   compact?: boolean;
 }) {
+  const t = useT();
   const v = VERDICT[cmp.verdict];
   const sign = cmp.diff > 0 ? '+' : '';
   return (
     <View style={[styles.badge, { borderColor: v.color, backgroundColor: `${v.color}1F` }]}>
       <Text style={[styles.badgeText, { color: v.color }]}>
-        {v.arrow} {compact ? '' : `${v.label} `}
+        {v.arrow} {compact ? '' : `${t(v.key)} `}
         {cmp.verdict !== 'empty' ? `${sign}${cmp.diff}` : ''}
       </Text>
     </View>
@@ -33,8 +36,9 @@ export function VerdictBadge({
 
 /** Détail des écarts stat par stat, face à la pièce portée. */
 export function CompareLines({ cmp }: { cmp: ItemComparison }) {
+  const t = useT();
   if (cmp.deltas.length === 0) {
-    return <Text style={styles.none}>Identique à ce que ton kok i port.</Text>;
+    return <Text style={styles.none}>{t('compare.identical')}</Text>;
   }
   return (
     <View style={styles.lines}>
@@ -51,9 +55,9 @@ export function CompareLines({ cmp }: { cmp: ItemComparison }) {
         );
       })}
       {cmp.equipped ? (
-        <Text style={styles.vs}>vs {cmp.equipped.name}</Text>
+        <Text style={styles.vs}>vs {itemLabel(cmp.equipped, t)}</Text>
       ) : (
-        <Text style={styles.vs}>Aucun ékipman su sèt emplacement</Text>
+        <Text style={styles.vs}>{t('compare.emptySlot')}</Text>
       )}
     </View>
   );

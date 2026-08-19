@@ -14,6 +14,11 @@ export interface SetDef {
   color: string;
   /** bonus par pièce au-delà du seuil, exprimé en points d'attribut par niveau */
   perLevel: number;
+  /**
+   * Look offert avec la panoplie complète. L'équipement ne se dessine pas sur
+   * le coq — sans cela, acheter huit pièces d'un coup ne se verrait nulle part.
+   */
+  look: { bodyColor: string; combColor: string; tailPalette: number; accessory: number };
 }
 
 export const SETS: SetDef[] = [
@@ -24,6 +29,7 @@ export const SETS: SetDef[] = [
     icon: '🥾',
     color: '#3BD97E',
     perLevel: 0.9,
+    look: { bodyColor: '#5d4037', combColor: '#7CFC00', tailPalette: 0, accessory: 6 },
   },
   {
     id: 'volkan',
@@ -32,6 +38,7 @@ export const SETS: SetDef[] = [
     icon: '🌋',
     color: '#FF5A1F',
     perLevel: 0.9,
+    look: { bodyColor: '#b5541c', combColor: '#ff7043', tailPalette: 8, accessory: 6 },
   },
   {
     id: 'sega',
@@ -40,6 +47,7 @@ export const SETS: SetDef[] = [
     icon: '🎵',
     color: '#B06BFF',
     perLevel: 0.9,
+    look: { bodyColor: '#7b1fa2', combColor: '#FF00E5', tailPalette: 6, accessory: 7 },
   },
   {
     id: 'gramoune',
@@ -48,6 +56,7 @@ export const SETS: SetDef[] = [
     icon: '🪬',
     color: '#FFC93C',
     perLevel: 0.8,
+    look: { bodyColor: '#C89B3C', combColor: '#f9a825', tailPalette: 5, accessory: 5 },
   },
   {
     id: 'kanyar',
@@ -56,6 +65,7 @@ export const SETS: SetDef[] = [
     icon: '💨',
     color: '#2FC6E8',
     perLevel: 0.9,
+    look: { bodyColor: '#1B4F72', combColor: '#00E5FF', tailPalette: 1, accessory: 8 },
   },
 ];
 

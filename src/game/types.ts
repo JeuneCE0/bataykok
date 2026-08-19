@@ -20,7 +20,9 @@ export type Rarity =
   | 'kalite'
   | 'rar'
   | 'lezand'
-  | 'mitik';
+  | 'mitik'
+  /** Zanset : le palier des uniques. Un objet nommé, jamais deux fois le même. */
+  | 'zanset';
 
 export type SlotId =
   | 'arme'
@@ -47,6 +49,8 @@ export interface Item {
   price: number;
   /** panoplie éventuelle (voir game/sets.ts) */
   setId?: string;
+  /** objet unique (voir game/uniques.ts) — porte son propre nom et sa légende */
+  uniqueId?: string;
 }
 
 export interface Appearance {
