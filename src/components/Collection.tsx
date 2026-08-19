@@ -14,9 +14,11 @@ import { countSets, SETS, setBonusLabel, SET_THRESHOLDS } from '../game/sets';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { Bar, Card, Chip, SectionTitle } from './ui';
+import { useT } from '../i18n/useT';
 
-/** Zalbum + panoplies : ce qu'on collectionne, et ce que ça rapporte. */
+/** {t('collection.album')} + panoplies : ce qu'on collectionne, et ce que ça rapporte. */
 export default function Collection() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const album = useGame((s) => s.album);
   if (!player) return null;
@@ -27,7 +29,7 @@ export default function Collection() {
   return (
     <>
       <Card>
-        <SectionTitle icon="🧷">Panoplies</SectionTitle>
+        <SectionTitle icon="🧷">{t('collection.sets')}</SectionTitle>
         {SETS.map((def) => {
           const n = counts[def.id] ?? 0;
           const steps = SET_THRESHOLDS.filter((t) => n >= t).length;
@@ -66,7 +68,7 @@ export default function Collection() {
 
       <Card>
         <View style={styles.albumHead}>
-          <SectionTitle icon="📔">Zalbum</SectionTitle>
+          <SectionTitle icon="📔">{t('collection.album')}</SectionTitle>
           <Chip
             label={`+${Math.round(albumXpBonus(album.length) * 100)} % XP`}
             color={C.mystic}

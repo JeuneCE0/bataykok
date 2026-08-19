@@ -7,6 +7,7 @@ import { RewardPart } from '../game/rewards';
 import { play } from '../lib/sound';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button, Chip } from './ui';
+import { useT } from '../i18n/useT';
 
 export interface RewardView {
   won: boolean;
@@ -33,6 +34,7 @@ export default function RewardOverlay({
   reward: RewardView | null;
   onClose: () => void;
 }) {
+  const t = useT();
   const pop = useRef(new Animated.Value(0)).current;
   const shine = useRef(new Animated.Value(0)).current;
   const coins = useRef(new Animated.Value(0)).current;
@@ -215,7 +217,7 @@ export default function RewardOverlay({
               full
               size="lg"
               variant={reward.won ? 'gold' : 'slate'}
-              label="Continuer"
+              label={t('common.continue')}
               onPress={onClose}
               style={{ marginTop: 16 }}
             />

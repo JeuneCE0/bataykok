@@ -7,6 +7,7 @@ import { useGame } from '../store/gameStore';
 import { localDay } from '../game/day';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button } from './ui';
+import { useT } from '../i18n/useT';
 
 function today(): string {
   return localDay();
@@ -14,6 +15,7 @@ function today(): string {
 
 /** Rendez-vous quotidien : la série de connexions, récompense croissante. */
 export default function DailyModal() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const loginStreak = useGame((s) => s.loginStreak);
   const streakClaimedDay = useGame((s) => s.streakClaimedDay);
@@ -46,10 +48,10 @@ export default function DailyModal() {
       <View style={styles.root}>
         <Animated.View style={{ transform: [{ scale }], width: '100%' }}>
           <LinearGradient colors={['#241533', '#0E0818']} style={styles.card}>
-            <Text style={styles.kicker}>KABAR DU JOUR</Text>
+            <Text style={styles.kicker}>{t('daily.kabar')}</Text>
             <Text style={styles.title}>Jour {loginStreak} d'affilée</Text>
             <Text style={styles.sub}>
-              Reviens chaque jour : la récompense i mont, i mont, i mont…
+              {t('daily.comeback')}
             </Text>
 
             <View style={styles.grid}>

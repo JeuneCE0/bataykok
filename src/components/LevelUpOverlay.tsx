@@ -5,11 +5,13 @@ import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 import { play } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
+import { useT } from '../i18n/useT';
 
 const CONFETTI = ['🌽', '🌶️', '✦', '🪶', '⭐', '✧'];
 
 /** Le moment de fierté : un niveau gagné doit s'entendre depuis la cuisine. */
 export default function LevelUpOverlay() {
+  const t = useT();
   const level = useGame((s) => s.player?.level ?? 0);
   const prev = useRef(level);
   const [show, setShow] = useState(false);
@@ -65,9 +67,9 @@ export default function LevelUpOverlay() {
             end={{ x: 1, y: 1 }}
             style={[styles.badge, SHADOW.glowGold]}
           >
-            <Text style={styles.kicker}>NIVO SUPÉRIÈR</Text>
+            <Text style={styles.kicker}>{t('levelup.title')}</Text>
             <Text style={styles.level}>{level}</Text>
-            <Text style={styles.sub}>Out kok i vien pli for !</Text>
+            <Text style={styles.sub}>{t('levelup.sub')}</Text>
           </LinearGradient>
         </Animated.View>
       </View>

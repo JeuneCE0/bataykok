@@ -5,6 +5,7 @@ import { fmt } from '../game/formulas';
 import { BattleLogEntry, useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { Card, GhostButton, SectionTitle } from './ui';
+import { useT } from '../i18n/useT';
 
 const KIND: Record<BattleLogEntry['kind'], { icon: string; label: string }> = {
   attack: { icon: '⚔️', label: 'Batay' },
@@ -16,6 +17,7 @@ const PREVIEW = 5;
 
 /** Journal des batays : ce que le kok a fait, gagné et perdu. */
 export default function BattleLog() {
+  const t = useT();
   const log = useGame((s) => s.battleLog);
   const [all, setAll] = useState(false);
 
@@ -24,7 +26,7 @@ export default function BattleLog() {
 
   return (
     <Card>
-      <SectionTitle icon="📜">Journal des combats</SectionTitle>
+      <SectionTitle icon="📜">{t('log.title')}</SectionTitle>
       {shown.map((e) => {
         const k = KIND[e.kind];
         return (

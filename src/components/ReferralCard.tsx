@@ -15,9 +15,11 @@ import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import ProfileCard from './ProfileCard';
 import { Button, Card, Chip, GhostButton, SectionTitle } from './ui';
+import { useT } from '../i18n/useT';
 
-/** Parrainage et partage du kok : inviter, et donner envie d'être invité. */
+/** {t('referral.title')} et partage du kok : inviter, et donner envie d'être invité. */
 export default function ReferralCard() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const onlineState = useGame((s) => s.onlineState);
   const grantBonus = useGame((s) => s.grantBonus);
@@ -83,7 +85,7 @@ export default function ReferralCard() {
       </View>
 
       <Card glow={state?.code ? C.gold : undefined}>
-        <SectionTitle icon="🤝">Parrainage</SectionTitle>
+        <SectionTitle icon="🤝">{t('referral.title')}</SectionTitle>
 
         {onlineState !== 'ok' ? (
           <Text style={styles.offline}>
@@ -100,7 +102,7 @@ export default function ReferralCard() {
             {state?.code && (
               <View style={styles.codeRow}>
                 <View style={styles.codeBox}>
-                  <Text style={styles.codeLabel}>TON CODE</Text>
+                  <Text style={styles.codeLabel}>{t('referral.code')}</Text>
                   <Text style={styles.code}>{state.code}</Text>
                 </View>
                 <View style={{ flex: 1, gap: 6 }}>
@@ -108,7 +110,7 @@ export default function ReferralCard() {
                     full
                     size="sm"
                     icon="📤"
-                    label="Envoyer le code"
+                    label={t('referral.send')}
                     onPress={() => Share.share({ message: shareText(state.code) })}
                   />
                   <Button
@@ -116,7 +118,7 @@ export default function ReferralCard() {
                     size="sm"
                     variant="mystic"
                     icon="🖼️"
-                    label="Partager mon kok"
+                    label={t('referral.share')}
                     onPress={shareImage}
                   />
                 </View>
@@ -125,12 +127,12 @@ export default function ReferralCard() {
 
             <View style={styles.chips}>
               <Chip
-                label={`${state?.godchildren ?? 0} filleuls`}
+                label={t('referral.godchildren', { n: state?.godchildren ?? 0 })}
                 color={C.cane}
                 active={(state?.godchildren ?? 0) > 0}
               />
               {state?.referredBy && (
-                <Chip label={`Parrain : ${state.referredBy}`} color={C.mystic} />
+                <Chip label={t('referral.parent', { name: state.referredBy })} color={C.mystic} />
               )}
             </View>
 
@@ -140,14 +142,14 @@ export default function ReferralCard() {
                   style={styles.input}
                   value={input}
                   onChangeText={(t) => setInput(t.toUpperCase())}
-                  placeholder="CODE PARRAIN"
+                  placeholder="{t('referral.parentCode')}"
                   placeholderTextColor={C.textFaint}
                   autoCapitalize="characters"
                   maxLength={6}
                 />
                 <Button
                   size="sm"
-                  label="Valider"
+                  label={t('referral.validate')}
                   disabled={input.trim().length < 4 || busy}
                   onPress={async () => {
                     setBusy(true);

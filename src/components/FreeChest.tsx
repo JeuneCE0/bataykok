@@ -7,9 +7,11 @@ import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import ChestOpening, { ChestLoot } from './ChestOpening';
 import { Button, Card, SectionTitle } from './ui';
+import { useT } from '../i18n/useT';
 
-/** Coffre gratuit toutes les 4 h : la raison de rouvrir l'app entre deux quêtes. */
+/** {t('chest.free')} toutes les 4 h : la raison de rouvrir l'app entre deux quêtes. */
 export default function FreeChest() {
+  const t = useT();
   const chestNextAt = useGame((s) => s.chestNextAt);
   const openFreeChest = useGame((s) => s.openFreeChest);
   const [now, setNow] = useState(Date.now());
@@ -56,7 +58,7 @@ export default function FreeChest() {
 
   return (
     <Card glow={ready ? C.gold : undefined}>
-      <SectionTitle icon="🧧">Coffre gratuit</SectionTitle>
+      <SectionTitle icon="🧧">{t('chest.free')}</SectionTitle>
       <View style={styles.row}>
         <Animated.View
           style={{

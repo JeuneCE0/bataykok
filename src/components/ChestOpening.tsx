@@ -8,6 +8,7 @@ import { Item } from '../game/types';
 import { play } from '../lib/sound';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Button } from './ui';
+import { useT } from '../i18n/useT';
 
 export interface ChestLoot {
   grains: number;
@@ -27,6 +28,7 @@ export default function ChestOpening({
   loot: ChestLoot | null;
   onClose: () => void;
 }) {
+  const t = useT();
   const shake = useRef(new Animated.Value(0)).current;
   const chest = useRef(new Animated.Value(0)).current;
   const burst = useRef(new Animated.Value(0)).current;
@@ -268,7 +270,7 @@ export default function ChestOpening({
           <Button
             full
             size="lg"
-            label="Empocher !"
+            label={t('chest.pocket')}
             onPress={onClose}
             style={{ marginTop: 18 }}
           />

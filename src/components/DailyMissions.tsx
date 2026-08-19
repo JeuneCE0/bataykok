@@ -6,9 +6,11 @@ import { DAILY_CHEST } from '../game/progress';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Bar, Button, Card, SectionTitle } from './ui';
+import { useT } from '../i18n/useT';
 
 /** Trois objectifs par jour + un coffre si le trio tombe. */
 export default function DailyMissions() {
+  const t = useT();
   const missions = useGame((s) => s.dailyMissions);
   const claimMission = useGame((s) => s.claimMission);
   const chestClaimed = useGame((s) => s.dailyChestClaimed);
@@ -18,7 +20,7 @@ export default function DailyMissions() {
 
   return (
     <Card glow={allClaimed && !chestClaimed ? C.gold : undefined}>
-      <SectionTitle icon="🎯">Défis du jour</SectionTitle>
+      <SectionTitle icon="🎯">{t('daily.missions')}</SectionTitle>
 
       {missions.map((m) => {
         const ready = m.progress >= m.def.target;
@@ -72,7 +74,7 @@ export default function DailyMissions() {
       >
         <Text style={{ fontSize: 26 }}>{chestClaimed ? '📭' : '🧰'}</Text>
         <View style={{ flex: 1 }}>
-          <Text style={styles.chestTitle}>Coffre du jour</Text>
+          <Text style={styles.chestTitle}>{t('daily.chest')}</Text>
           <Text style={styles.chestSub}>
             {chestClaimed
               ? 'Déjà ouvert — retour demain !'

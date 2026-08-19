@@ -7,12 +7,14 @@ import { fmt } from '../game/formulas';
 import { useGame } from '../store/gameStore';
 import { C, F, R, SHADOW } from '../theme';
 import { Button, Chip } from './ui';
+import { useT } from '../i18n/useT';
 
 /**
  * Ce qui s'est passé pendant l'absence. Le snapshot du kok se bat tout seul :
  * sans ce rapport, le joueur verrait son honneur bouger sans savoir pourquoi.
  */
 export default function DefenseReport() {
+  const t = useT();
   const defenses = useGame((s) => s.pendingDefenses);
   const clearDefenses = useGame((s) => s.clearDefenses);
   const pop = useRef(new Animated.Value(0)).current;
@@ -53,7 +55,7 @@ export default function DefenseReport() {
           }}
         >
           <LinearGradient colors={['#2A1A3D', '#0E0818']} style={styles.card}>
-            <Text style={styles.kicker}>PENDANT TON ABSENCE</Text>
+            <Text style={styles.kicker}>{t('defense.title')}</Text>
             <Text style={styles.title}>
               {defenses.length} combats sur ton kok
             </Text>
@@ -124,7 +126,7 @@ export default function DefenseReport() {
             <Button
               full
               size="lg"
-              label="Bien reçu"
+              label={t('defense.ack')}
               onPress={clearDefenses}
               style={{ marginTop: 14 }}
             />

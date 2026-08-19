@@ -50,9 +50,9 @@ export default function TalentModal() {
         >
           <LinearGradient colors={['#2A1A3D', '#0E0818']} style={styles.card}>
             <Text style={styles.kicker}>NIVO {tier.level} · TALAN</Text>
-            <Text style={styles.title}>Choizi out voi</Text>
+            <Text style={styles.title}>{t('talent.choose')}</Text>
             <Text style={styles.sub}>
-              Un seul talan par palier. Sa i chanz out kok pou de bon.
+              {t('talent.warn')}
             </Text>
 
             <View style={{ gap: 10, marginTop: 16 }}>

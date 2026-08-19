@@ -17,6 +17,7 @@ import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
 import { Button, GhostButton, Well } from './ui';
+import { useT } from '../i18n/useT';
 
 const ROUND_MS = 720;
 
@@ -46,6 +47,7 @@ export default function CombatView({
   result: CombatResult;
   onDone: () => void;
 }) {
+  const t = useT();
   const [idx, setIdx] = useState(-1);
   const scrollRef = useRef<ScrollView>(null);
   const finished = idx >= result.rounds.length - 1;
@@ -328,14 +330,14 @@ export default function CombatView({
             full
             size="lg"
             variant={result.winner === 0 ? 'gold' : 'slate'}
-            label="Retour au rond"
+            label={t('combat.back')}
             onPress={onDone}
           />
         </View>
       ) : (
         <GhostButton
           icon="⏩"
-          label="Passer l'animation"
+          label={t('combat.skip')}
           onPress={() => setIdx(result.rounds.length - 1)}
           style={{ alignSelf: 'center' }}
         />

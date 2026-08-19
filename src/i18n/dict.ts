@@ -64,6 +64,136 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Composants ────────────────────────────────────────────────────────
+  'ad.badge': {
+    fr: 'PUBLICITÉ · SIMULATION PROTOTYPE',
+    rcf: 'PIBLISITÉ · SIMILASYON PROTOTIP',
+  },
+  'ad.incoming': {
+    fr: 'Ta récompense arrive…',
+    rcf: 'Out rékonpans i ariv…',
+  },
+  'log.title': {
+    fr: 'Journal des combats',
+    rcf: 'Zournal bann batay',
+  },
+  'chest.pocket': {
+    fr: 'Empocher !',
+    rcf: 'Ramas !',
+  },
+  'collection.sets': {
+    fr: 'Panoplies',
+    rcf: 'Panopli',
+  },
+  'collection.album': {
+    fr: 'Zalbum',
+    rcf: 'Zalbum',
+  },
+  'combat.back': {
+    fr: 'Retour au rond',
+    rcf: 'Rotour o rond',
+  },
+  'combat.skip': {
+    fr: 'Passer l’animation',
+    rcf: 'Sote lanimasyon',
+  },
+  'daily.missions': {
+    fr: 'Défis du jour',
+    rcf: 'Défi du zour',
+  },
+  'daily.chest': {
+    fr: 'Coffre du jour',
+    rcf: 'Kof du zour',
+  },
+  'daily.kabar': {
+    fr: 'KABAR DU JOUR',
+    rcf: 'KABAR DU ZOUR',
+  },
+  'daily.comeback': {
+    fr: 'Reviens chaque jour : la récompense monte, monte, monte…',
+    rcf: 'Rovien shak zour : la rékonpans i mont, i mont, i mont…',
+  },
+  'defense.ack': {
+    fr: 'Bien reçu',
+    rcf: 'Bien resi',
+  },
+  'defense.title': {
+    fr: 'PENDANT TON ABSENCE',
+    rcf: 'PANDAN OU LÉ PA LÀ',
+  },
+  'chest.free': {
+    fr: 'Coffre gratuit',
+    rcf: 'Kof gratui',
+  },
+  'levelup.title': {
+    fr: 'NIVEAU SUPÉRIEUR',
+    rcf: 'NIVO SIPÉRIÈR',
+  },
+  'levelup.sub': {
+    fr: 'Ton coq devient plus fort !',
+    rcf: 'Out kok i vien pli for !',
+  },
+  'profile.power': {
+    fr: 'Puissance',
+    rcf: 'Fors',
+  },
+  'profile.tagline': {
+    fr: 'RPG de combat de coqs péi · La Réunion',
+    rcf: 'RPG batay kok péi · La Rényon',
+  },
+  'referral.title': {
+    fr: 'Parrainage',
+    rcf: 'Parenaz',
+  },
+  'referral.code': {
+    fr: 'TON CODE',
+    rcf: 'OUT KOD',
+  },
+  'referral.codeLabel': {
+    fr: 'CODE DE PARRAINAGE',
+    rcf: 'KOD PARENAZ',
+  },
+  'referral.enterHint': {
+    fr: 'Entre ce code : tu reçois 🌶️40 + 🌽500',
+    rcf: 'Rant sé kod-là : ou gingn 🌶️40 + 🌽500',
+  },
+  'referral.send': {
+    fr: 'Envoyer le code',
+    rcf: 'Anvoy le kod',
+  },
+  'referral.share': {
+    fr: 'Partager mon coq',
+    rcf: 'Partaz mon kok',
+  },
+  'referral.parentCode': {
+    fr: 'CODE PARRAIN',
+    rcf: 'KOD PAREN',
+  },
+  'referral.validate': {
+    fr: 'Valider',
+    rcf: 'Validé',
+  },
+  'referral.godchildren': {
+    fr: '{n} filleul',
+    rcf: '{n} fiyol',
+  },
+  'referral.godchildren_n': {
+    fr: '{n} filleuls',
+    rcf: '{n} fiyol',
+  },
+  'referral.parent': {
+    fr: 'Parrain : {name}',
+    rcf: 'Paren : {name}',
+  },
+  'talent.choose': {
+    fr: 'Choisis ta voie',
+    rcf: 'Choizi out voi',
+  },
+  'talent.warn': {
+    fr: 'Un seul talent par palier. Ça change ton coq pour de bon.',
+    rcf: 'In sèl talan par palié. Sa i shanz out kok pou de bon.',
+  },
+
   // ─── Panoplies ─────────────────────────────────────────────────────────
   'setkit.title': {
     fr: 'Panoplies complètes',

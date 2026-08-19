@@ -9,6 +9,7 @@ import { PlayerState } from '../game/types';
 import { C, F, R } from '../theme';
 import Rooster from './Rooster';
 import { auraColor } from '../game/power';
+import { useT } from '../i18n/useT';
 
 /**
  * Carte de profil : la vue que l'on capture pour la partager. Pas de
@@ -21,6 +22,7 @@ export default function ProfileCard({
   player: PlayerState;
   code: string | null;
 }) {
+  const t = useT();
   const cls = CLASSES[player.classId];
   const w = playerWeapon(player);
   const f = playerToFighter(player);
@@ -29,7 +31,7 @@ export default function ProfileCard({
     <LinearGradient colors={['#2A1A3D', '#0B0714']} style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.brand}>BATAY KOK</Text>
-        <Text style={styles.tagline}>RPG de batay coq péi · La Réunion</Text>
+        <Text style={styles.tagline}>{t('profile.tagline')}</Text>
       </View>
 
       <View style={styles.body}>
@@ -46,10 +48,10 @@ export default function ProfileCard({
             {cls.emoji} {cls.name} · niv. {player.level}
           </Text>
           <View style={styles.stats}>
-            <Stat icon="⚡" label="Puissance" value={fmt(kokPower(player))} />
+            <Stat icon="⚡" label={t('profile.power')} value={fmt(kokPower(player))} />
             <Stat icon="❤️" label="PV" value={fmt(maxHp(f))} />
-            <Stat icon="🗡️" label="Dégâts" value={`${w.min}–${w.max}`} />
-            <Stat icon="🛡️" label="Armure" value={`${playerArmor(player)}`} />
+            <Stat icon="🗡️" label={t('profile.damage')} value={`${w.min}–${w.max}`} />
+            <Stat icon="🛡️" label={t('profile.armor')} value={`${playerArmor(player)}`} />
           </View>
         </View>
       </View>
@@ -63,10 +65,10 @@ export default function ProfileCard({
 
       {code && (
         <View style={styles.codeBox}>
-          <Text style={styles.codeLabel}>CODE DE PARRAINAGE</Text>
+          <Text style={styles.codeLabel}>{t('referral.codeLabel')}</Text>
           <Text style={styles.code}>{code}</Text>
           <Text style={styles.codeHint}>
-            Entre ce code : tu reçois 🌶️40 + 🌽500
+            {t('referral.enterHint')}
           </Text>
         </View>
       )}

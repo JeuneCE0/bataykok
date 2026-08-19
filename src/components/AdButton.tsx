@@ -6,6 +6,7 @@ import { AD_OFFERS, AdKind, MAX_ADS_PER_DAY } from '../game/progress';
 import { trackEvent } from '../lib/analytics';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
+import { useT } from '../i18n/useT';
 
 const AD_SECONDS = 4;
 
@@ -24,6 +25,7 @@ export default function AdButton({
   full?: boolean;
   onRewarded?: () => void;
 }) {
+  const t = useT();
   const watchAd = useGame((s) => s.watchAd);
   const adsToday = useGame((s) => s.adsToday);
   const adNextAt = useGame((s) => s.adNextAt);
@@ -130,14 +132,14 @@ export default function AdButton({
       <Modal visible={playing} transparent animationType="fade">
         <View style={styles.adRoot}>
           <LinearGradient colors={G.night} style={styles.adCard}>
-            <Text style={styles.adTag}>PUBLICITÉ · SIMULATION PROTOTYPE</Text>
+            <Text style={styles.adTag}>{t('ad.badge')}</Text>
             <Text style={styles.adEmoji}>{offer.icon}</Text>
             <Text style={styles.adTitle}>{offer.title}</Text>
             <Text style={styles.adReward}>{offer.reward}</Text>
             <View style={styles.adTimer}>
               <Text style={styles.adTimerText}>{Math.max(0, left)}</Text>
             </View>
-            <Text style={styles.adHint}>Ta récompense arrive…</Text>
+            <Text style={styles.adHint}>{t('ad.incoming')}</Text>
           </LinearGradient>
         </View>
       </Modal>
