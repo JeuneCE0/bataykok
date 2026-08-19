@@ -106,6 +106,8 @@ export interface Quest {
   xp: number;
   itemChance: number; // 0..1
   pimentChance: number; // 0..1
+  /** bonus de gamme sur le butin — une longue quête tire mieux, pas seulement plus */
+  luck: number;
 }
 
 export interface ActiveQuest {

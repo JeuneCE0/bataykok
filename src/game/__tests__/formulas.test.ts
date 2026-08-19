@@ -19,7 +19,7 @@ function joueur(over: Partial<PlayerState> = {}): PlayerState {
     name: 'Test', classId: 'gep', level: 10, xp: 0,
     appearance: { bodyColor: '#8d5524', combColor: '#e53935', tailPalette: 0, accessory: 0 },
     baseAttrs: { force: 30, adresse: 15, esprit: 15, endurance: 20, chance: 10 },
-    equipment: {}, inventory: [], grains: 0, piments: 0, honor: 100,
+    equipment: {}, inventory: [], grains: 0, piments: 0, honor: 100, cosmetics: [],
     rank: 1, wins: 0, losses: 0, guildId: null, transport: 0, talents: [],
     ...over,
   };

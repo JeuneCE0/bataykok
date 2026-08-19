@@ -114,8 +114,13 @@ export function generateQuests(level: number, count = 3): Quest[] {
       motivationCost: Math.max(2, Math.round(minutes * 8)),
       gold: questGold(level, minutes),
       xp: questXp(level, minutes),
-      itemChance: 0.22 + minutes * 0.04,
-      pimentChance: 0.06 + minutes * 0.01,
+      // Le butin ne suivait pas le coût : une quête de 5 min coûtait 40 de
+      // motivation pour 42 % de chance d'objet, contre 4 pour 24 % sur 30 s —
+      // soit 5,7× moins de butin par point dépensé. Personne ne partait long.
+      itemChance: Math.min(0.94, 0.16 + minutes * 0.17),
+      pimentChance: Math.min(0.5, 0.04 + minutes * 0.075),
+      // et le temps investi améliore la gamme, pas seulement la fréquence
+      luck: Math.min(0.22, minutes * 0.045),
     };
   });
 }

@@ -106,7 +106,7 @@ export const UNIQUE_BY_ID: Record<string, UniqueDef> = UNIQUES.reduce(
 );
 
 /** Budget d'attributs d'un unique à ce niveau — nettement au-dessus du mitik. */
-const UNIQUE_BUDGET = (level: number) => Math.round((1 + level * 0.7) * 6.5 * 4);
+const UNIQUE_BUDGET = (level: number) => Math.round((1 + level * 0.42) * 6.5 * 4);
 
 /**
  * Forge un unique. Les statistiques sont dérivées du niveau et du profil, sans

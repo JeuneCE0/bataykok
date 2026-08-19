@@ -25,9 +25,17 @@ export function xpForLevel(level: number): number {
   return Math.round(60 * Math.pow(level, 1.75) + 40 * level);
 }
 
-/** Coût en grains pour monter un attribut de sa valeur actuelle n → n+1 */
+/**
+ * Coût en grains pour monter un attribut de sa valeur actuelle n → n+1.
+ *
+ * L'exposant valait 1,9 : à haut niveau un point coûtait 1 400 grains quand un
+ * objet de boutique en donnait 250 pour 900. Aucun joueur rationnel n'achetait
+ * jamais d'attribut, et l'écran de la Kaz — avec ses boutons ×1 / ×5 / ×10 —
+ * était un piège. Ramené à 1,45, l'écart avec la boutique reste large (il faut
+ * bien que l'équipement soit l'axe excitant) sans être absurde.
+ */
 export function attrCost(current: number): number {
-  return Math.round(2 + current * 1.2 + Math.pow(current, 1.9) / 10);
+  return Math.round(3 + current * 1.2 + Math.pow(current, 1.45) / 3);
 }
 
 // ─── Attributs & équipement ──────────────────────────────────────────────
@@ -40,7 +48,7 @@ export function totalAttrs(p: PlayerState): Attributes {
       t[k] += it.bonuses[k] ?? 0;
     });
   });
-  const sets = setBonuses(p.equipment, p.level);
+  const sets = setBonuses(p.equipment);
   (Object.keys(sets) as AttrId[]).forEach((k) => {
     t[k] += sets[k] ?? 0;
   });
@@ -94,10 +102,17 @@ export function questGold(level: number, minutes: number): number {
   return Math.round((8 + level * 3.5) * minutes * (0.85 + Math.random() * 0.3));
 }
 
+/**
+ * XP de quête, en valeur absolue.
+ *
+ * L'ancienne formule partait de `xpForLevel(level)` — l'exigence du palier —
+ * si bien que le palier se simplifiait : il fallait 18 minutes de quête pour
+ * monter d'un niveau, au niveau 3 comme au niveau 99. La courbe d'XP était
+ * décorative. Un gain absolu qui croît moins vite que l'exigence redonne à la
+ * progression sa pente.
+ */
 export function questXp(level: number, minutes: number): number {
-  return Math.round(
-    xpForLevel(level) * 0.055 * minutes * (0.9 + Math.random() * 0.2)
-  );
+  return Math.round((18 + level * 6) * minutes * (0.9 + Math.random() * 0.2));
 }
 
 export function arenaGold(level: number): number {
@@ -105,7 +120,8 @@ export function arenaGold(level: number): number {
 }
 
 export function arenaXp(level: number): number {
-  return Math.round(xpForLevel(level) * 0.08);
+  // même raison que `questXp` : une part fixe de l'exigence annule la courbe
+  return Math.round(30 + level * 11);
 }
 
 /** grains obtenus en échange de piments (taux dépendant du niveau) */

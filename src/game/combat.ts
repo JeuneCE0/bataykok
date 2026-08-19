@@ -29,8 +29,19 @@ function pick(lines: string[], a: string, d: string) {
   return l.replace(/%A/g, a).replace(/%D/g, d);
 }
 
+/**
+ * Taux de coup critique.
+ *
+ * L'ancienne formule — `chance × 2,5 / (niveau × 100)` — faisait *baisser* le
+ * taux en montant : 7,5 % au niveau 20, 4,6 % au niveau 50 pour un joueur qui
+ * suit la courbe. La chance était un attribut mort, et le talent « Mèt du
+ * kritik » ne rattrapait rien. Une forme en saturation garde un socle constant
+ * (~13 %) et récompense vraiment l'investissement (jusqu'à 45 %).
+ */
 function critChance(attacker: Fighter, defender: Fighter): number {
-  return Math.min(0.5, (attacker.attrs.chance * 2.5) / (defender.level * 100));
+  const c = Math.max(0, attacker.attrs.chance);
+  const seuil = 12 * Math.max(1, defender.level);
+  return Math.min(0.45, c / (c + seuil));
 }
 
 function baseDamage(attacker: Fighter, defender: Fighter): number {

@@ -22,7 +22,7 @@ import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
-import { SLOT_LIST, generateItem, resaleValue, shopRotation } from '../game/items';
+import { SLOT_LIST, generateItem, resaleValue, rollRarity, shopRotation } from '../game/items';
 import { expectedRarity } from '../game/reference';
 import { SET_BY_ID } from '../game/sets';
 import { compareToEquipped } from '../game/power';
@@ -683,7 +683,8 @@ export const useGame = create<GameState>()(
           const lootChance =
             q.itemChance * (ev.kind === 'loot' ? ev.mult : 1);
           if (Math.random() < lootChance && p.inventory.length < 24) {
-            item = generateItem(p.level);
+            // le temps investi dans la quête pousse le tirage de gamme
+            item = generateItem(p.level, undefined, rollRarity(q.luck ?? 0));
             p.inventory.push(item);
           }
           let piments = 0;

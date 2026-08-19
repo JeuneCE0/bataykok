@@ -1,4 +1,5 @@
-import { CLASSES } from './classes';
+import { playerToFighter } from './formulas';
+import { referencePlayer } from './reference';
 import { TransKey } from '../i18n';
 import { Appearance, ClassId, Fighter, Rarity } from './types';
 
@@ -15,7 +16,15 @@ export interface Boss {
   flavorKey: TransKey;
   level: number;
   classId: ClassId;
-  /** multiplicateur de statistiques par rapport à un adversaire du même niveau */
+  /**
+   * Écart au joueur de référence de son niveau.
+   *
+   * Rampe régulière 1,00 → 1,30 plutôt que des valeurs ajustées au taux de
+   * victoire : à ces niveaux le combat est quasi déterministe (8 % de
+   * statistiques font 30 points de victoire), donc viser un pourcentage revient
+   * à sur-ajuster du bruit. La difficulté vient d'abord du niveau du gardien —
+   * ici, monotone par construction.
+   */
   power: number;
   appearance: Appearance;
   reward: {
@@ -43,7 +52,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.tikok.flavor',
     level: 3,
     classId: 'sovaz',
-    power: 1.1,
+    power: 1.0,
     appearance: look('#8d5524', '#e53935', 2, 0),
     reward: { grains: 220, xp: 90, piments: 1, rarity: 'korek' },
   },
@@ -54,7 +63,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.tikok.flavor',
     level: 6,
     classId: 'gep',
-    power: 1.15,
+    power: 1.025,
     appearance: look('#5d4037', '#f9a825', 0, 4),
     reward: { grains: 420, xp: 190, piments: 1, rarity: 'korek' },
   },
@@ -65,7 +74,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.zarlor.flavor',
     level: 9,
     classId: 'gep',
-    power: 1.2,
+    power: 1.05,
     appearance: look('#3b3b3b', '#c2185b', 4, 0),
     reward: { grains: 700, xp: 340, piments: 2, rarity: 'kalite' },
   },
@@ -76,7 +85,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.vakoa.flavor',
     level: 12,
     classId: 'tizane',
-    power: 1.25,
+    power: 1.075,
     appearance: look('#e8e4d8', '#6a1b9a', 4, 3),
     reward: { grains: 1100, xp: 560, piments: 2, rarity: 'kalite' },
   },
@@ -87,7 +96,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.mafate.flavor',
     level: 15,
     classId: 'sovaz',
-    power: 1.3,
+    power: 1.1,
     appearance: look('#b5541c', '#e53935', 2, 1),
     reward: { grains: 1700, xp: 850, piments: 3, rarity: 'kalite' },
   },
@@ -98,7 +107,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.cilaos.flavor',
     level: 18,
     classId: 'malin',
-    power: 1.35,
+    power: 1.125,
     appearance: look('#3b3b3b', '#6a1b9a', 3, 2),
     reward: { grains: 2500, xp: 1250, piments: 3, rarity: 'rar' },
   },
@@ -109,7 +118,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.mafate.flavor',
     level: 21,
     classId: 'piman',
-    power: 1.4,
+    power: 1.15,
     appearance: look('#b5541c', '#ff7043', 2, 0),
     reward: { grains: 3600, xp: 1800, piments: 4, rarity: 'rar' },
   },
@@ -120,7 +129,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.sitarane.flavor',
     level: 24,
     classId: 'tizane',
-    power: 1.45,
+    power: 1.175,
     appearance: look('#e8e4d8', '#c2185b', 4, 3),
     reward: { grains: 5000, xp: 2500, piments: 5, rarity: 'rar' },
   },
@@ -131,7 +140,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.volkan.flavor',
     level: 27,
     classId: 'gep',
-    power: 1.5,
+    power: 1.16,
     appearance: look('#3b3b3b', '#e53935', 1, 1),
     reward: { grains: 7000, xp: 3400, piments: 5, rarity: 'lezand' },
   },
@@ -142,7 +151,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.grandmere.flavor',
     level: 30,
     classId: 'malin',
-    power: 1.55,
+    power: 1.225,
     appearance: look('#5d4037', '#f9a825', 0, 2),
     reward: { grains: 9500, xp: 4600, piments: 6, rarity: 'lezand' },
   },
@@ -153,7 +162,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.capmechant.flavor',
     level: 34,
     classId: 'piman',
-    power: 1.62,
+    power: 1.2,
     appearance: look('#b5541c', '#ff7043', 2, 4),
     reward: { grains: 13000, xp: 6200, piments: 8, rarity: 'lezand' },
   },
@@ -164,7 +173,7 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.papang.flavor',
     level: 38,
     classId: 'tizane',
-    power: 1.7,
+    power: 1.24,
     appearance: look('#e8e4d8', '#6a1b9a', 4, 3),
     reward: { grains: 18000, xp: 8500, piments: 10, rarity: 'mitik' },
   },
@@ -175,38 +184,41 @@ export const BOSSES: Boss[] = [
     flavorKey: 'boss.fournez.flavor',
     level: 42,
     classId: 'sega',
-    power: 1.8,
+    power: 1.12,
     appearance: look('#7b1fa2', '#f9a825', 3, 4),
     reward: { grains: 26000, xp: 12000, piments: 15, rarity: 'mitik' },
   },
 ];
 
-/** Statistiques du boss — mêmes formules qu'un bot, rehaussées par `power`. */
+/**
+ * Statistiques du gardien.
+ *
+ * Elles dérivaient d'une formule d'attributs propre au donjon, restée figée
+ * quand la courbe du joueur a changé : à partir de l'étage 5, le joueur de
+ * référence gagnait 100 % du temps. Le gardien est désormais un joueur de
+ * référence de son niveau, équipé, dont les attributs et l'arme sont rehaussés
+ * par `power` — il reste donc calé sur la progression réelle.
+ */
 export function bossToFighter(boss: Boss): Fighter {
-  const L = boss.level;
+  // équipé comme un joueur de son niveau : c'est `power` qui fait l'écart,
+  // sinon la gamme du butin comptait deux fois
+  const base = playerToFighter(referencePlayer(boss.classId, boss.level));
   const p = boss.power;
-  const main = Math.round((8 + L * 3.2) * p);
-  const side = Math.round((5 + L * 1.6) * p);
-  const attrs = {
-    force: side,
-    adresse: side,
-    esprit: side,
-    endurance: Math.round((6 + L * 2.4) * p),
-    chance: Math.round((4 + L * 1.2) * p),
-  };
-  attrs[CLASSES[boss.classId].mainAttr] = main;
-  const wBase = Math.round((2 + L * 2.1) * p);
-  const f: Fighter = {
+  return {
+    ...base,
     name: boss.name,
-    level: L,
-    classId: boss.classId,
-    attrs,
-    weaponMin: wBase,
-    weaponMax: wBase + Math.max(2, Math.round(wBase * 0.4)),
-    armor: Math.round(L * 4.5 * p),
     appearance: boss.appearance,
+    attrs: {
+      force: Math.round(base.attrs.force * p),
+      adresse: Math.round(base.attrs.adresse * p),
+      esprit: Math.round(base.attrs.esprit * p),
+      endurance: Math.round(base.attrs.endurance * p),
+      chance: Math.round(base.attrs.chance * p),
+    },
+    weaponMin: Math.round(base.weaponMin * p),
+    weaponMax: Math.round(base.weaponMax * p),
+    armor: Math.round(base.armor * p),
   };
-  return f;
 }
 
 export const MAX_KEYS = 5;

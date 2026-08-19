@@ -12,12 +12,27 @@ import { ClassId, PlayerState, Rarity } from './types';
  * attributs plats, aucun équipement, un profil qui n'existait nulle part dans
  * le jeu. Le test et le banc d'essai partagent désormais cette définition.
  */
+/**
+ * Attributs qu'un joueur peut réellement financer à ce niveau.
+ *
+ * La courbe était posée à la main (linéaire, 2,6 par niveau). Elle est
+ * maintenant dérivée du revenu : `scripts/economy-lab.ts` mesure les grains
+ * gagnés pour atteindre chaque niveau, en déduit les points achetables si l'on
+ * consacre 40 % de ses grains aux attributs, et la courbe suit — d'où
+ * l'exposant, le revenu croissant moins vite que le coût du point.
+ */
 export const REFERENCE_CURVE = {
-  main: 2.6,
-  side: 1.1,
-  endurance: 1.6,
-  chance: 0.8,
+  exp: 1.41,
+  main: 1.24,
+  side: 0.44,
+  endurance: 0.6,
+  chance: 0.32,
 } as const;
+
+/** Points d'un attribut au niveau donné. */
+export function curveAttr(level: number, coef: number, base: number): number {
+  return Math.round(base + coef * Math.pow(level, REFERENCE_CURVE.exp));
+}
 
 /** Gamme qu'un joueur porte normalement à ce niveau. */
 export function expectedRarity(level: number): Rarity {
@@ -43,15 +58,15 @@ export function referencePlayer(
   const equipment: PlayerState['equipment'] = {};
   if (gamme) for (const s of SLOT_LIST) equipment[s] = generateItem(level, s, gamme, rand);
 
-  const side = Math.round(8 + level * REFERENCE_CURVE.side);
+  const side = curveAttr(level, REFERENCE_CURVE.side, 8);
   const attrs = {
     force: side,
     adresse: side,
     esprit: side,
-    endurance: Math.round(9 + level * REFERENCE_CURVE.endurance),
-    chance: Math.round(6 + level * REFERENCE_CURVE.chance),
+    endurance: curveAttr(level, REFERENCE_CURVE.endurance, 9),
+    chance: curveAttr(level, REFERENCE_CURVE.chance, 6),
   };
-  attrs[CLASSES[classId].mainAttr] = Math.round(10 + level * REFERENCE_CURVE.main);
+  attrs[CLASSES[classId].mainAttr] = curveAttr(level, REFERENCE_CURVE.main, 10);
 
   return {
     name: 'Référence',

@@ -90,10 +90,16 @@ export function countSets(
   return out;
 }
 
-/** Attributs offerts par les panoplies portées. */
+/**
+ * Attributs offerts par les panoplies portées.
+ *
+ * Le bonus suivait le niveau du **joueur** : quatre pièces korek ramassées au
+ * niveau 1 valaient +94 Force à niveau 50, sans jamais être remplacées. Il
+ * suit désormais le niveau moyen des pièces qui le composent — une vieille
+ * panoplie vieillit.
+ */
 export function setBonuses(
-  equipment: Partial<Record<SlotId, Item>>,
-  level: number
+  equipment: Partial<Record<SlotId, Item>>
 ): Partial<Attributes> {
   const counts = countSets(equipment);
   const out: Partial<Attributes> = {};
@@ -102,8 +108,11 @@ export function setBonuses(
     if (!def) return;
     const steps = SET_THRESHOLDS.filter((t) => n >= t).length;
     if (!steps) return;
-    const gain = Math.round(def.perLevel * (level + 2) * steps);
-    out[def.attr] = (out[def.attr] ?? 0) + gain;
+    const pieces = (Object.values(equipment) as (Item | undefined)[]).filter(
+      (it) => it?.setId === id
+    ) as Item[];
+    const lvl = pieces.reduce((a, it) => a + it.level, 0) / pieces.length;
+    out[def.attr] = (out[def.attr] ?? 0) + Math.round(def.perLevel * (lvl + 2) * steps);
   });
   return out;
 }

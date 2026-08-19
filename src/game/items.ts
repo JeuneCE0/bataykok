@@ -208,7 +208,10 @@ export function generateItem(
   const pool = [...ATTRS].sort(() => rand() - 0.5).slice(0, nBonuses);
   const bonuses: Partial<Record<AttrId, number>> = {};
   pool.forEach((a) => {
-    bonuses[a] = Math.max(1, Math.round((1 + level * 0.7) * mult * (0.7 + rand() * 0.6)));
+    // 0,7 par niveau faisait de l'équipement 93 % des attributs à niveau 50 :
+    // la classe n'avait plus d'identité, son attribut principal se noyait dans
+    // le tirage aléatoire des pièces.
+    bonuses[a] = Math.max(1, Math.round((1 + level * 0.42) * mult * (0.7 + rand() * 0.6)));
   });
 
   // une pièce sur cinq appartient à une panoplie (jamais sur du commun :

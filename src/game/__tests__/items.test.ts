@@ -148,11 +148,13 @@ describe('panoplies', () => {
       ...generateItem(20, slot, 'kalite'),
       setId: set.id,
     });
-    const deux = setBonuses({ arme: piece('arme'), tete: piece('tete') }, 20);
-    const quatre = setBonuses(
-      { arme: piece('arme'), tete: piece('tete'), torse: piece('torse'), pattes: piece('pattes') },
-      20
-    );
+    const deux = setBonuses({ arme: piece('arme'), tete: piece('tete') });
+    const quatre = setBonuses({
+      arme: piece('arme'),
+      tete: piece('tete'),
+      torse: piece('torse'),
+      pattes: piece('pattes'),
+    });
     const attr = set.attr;
     assert.ok((deux[attr] ?? 0) > 0, 'deux pièces ne donnent rien');
     assert.equal(quatre[attr], (deux[attr] ?? 0) * 2, 'quatre pièces ne doublent pas');
@@ -161,7 +163,7 @@ describe('panoplies', () => {
   it('une seule pièce ne donne rien', () => {
     const set = SETS[1];
     const it: Item = { ...generateItem(20, 'arme', 'kalite'), setId: set.id };
-    assert.deepEqual(setBonuses({ arme: it }, 20), {});
+    assert.deepEqual(setBonuses({ arme: it }), {});
   });
 
   it('le comptage distingue les panoplies', () => {

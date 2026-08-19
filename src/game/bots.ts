@@ -3,6 +3,7 @@ import { BODY_COLORS, COMB_COLORS, FREE_COUNTS } from './cosmetics';
 import { mulberry32, playerToFighter } from './formulas';
 import { SLOT_LIST, generateItem } from './items';
 import { botNames } from './names';
+import { REFERENCE_CURVE, curveAttr } from './reference';
 import { Appearance, Bot, ClassId, Fighter, Item, PlayerState, Rarity, SlotId } from './types';
 
 /** Un bot ne porte que du cosmétique gratuit : il n'a rien acheté au Bazar. */
@@ -52,7 +53,7 @@ function buildLadder(): Bot[] {
  * qu'un joueur assidu possède au même niveau : l'adversaire doit être un
  * miroir, pas une courbe parallèle.
  */
-const BASE = { main: 2.6, side: 1.1, endurance: 1.6, chance: 0.8 } as const;
+// (voir game/reference.ts — la courbe est dérivée du revenu, pas posée à la main)
 
 /**
  * Gamme portée selon le niveau. C'est *la* raison d'être de ce fichier : sans
@@ -85,15 +86,14 @@ export function botProfile(bot: Bot): PlayerState {
     equipment[slot] = generateItem(lvl, slot, rarityForLevel(L, rand()), rand);
   }
 
-  const main = Math.round(10 + L * BASE.main);
-  const side = Math.round(8 + L * BASE.side);
   const attrs = {
-    force: side,
-    adresse: side,
-    esprit: side,
-    endurance: Math.round(9 + L * BASE.endurance),
-    chance: Math.round(6 + L * BASE.chance),
+    force: curveAttr(L, REFERENCE_CURVE.side, 8),
+    adresse: curveAttr(L, REFERENCE_CURVE.side, 8),
+    esprit: curveAttr(L, REFERENCE_CURVE.side, 8),
+    endurance: curveAttr(L, REFERENCE_CURVE.endurance, 9),
+    chance: curveAttr(L, REFERENCE_CURVE.chance, 6),
   };
+  const main = curveAttr(L, REFERENCE_CURVE.main, 10);
   attrs[CLASSES[bot.classId].mainAttr] = main;
 
   const profile: PlayerState = {
