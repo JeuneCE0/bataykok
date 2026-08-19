@@ -18,7 +18,7 @@ import {
 } from '../game/guilds';
 import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
-import { eventOfDay } from '../game/events';
+import { eventLuck, eventOfDay } from '../game/events';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID } from '../game/cosmetics';
 import { honorFloor } from '../game/ranks';
@@ -695,7 +695,11 @@ export const useGame = create<GameState>()(
             q.itemChance * (ev.kind === 'loot' ? ev.mult : 1);
           if (Math.random() < lootChance && p.inventory.length < 24) {
             // le temps investi dans la quête pousse le tirage de gamme
-            item = generateItem(p.level, undefined, rollRarity(q.luck ?? 0));
+            item = generateItem(
+              p.level,
+              undefined,
+              rollRarity((q.luck ?? 0) + eventLuck(ev))
+            );
             p.inventory.push(item);
           }
           let piments = 0;
@@ -802,7 +806,9 @@ export const useGame = create<GameState>()(
           const dropChance = 0.09 * (ev.kind === 'loot' ? ev.mult : 1);
           if (won && p.inventory.length < 24 && Math.random() < dropChance) {
             drop = generateItem(
-              Math.max(1, context?.opponentLevel ?? p.level)
+              Math.max(1, context?.opponentLevel ?? p.level),
+              undefined,
+              rollRarity(eventLuck(ev))
             );
             p.inventory.push(drop);
           }

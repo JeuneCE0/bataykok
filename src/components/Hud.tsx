@@ -12,8 +12,10 @@ import Counter from './Counter';
 import Rooster from './Rooster';
 import SettingsModal from './SettingsModal';
 import { Bar } from './ui';
+import { useT } from '../i18n/useT';
 
 export default function Hud() {
+  const t = useT();
   const player = useGame((s) => s.player);
   const sfxOn = useGame((s) => s.sfxOn);
   const musicOn = useGame((s) => s.musicOn);
@@ -97,7 +99,7 @@ export default function Hud() {
         </View>
         <View style={[styles.evPill, { borderColor: `${ev.color}66` }]}>
           <Text style={{ fontSize: 11 }}>{ev.icon}</Text>
-          <Text style={[styles.evText, { color: ev.color }]}>{ev.short}</Text>
+          <Text style={[styles.evText, { color: ev.color }]}>{t(ev.shortKey)}</Text>
         </View>
       </View>
     </LinearGradient>

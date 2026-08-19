@@ -64,6 +64,104 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Événements du jour ────────────────────────────────────────────────
+  'event.grains.title': {
+    fr: 'Jour de marché',
+    rcf: 'Zour de marsé',
+  },
+  'event.grains.desc': {
+    fr: 'Toutes les récompenses en grains ×1,5',
+    rcf: 'Tout bann rékonpans an grin ×1,5',
+  },
+  'event.grains.short': {
+    fr: 'Grains ×1,5',
+    rcf: 'Grin ×1,5',
+  },
+  'event.xp.title': {
+    fr: 'École dans le rond',
+    rcf: 'Lékol dann rond',
+  },
+  'event.xp.desc': {
+    fr: 'Toute l’XP gagnée ×1,5',
+    rcf: 'Tout lXP gingné ×1,5',
+  },
+  'event.xp.short': {
+    fr: 'XP ×1,5',
+    rcf: 'XP ×1,5',
+  },
+  'event.loot.title': {
+    fr: 'Chance du gramoune',
+    rcf: 'Chans du gramoune',
+  },
+  'event.loot.desc': {
+    fr: 'Deux fois plus de chances de trouver un objet en quête',
+    rcf: 'Dé foi plis de shans pou trouv in zafèr an kést',
+  },
+  'event.loot.short': {
+    fr: 'Butin ×2',
+    rcf: 'Loot ×2',
+  },
+  'event.shop.title': {
+    fr: 'Braderie au Bazar',
+    rcf: 'Brad o Bazar',
+  },
+  'event.shop.desc': {
+    fr: '−30 % sur tout l’équipement du Bazar',
+    rcf: '−30 % su tout lékipman du Bazar',
+  },
+  'event.shop.short': {
+    fr: 'Bazar −30 %',
+    rcf: 'Bazar −30 %',
+  },
+  'event.batay.title': {
+    fr: 'Grand kabar dans le rond',
+    rcf: 'Gran kabar dann rond',
+  },
+  'event.batay.desc': {
+    fr: '+2 jetons de combat toute la journée',
+    rcf: '+2 zeton batay tout la zourné',
+  },
+  'event.batay.short': {
+    fr: '+2 combats',
+    rcf: '+2 batay',
+  },
+  'event.krit.title': {
+    fr: 'Jour des éclairs',
+    rcf: 'Zour dé zéklair',
+  },
+  'event.krit.desc': {
+    fr: 'Les coups critiques font ×3 au lieu de ×2',
+    rcf: 'Bann kou kritik i fé ×3 o lyé de ×2',
+  },
+  'event.krit.short': {
+    fr: 'Critiques ×3',
+    rcf: 'Kritik ×3',
+  },
+  'event.sitarane.title': {
+    fr: 'Nuit Sitarane',
+    rcf: 'Nuit Sitarane',
+  },
+  'event.sitarane.desc': {
+    fr: 'L’armure ne protège plus qu’à moitié — les combats sont courts et brutaux',
+    rcf: 'Larmir i protèz pi ka moityé — bann batay lé kourt ek brital',
+  },
+  'event.sitarane.short': {
+    fr: 'Armure ÷2',
+    rcf: 'Armir ÷2',
+  },
+  'event.chans.title': {
+    fr: 'Doigt du gramoune',
+    rcf: 'Doi du gramoune',
+  },
+  'event.chans.desc': {
+    fr: 'Tout le butin tire une gamme au-dessus',
+    rcf: 'Tout le bitin i tir in gam o dsi',
+  },
+  'event.chans.short': {
+    fr: 'Butin +1 gamme',
+    rcf: 'Bitin +1 gam',
+  },
+
   // ─── Écurie vivante ────────────────────────────────────────────────────
   'guild.pot': {
     fr: 'Caisse commune',

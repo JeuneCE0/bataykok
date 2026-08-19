@@ -130,10 +130,13 @@ let itemSeq = 0;
  * événement : c'est ce qui donne sa valeur au reste (et à l'hôtel des ventes).
  */
 export function rollRarity(luck = 0, rand: () => number = Math.random): Rarity {
-  // décaler la plage vers le haut, pas la rétrécir vers le bas : l'ancienne
-  // formule faisait disparaître rar, lézandèr et mitik dès luck = 0,1
+  // La chance comprime le tirage vers le haut plutôt que d'en relever le
+  // plancher. Décaler la plage (`rand * (1 - l) + l`) écrasait le bas sans
+  // presque rien donner en haut : à luck = 0,18 les chances de « rar » ou mieux
+  // ne montaient que de 22 %, alors qu'un bonus de chance doit se sentir.
+  // Ici l'exposant tire toute la distribution vers 1.
   const l = Math.min(0.25, Math.max(0, luck));
-  const r = rand() * (1 - l) + l;
+  const r = Math.pow(rand(), 1 - l * 2);
   if (r < 0.46) return 'commun';
   if (r < 0.74) return 'korek';
   if (r < 0.90) return 'kalite';

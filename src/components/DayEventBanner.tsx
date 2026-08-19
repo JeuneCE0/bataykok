@@ -4,9 +4,11 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { eventOfDay } from '../game/events';
 import { C, F, R } from '../theme';
+import { useT } from '../i18n/useT';
 
 /** Ce qui change aujourd'hui — visible partout, parce que ça change les gains. */
 export default function DayEventBanner() {
+  const t = useT();
   const ev = eventOfDay(new Date().toISOString().slice(0, 10));
   return (
     <LinearGradient
@@ -17,11 +19,11 @@ export default function DayEventBanner() {
     >
       <Text style={{ fontSize: 15 }}>{ev.icon}</Text>
       <Text style={[styles.title, { color: ev.color }]} numberOfLines={1}>
-        {ev.title}
+        {t(ev.titleKey)}
       </Text>
       <View style={styles.dot} />
       <Text style={styles.desc} numberOfLines={1}>
-        {ev.desc}
+        {t(ev.descKey)}
       </Text>
     </LinearGradient>
   );

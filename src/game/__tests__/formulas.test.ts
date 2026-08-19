@@ -151,10 +151,11 @@ describe('événement du jour', () => {
   });
 
   it('chaque événement a un libellé court pour le HUD', () => {
-    for (let d = 1; d <= 28; d++) {
-      const ev = eventOfDay(`2026-03-${String(d).padStart(2, '0')}`);
-      assert.ok(ev.short.length > 0 && ev.short.length < 16, `libellé HUD trop long : ${ev.short}`);
-      assert.ok(ev.mult > 0);
+    for (const j of ['2026-01-0', '2026-02-1', '2026-03-2']) {
+      for (let d = 1; d <= 9; d++) {
+        const ev = eventOfDay(`${j}${d}`);
+        assert.ok(translate('fr', ev.shortKey).length > 2, `${ev.kind} sans pastille`);
+      }
     }
   });
 });

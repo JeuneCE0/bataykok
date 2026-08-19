@@ -20,7 +20,6 @@ import { botToFighter, generateLadder } from '../game/bots';
 import { CLASSES } from '../game/classes';
 import { RARITY_COLORS } from '../game/items';
 import { simulateCombat } from '../game/combat';
-import { eventOfDay } from '../game/events';
 import { fmt, playerToFighter } from '../game/formulas';
 import { fighterPower } from '../game/power';
 import { BatayReward } from '../game/rewards';
@@ -39,6 +38,8 @@ import { maxArenaTickets, useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import RankingScreen from './RankingScreen';
 import HonorTier from '../components/HonorTier';
+import { localDay } from '../game/day';
+import { eventCombatMods, eventOfDay } from '../game/events';
 
 const LADDER = generateLadder();
 const ARENA_TICKET_SEC = 120;
@@ -176,7 +177,7 @@ export default function ArenaScreen() {
       // le classement local ne connaît pas les joueurs réels : aucun rang à échanger
       opId: 'online',
       onlineId: k.id,
-      result: simulateCombat(me, op),
+      result: simulateCombat(me, op, eventCombatMods(eventOfDay(localDay()))),
     });
   };
 
@@ -185,7 +186,12 @@ export default function ArenaScreen() {
     const me = playerToFighter(player);
     const op = botToFighter(bot);
     setReward(null);
-    setFight({ me, op, opId: bot.id, result: simulateCombat(me, op) });
+    setFight({
+      me,
+      op,
+      opId: bot.id,
+      result: simulateCombat(me, op, eventCombatMods(eventOfDay(localDay()))),
+    });
   };
 
   if (view === 'palmares') {

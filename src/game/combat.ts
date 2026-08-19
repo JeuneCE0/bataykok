@@ -44,7 +44,11 @@ function critChance(attacker: Fighter, defender: Fighter): number {
   return Math.min(0.45, c / (c + seuil));
 }
 
-function baseDamage(attacker: Fighter, defender: Fighter): number {
+function baseDamage(
+  attacker: Fighter,
+  defender: Fighter,
+  armorScale = 1
+): number {
   const c = CLASSES[attacker.classId];
   const cd = CLASSES[defender.classId];
   const weapon =
@@ -55,14 +59,28 @@ function baseDamage(attacker: Fighter, defender: Fighter): number {
   // réduction par l'armure (plafonnée par la classe du défenseur)
   const reduction = Math.min(
     cd.armorCap,
-    defender.armor / (Math.max(1, attacker.level) * 12)
+    (defender.armor * armorScale) / (Math.max(1, attacker.level) * 12)
   );
   dmg *= 1 - reduction;
   return Math.max(1, dmg);
 }
 
+/**
+ * Règles modifiées d'un jour d'événement.
+ *
+ * Un multiplicateur de gains est invisible en jeu : « +50 % de grains » ne se
+ * raconte pas. Une règle qui change se voit au premier coup, et c'est ce qui
+ * fait revenir un mardi plutôt qu'un lundi.
+ */
+export interface CombatMods {
+  /** multiplicateur des dégâts critiques (2 par défaut) */
+  critMult?: number;
+  /** part d'armure conservée — 0,5 rend les combats brutaux */
+  armorScale?: number;
+}
+
 /** Simule un combat complet, tour par tour, façon Shakes & Fidget. */
-export function simulateCombat(a: Fighter, b: Fighter): CombatResult {
+export function simulateCombat(a: Fighter, b: Fighter, mods: CombatMods = {}): CombatResult {
   const fighters: [Fighter, Fighter] = [a, b];
   const hp: [number, number] = [maxHp(a), maxHp(b)];
   const maxHpArr: [number, number] = [hp[0], hp[1]];
@@ -140,9 +158,9 @@ export function simulateCombat(a: Fighter, b: Fighter): CombatResult {
           text: pick(BLOCK_LINES, atk.name, def.name),
         });
       } else {
-        let dmg = baseDamage(atk, def);
+        let dmg = baseDamage(atk, def, mods.armorScale ?? 1);
         const isCrit = Math.random() < critChance(atk, def);
-        if (isCrit) dmg *= 2;
+        if (isCrit) dmg *= mods.critMult ?? 2;
         if (segaBuff[atkIdx]) {
           dmg *= 1.6;
           segaBuff[atkIdx] = false;

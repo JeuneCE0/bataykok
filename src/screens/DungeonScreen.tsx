@@ -26,6 +26,8 @@ import { CombatResult, Fighter } from '../game/types';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
+import { localDay } from '../game/day';
+import { eventCombatMods, eventOfDay } from '../game/events';
 
 export default function DungeonScreen() {
   const t = useT();
@@ -87,7 +89,15 @@ export default function DungeonScreen() {
     if (keys <= 0) return;
     const me = playerToFighter(player);
     setOutcome(null);
-    setFight({ me, boss, result: simulateCombat(me, bossToFighter(boss)) });
+    setFight({
+      me,
+      boss,
+      result: simulateCombat(
+        me,
+        bossToFighter(boss),
+        eventCombatMods(eventOfDay(localDay()))
+      ),
+    });
   };
 
   return (
