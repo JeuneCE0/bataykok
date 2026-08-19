@@ -210,23 +210,36 @@ export interface MissionDef {
   id: string;
   kind: MissionKind;
   target: number;
-  title: string;
+  titleKey: TransKey;
   icon: string;
+  /** grains **de base** — le gain réel suit le niveau, voir `missionGrains` */
   grains: number;
   piments: number;
 }
 
+/**
+ * Grains rendus par un défi à ce niveau.
+ *
+ * Les valeurs étaient fixes : 990 grains pour les trois défis et le coffre,
+ * quand un joueur de niveau 50 en gagne 6 000 par jour. Passé le niveau 15,
+ * les défis du jour ne valaient plus le détour — et c'est justement à ce
+ * moment-là qu'on a besoin d'une raison de revenir.
+ */
+export function missionGrains(base: number, level: number): number {
+  return Math.round(base * (1 + level * 0.03));
+}
+
 const POOL: MissionDef[] = [
-  { id: 'q2', kind: 'quest', target: 2, title: 'Fé 2 kèt', icon: '🗺️', grains: 150, piments: 0 },
-  { id: 'q3', kind: 'quest', target: 3, title: 'Fé 3 kèt', icon: '🗺️', grains: 220, piments: 1 },
-  { id: 'a2', kind: 'arena', target: 2, title: 'Batay 2 foi dann rond', icon: '⚔️', grains: 160, piments: 0 },
-  { id: 'w1', kind: 'win', target: 1, title: 'Gagne 1 batay', icon: '🏆', grains: 200, piments: 1 },
-  { id: 'w2', kind: 'win', target: 2, title: 'Gagne 2 batay', icon: '🏆', grains: 320, piments: 1 },
-  { id: 'b1', kind: 'buy', target: 1, title: 'Achète 1 ékipman', icon: '🛒', grains: 120, piments: 0 },
-  { id: 'at2', kind: 'attr', target: 2, title: 'Monte 2 attributs', icon: '💪', grains: 140, piments: 0 },
-  { id: 'at4', kind: 'attr', target: 4, title: 'Monte 4 attributs', icon: '💪', grains: 260, piments: 1 },
-  { id: 'd1', kind: 'dodo', target: 1, title: 'Boir in Dodo fré', icon: '🍺', grains: 100, piments: 0 },
-  { id: 'e1', kind: 'equip', target: 1, title: 'Ékip in nouvo linz', icon: '🎽', grains: 110, piments: 0 },
+  { id: 'q2', kind: 'quest', target: 2, titleKey: 'mission.q2', icon: '🗺️', grains: 150, piments: 0 },
+  { id: 'q3', kind: 'quest', target: 3, titleKey: 'mission.q3', icon: '🗺️', grains: 220, piments: 1 },
+  { id: 'a2', kind: 'arena', target: 2, titleKey: 'mission.a2', icon: '⚔️', grains: 160, piments: 0 },
+  { id: 'w1', kind: 'win', target: 1, titleKey: 'mission.w1', icon: '🏆', grains: 200, piments: 1 },
+  { id: 'w2', kind: 'win', target: 2, titleKey: 'mission.w2', icon: '🏆', grains: 320, piments: 1 },
+  { id: 'b1', kind: 'buy', target: 1, titleKey: 'mission.b1', icon: '🛒', grains: 120, piments: 0 },
+  { id: 'at2', kind: 'attr', target: 2, titleKey: 'mission.at2', icon: '💪', grains: 140, piments: 0 },
+  { id: 'at4', kind: 'attr', target: 4, titleKey: 'mission.at4', icon: '💪', grains: 260, piments: 1 },
+  { id: 'd1', kind: 'dodo', target: 1, titleKey: 'mission.d1', icon: '🍺', grains: 100, piments: 0 },
+  { id: 'e1', kind: 'equip', target: 1, titleKey: 'mission.e1', icon: '🎽', grains: 110, piments: 0 },
 ];
 
 export interface MissionState {

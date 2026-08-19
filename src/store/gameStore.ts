@@ -56,6 +56,7 @@ import {
   isStepComplete as stepComplete,
   MissionKind,
   MissionState,
+  missionGrains,
   rollDailyMissions,
   StepId,
   STEPS,
@@ -1123,7 +1124,7 @@ export const useGame = create<GameState>()(
           set({
             player: {
               ...s.player,
-              grains: s.player.grains + m.def.grains,
+              grains: s.player.grains + missionGrains(m.def.grains, s.player.level),
               piments: s.player.piments + m.def.piments,
             },
             dailyMissions: s.dailyMissions.map((x) =>
@@ -1139,7 +1140,8 @@ export const useGame = create<GameState>()(
           set({
             player: {
               ...s.player,
-              grains: s.player.grains + DAILY_CHEST.grains,
+              grains:
+                s.player.grains + missionGrains(DAILY_CHEST.grains, s.player.level),
               piments: s.player.piments + DAILY_CHEST.piments,
             },
             dailyChestClaimed: true,

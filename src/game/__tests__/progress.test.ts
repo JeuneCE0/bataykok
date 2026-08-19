@@ -6,6 +6,7 @@ import { translate } from '../../i18n';
 import {
   DAILY_CHEST,
   isStepComplete,
+  missionGrains,
   rollDailyMissions,
   STEPS,
   StepContext,
@@ -165,5 +166,39 @@ describe('série de connexions — cas limites', () => {
       7,
       'une série à 0 rapporte la récompense du jour 7'
     );
+  });
+});
+
+describe('défis du jour', () => {
+  it('trois défis distincts, stables sur la journée', () => {
+    for (const j of ['2026-08-19', '2026-01-01']) {
+      const a = rollDailyMissions(j);
+      assert.equal(a.length, 3);
+      assert.equal(new Set(a.map((m) => m.def.kind)).size, 3, 'deux défis du même type');
+      const b = rollDailyMissions(j);
+      assert.deepEqual(a.map((m) => m.def.id), b.map((m) => m.def.id));
+    }
+  });
+
+  it('la récompense suit le niveau', () => {
+    // Elle était fixe : 990 grains pour les trois défis et le coffre, quand un
+    // joueur de niveau 50 en gagne 6 000 par jour. Passé le niveau 15, les
+    // défis ne valaient plus le détour — au moment précis où il faut une
+    // raison de revenir.
+    assert.ok(missionGrains(200, 50) > missionGrains(200, 5) * 2);
+    assert.ok(missionGrains(200, 1) >= 200, 'le niveau 1 y perd');
+  });
+
+  it('chaque défi est nommé dans les deux langues', () => {
+    for (const j of ['2026-03-01', '2026-03-02', '2026-03-03', '2026-03-04']) {
+      for (const m of rollDailyMissions(j)) {
+        for (const lang of ['fr', 'rcf'] as const) {
+          assert.ok(
+            translate(lang, m.def.titleKey).length > 5,
+            `${m.def.id} sans libellé (${lang})`
+          );
+        }
+      }
+    }
   });
 });

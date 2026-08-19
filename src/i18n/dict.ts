@@ -64,6 +64,48 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Défis du jour ─────────────────────────────────────────────────────
+  'mission.q2': {
+    fr: 'Fais 2 quêtes',
+    rcf: 'Fé 2 kèt',
+  },
+  'mission.q3': {
+    fr: 'Fais 3 quêtes',
+    rcf: 'Fé 3 kèt',
+  },
+  'mission.a2': {
+    fr: 'Combats 2 fois dans le rond',
+    rcf: 'Batay 2 foi dann rond',
+  },
+  'mission.w1': {
+    fr: 'Gagne 1 combat',
+    rcf: 'Gingn 1 batay',
+  },
+  'mission.w2': {
+    fr: 'Gagne 2 combats',
+    rcf: 'Gingn 2 batay',
+  },
+  'mission.b1': {
+    fr: 'Achète 1 équipement',
+    rcf: 'Ashète 1 ékipman',
+  },
+  'mission.at2': {
+    fr: 'Monte 2 attributs',
+    rcf: 'Monte 2 attribi',
+  },
+  'mission.at4': {
+    fr: 'Monte 4 attributs',
+    rcf: 'Monte 4 attribi',
+  },
+  'mission.d1': {
+    fr: 'Bois une Dodo fraîche',
+    rcf: 'Boir in Dodo fré',
+  },
+  'mission.e1': {
+    fr: 'Équipe un nouvel habit',
+    rcf: 'Ékip in nouvo linz',
+  },
+
   // ─── Événements du jour ────────────────────────────────────────────────
   'event.grains.title': {
     fr: 'Jour de marché',

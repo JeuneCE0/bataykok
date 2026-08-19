@@ -2,7 +2,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { DAILY_CHEST } from '../game/progress';
+import { fmt } from '../game/formulas';
+import { DAILY_CHEST, missionGrains } from '../game/progress';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
 import { Bar, Button, Card, SectionTitle } from './ui';
@@ -11,6 +12,7 @@ import { useT } from '../i18n/useT';
 /** Trois objectifs par jour + un coffre si le trio tombe. */
 export default function DailyMissions() {
   const t = useT();
+  const level = useGame((s) => s.player?.level ?? 1);
   const missions = useGame((s) => s.dailyMissions);
   const claimMission = useGame((s) => s.claimMission);
   const chestClaimed = useGame((s) => s.dailyChestClaimed);
@@ -32,7 +34,7 @@ export default function DailyMissions() {
             <View style={{ flex: 1, gap: 4 }}>
               <View style={styles.head}>
                 <Text style={[styles.title, m.claimed && styles.done]} numberOfLines={1}>
-                  {m.def.title}
+                  {t(m.def.titleKey)}
                 </Text>
                 <Text style={styles.count}>
                   {Math.min(m.progress, m.def.target)}/{m.def.target}
@@ -45,7 +47,7 @@ export default function DailyMissions() {
                 height={6}
               />
               <Text style={styles.reward}>
-                {m.def.grains > 0 ? `🌽${m.def.grains}` : ''}
+                {m.def.grains > 0 ? `🌽${fmt(missionGrains(m.def.grains, level))}` : ''}
                 {m.def.piments > 0 ? `  🌶️${m.def.piments}` : ''}
               </Text>
             </View>
@@ -78,7 +80,7 @@ export default function DailyMissions() {
           <Text style={styles.chestSub}>
             {chestClaimed
               ? 'Déjà ouvert — retour demain !'
-              : `Les 3 défis → 🌽${DAILY_CHEST.grains} + 🌶️${DAILY_CHEST.piments}`}
+              : `Les 3 défis → 🌽${missionGrains(DAILY_CHEST.grains, level)} + 🌶️${DAILY_CHEST.piments}`}
           </Text>
         </View>
         <Button
