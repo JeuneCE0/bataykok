@@ -73,6 +73,40 @@ export const DICT = {
     rcf: 'Doub sète rékonpans',
   },
 
+  // ─── Duel entre amis ───────────────────────────────────────────────────
+  'duel.title': {
+    fr: 'Défier un ami',
+    rcf: 'Défié in kamarad',
+  },
+  'duel.sub': {
+    fr: 'Entre son code : tu affrontes son coq tel qu’il l’a laissé.',
+    rcf: 'Rant son kod : ou batay kont son kok tel ki la lès a li.',
+  },
+  'duel.placeholder': {
+    fr: 'Code de l’ami',
+    rcf: 'Kod du kamarad',
+  },
+  'duel.search': {
+    fr: 'Chercher',
+    rcf: 'Sershé',
+  },
+  'duel.notFound': {
+    fr: 'Aucun coq avec ce code.',
+    rcf: 'Okin kok ek sé kod-là.',
+  },
+  'duel.offline': {
+    fr: 'Il faut être en ligne pour défier un ami.',
+    rcf: 'Fo èt an lign pou défié in kamarad.',
+  },
+  'duel.myCode': {
+    fr: 'Ton code à partager',
+    rcf: 'Out kod pou partaz',
+  },
+  'duel.found': {
+    fr: '{name} · niveau {n}',
+    rcf: '{name} · nivo {n}',
+  },
+
   // ─── Offres payantes ───────────────────────────────────────────────────
   'offer.ti_batayer.name': {
     fr: 'Pack Ti Batailleur',

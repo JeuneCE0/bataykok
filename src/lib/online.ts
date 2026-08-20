@@ -315,3 +315,21 @@ function toOnlineKok(r: LadderRow): OnlineKok {
     rank: r.rank,
   };
 }
+
+/**
+ * Retrouve un kok par son code de parrainage, pour le défier.
+ *
+ * Le code servait uniquement à inviter ; il devient aussi une adresse de duel.
+ * `koks` n'étant plus lisible que par son propriétaire, la recherche passe par
+ * une fonction serveur qui n'expose que le combat.
+ */
+export async function findKokByCode(code: string): Promise<OnlineKok | null> {
+  if (!supabase) return null;
+  const id = await ensureSession();
+  if (!id) return null;
+  const { data, error } = await supabase.rpc('find_kok_by_code', { p_code: code });
+  if (error || !data || (data as LadderRow[]).length === 0) return null;
+  const r = (data as LadderRow[])[0];
+  // la fonction ne renvoie pas de rang : un duel amical ne se classe pas
+  return toOnlineKok({ ...r, rank: 0 });
+}

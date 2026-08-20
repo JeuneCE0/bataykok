@@ -40,6 +40,7 @@ import RankingScreen from './RankingScreen';
 import HonorTier from '../components/HonorTier';
 import { localDay } from '../game/day';
 import { eventCombatMods, eventOfDay } from '../game/events';
+import FriendDuel from '../components/FriendDuel';
 
 const LADDER = generateLadder();
 const ARENA_TICKET_SEC = 120;
@@ -240,6 +241,8 @@ export default function ArenaScreen() {
         <Chip label={t('rond.myRank', { n: myIdx + 1 })} color={C.gold} active />
         <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />
       </View>
+
+      <FriendDuel onDuel={launchOnline} />
 
       <Card compact>
         <View style={styles.ticketRow}>
