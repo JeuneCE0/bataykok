@@ -71,7 +71,7 @@ export default function ShopScreen() {
 
   const mockBuy = (n: number, price: string) => {
     Alert.alert(`${t('iap.title')} · ${price}`, t('iap.body'), [
-      { text: t('iap.cancel'), style: 'cancel' },
+      { text: t('common.cancel'), style: 'cancel' },
       { text: t('iap.takePiments', { n }), onPress: () => addPiments(n) },
     ]);
   };
@@ -276,7 +276,7 @@ export default function ShopScreen() {
               sub={t('shop.perMonth', { price: '6,99 €' })}
             onPress={() =>
               Alert.alert(t('iap.title'), t('iap.body'), [
-                { text: t('iap.cancel'), style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 { text: t('iap.takePass'), onPress: buyPass },
               ])
             }
@@ -314,7 +314,7 @@ export default function ShopScreen() {
                 sub="−62 %"
             onPress={() =>
               Alert.alert(t('iap.title'), t('iap.body'), [
-                { text: t('iap.cancel'), style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 { text: t('iap.takePack'), onPress: buyStarterPack },
               ])
             }

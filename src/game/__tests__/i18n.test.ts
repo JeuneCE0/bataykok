@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
 import { CLASS_LIST } from '../classes';
@@ -68,5 +70,34 @@ describe('pluriels', () => {
       const plusieurs = translate('fr', singulier, { n: 13, s: 1, d: 13 });
       assert.notEqual(un.replace(/\d+/g, '#'), plusieurs.replace(/\d+/g, '#'), `${singulier} ne se décline pas`);
     }
+  });
+});
+
+describe('hygiène du dictionnaire', () => {
+  /** Tout le code de l'app, concaténé — le dictionnaire exclu. */
+  function sources(dir: string): string {
+    let out = '';
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const chemin = join(dir, e.name);
+      if (e.isDirectory()) out += sources(chemin);
+      else if (/\.tsx?$/.test(e.name) && e.name !== 'dict.ts') out += readFileSync(chemin, 'utf8');
+    }
+    return out;
+  }
+
+  it('aucune clé ne dort dans le dictionnaire', () => {
+    // Trente-quatre clés traînaient sans lecteur — des restes de fonctions
+    // retirées. Une traduction qu'on écrit sans la brancher coûte deux fois :
+    // à l'écrire, puis à la relire en croyant qu'elle sert.
+    const code = sources('src') + readFileSync('App.tsx', 'utf8');
+    const mortes = Object.keys(DICT).filter((k) => {
+      if (code.includes(`'${k}'`)) return false;
+      // une forme plurielle s'atteint par son singulier
+      if (k.endsWith('_n') && code.includes(`'${k.slice(0, -2)}'`)) return false;
+      // `unique.<id>.name` et `.lore` se composent à la volée
+      if (/^unique\.[\w-]+\.(name|lore)$/.test(k)) return false;
+      return true;
+    });
+    assert.deepEqual(mortes, [], `clés sans lecteur : ${mortes.join(', ')}`);
   });
 });

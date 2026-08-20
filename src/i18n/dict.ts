@@ -19,21 +19,13 @@ export const DICT = {
   // ─── Vocabulaire commun ────────────────────────────────────────────────
   'common.close': { fr: 'Fermer', rcf: 'Ferm' },
   'common.cancel': { fr: 'Annuler', rcf: 'Anil' },
-  'common.confirm': { fr: 'Confirmer', rcf: 'Konfirm' },
-  'common.back': { fr: 'Retour', rcf: 'Arièr' },
   'common.continue': { fr: 'Continuer', rcf: 'Kontinié' },
   'common.level': { fr: 'Niv. {n}', rcf: 'Niv. {n}' },
   'common.wins': { fr: '{n} V', rcf: '{n} V' },
   'common.losses': { fr: '{n} D', rcf: '{n} D' },
-  'common.free': { fr: 'gratuit', rcf: 'gratui' },
-  'common.soon': { fr: 'bientôt', rcf: 'talèr' },
-  'common.locked': { fr: 'Verrouillé', rcf: 'Fermé' },
-  'common.equipped': { fr: 'Équipé', rcf: 'Ékipé' },
   'common.equip': { fr: 'Équiper', rcf: 'Ékip' },
   'common.sell': { fr: 'Vendre', rcf: 'Vann' },
   'common.buy': { fr: 'Acheter', rcf: 'Ashté' },
-  'common.empty': { fr: 'Rien pour l’instant', rcf: 'Néna arien pou lo momen' },
-  'common.total': { fr: 'Total', rcf: 'Total' },
 
   // ─── Réglages ──────────────────────────────────────────────────────────
   'settings.title': { fr: 'Réglages', rcf: 'Réglaz' },
@@ -61,8 +53,6 @@ export const DICT = {
   'settings.account.id': { fr: 'Identifiant du coq', rcf: 'Niméro out kok' },
   'settings.account.offline': { fr: 'Hors ligne', rcf: 'Dékonekté' },
 
-  // ─── HUD ───────────────────────────────────────────────────────────────
-  'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
   'shop.exchangeRate': {
     fr: '1 🌶️ = 🌽{n} à ton niveau',
@@ -124,17 +114,9 @@ export const DICT = {
     fr: 'Aucun coq avec ce code.',
     rcf: 'Okin kok ek sé kod-là.',
   },
-  'duel.offline': {
-    fr: 'Il faut être en ligne pour défier un ami.',
-    rcf: 'Fo èt an lign pou défié in kamarad.',
-  },
   'duel.myCode': {
     fr: 'Ton code à partager',
     rcf: 'Out kod pou partaz',
-  },
-  'duel.found': {
-    fr: '{name} · niveau {n}',
-    rcf: '{name} · nivo {n}',
   },
 
   // ─── Offres payantes ───────────────────────────────────────────────────
@@ -182,21 +164,9 @@ export const DICT = {
     fr: 'Ce que tu reçois',
     rcf: 'Sak ou i gingn',
   },
-  'offer.itemOf': {
-    fr: '1 pièce {rarity}',
-    rcf: '1 pyès {rarity}',
-  },
-  'offer.expires': {
-    fr: 'Se termine dans {t}',
-    rcf: 'I fini dan {t}',
-  },
   'offer.take': {
     fr: 'Prendre l’offre',
     rcf: 'Pran lofèr',
-  },
-  'offer.later': {
-    fr: 'Plus tard',
-    rcf: 'Pli tar',
   },
   'offer.proto': {
     fr: 'Achat intégré non branché — pour le prototype, l’offre est offerte.',
@@ -223,10 +193,6 @@ export const DICT = {
   'item.setPiece': {
     fr: 'Pièce de panoplie',
     rcf: 'Pyès de panopli',
-  },
-  'item.uniqueLore': {
-    fr: 'Légende',
-    rcf: 'Lézand',
   },
 
   // ─── Messages d'erreur ─────────────────────────────────────────────────
@@ -473,10 +439,6 @@ export const DICT = {
     fr: 'Tout ce que les membres versent monte le niveau — pour tout le monde.',
     rcf: 'Tout sak bann manm i vèrs i mont le nivo — pou tout le monde.',
   },
-  'guild.donate': {
-    fr: 'Verser à la caisse',
-    rcf: 'Vèrs dan la kès',
-  },
   'guild.donateLimit': {
     fr: 'Plafond du jour atteint',
     rcf: 'Plafon du zour atin',
@@ -497,10 +459,6 @@ export const DICT = {
     fr: 'Ceux qui font vivre l’écurie',
     rcf: 'Sak i fé viv lékiri',
   },
-  'guild.donated': {
-    fr: '{n} versés',
-    rcf: '{n} vèrsé',
-  },
   'guild.levelUp': {
     fr: 'L’écurie passe niveau {n} !',
     rcf: 'Lékiri i pass nivo {n} !',
@@ -508,10 +466,6 @@ export const DICT = {
   'guild.offline': {
     fr: 'Écurie hors ligne — les données reviendront à la connexion.',
     rcf: 'Lékiri dékonekté — bann done i sar rovni a la konèksyon.',
-  },
-  'guild.you': {
-    fr: 'toi',
-    rcf: 'ou',
   },
 
   // ─── Affaire du jour ───────────────────────────────────────────────────
@@ -756,10 +710,6 @@ export const DICT = {
     fr: 'Queue Lo Mahavéli',
     rcf: 'Ké Lo Mahavéli',
   },
-  'cosmetic.peiSection': {
-    fr: 'Aux couleurs du péi',
-    rcf: 'O kouler du péi',
-  },
 
   // ─── Objets uniques ────────────────────────────────────────────────────
   'unique.zepron_sitarane.name': {
@@ -825,14 +775,6 @@ export const DICT = {
   'unique.grigri_zanset.lore': {
     fr: 'Personne ne sait ce qu’il y a dedans. Personne n’a osé l’ouvrir.',
     rcf: 'Personn i koné sak nana andan. Personn la pa ozé ouvèr a li.',
-  },
-  'unique.badge': {
-    fr: 'UNIQUE',
-    rcf: 'INIK',
-  },
-  'rarity.zanset.hint': {
-    fr: 'Un objet sur mille. Il porte un nom.',
-    rcf: 'In zafèr su mil. Li port in non.',
   },
 
   // ─── Cosmétiques ───────────────────────────────────────────────────────
@@ -908,10 +850,6 @@ export const DICT = {
     fr: 'Lunettes en or',
     rcf: 'Linèt an lor',
   },
-  'cosmetic.section': {
-    fr: 'Apparence',
-    rcf: 'Aparans',
-  },
   'cosmetic.shopTitle': {
     fr: 'Plumage & parures',
     rcf: 'Plimaz & parir',
@@ -923,18 +861,6 @@ export const DICT = {
   'cosmetic.shopSub': {
     fr: 'Change la tête de ton coq — aucun effet au combat, tout l’effet au rond.',
     rcf: 'Shanz la tèt out kok — okin éfé o batay, tout léfé dann rond.',
-  },
-  'cosmetic.owned': {
-    fr: 'Possédé',
-    rcf: 'Néna',
-  },
-  'cosmetic.equipped': {
-    fr: 'Porté',
-    rcf: 'Su li',
-  },
-  'cosmetic.preview': {
-    fr: 'Aperçu',
-    rcf: 'Aparsi',
   },
   'cosmetic.body': {
     fr: 'Corps',
@@ -951,10 +877,6 @@ export const DICT = {
   'cosmetic.accessory': {
     fr: 'Accessoire',
     rcf: 'Aksesoir',
-  },
-  'cosmetic.locked': {
-    fr: 'À acheter au Bazar',
-    rcf: 'Pou ashté o Bazar',
   },
 
   // ─── Gardiens du donjon ────────────────────────────────────────────────
@@ -1468,16 +1390,12 @@ export const DICT = {
     rcf: 'Star bann kabar. Son maloya i fé tranblé le galodrom.',
   },
 
-  // ─── Mon coq ───────────────────────────────────────────────────────────
-  'kok.title': { fr: 'Mon coq', rcf: 'Mon Kok' },
   'kok.tab.me': { fr: 'Mon coq', rcf: 'Mon Kok' },
   'kok.tab.kaz': { fr: 'La Kaz', rcf: 'La Kaz' },
   'kok.attrs': { fr: 'Attributs', rcf: 'Atribi' },
   'kok.equipment': { fr: 'Équipement', rcf: 'Ékipman' },
   'kok.equipBest': { fr: 'Équiper le meilleur', rcf: 'Ékip le meyèr' },
-  'kok.bag': { fr: 'Sac', rcf: 'Sak' },
   'kok.rank': { fr: '#{n} au rond', rcf: '#{n} dann rond' },
-  'kok.power': { fr: 'Puissance', rcf: 'Fors' },
 
   // ─── Quêtes ────────────────────────────────────────────────────────────
   'quest.title': { fr: 'Chez Mémé Zizine', rcf: 'Kaz Mémé Zizine' },
@@ -1548,7 +1466,6 @@ export const DICT = {
     fr: 'Ton sac est vide, petit coq. Passe au Bazar !',
     rcf: 'Sak lé vide, ti kok. Pass o Bazar !',
   },
-  'kok.tapCompare': { fr: 'Touche pour comparer en détail', rcf: 'Tous pou konpar an détay' },
 
   // ─── Bazar ─────────────────────────────────────────────────────────────
   'shop.title': { fr: 'Bazar Forain', rcf: 'Bazar Forin' },
@@ -1570,11 +1487,9 @@ export const DICT = {
   },
   'shop.exchange': { fr: 'Piments → grains', rcf: 'Piman → grin' },
   'shop.pass': { fr: 'Pass Ti Planteur', rcf: 'Pass Ti Plantèr' },
-  'shop.passBadge': { fr: 'ABONNEMENT · 30 JOURS', rcf: 'ABONMAN · 30 ZOUR' },
   'shop.passActive': { fr: 'Actif jusqu’au {d}', rcf: 'Aktif ziska {d}' },
   'shop.subscribe': { fr: 'S’abonner', rcf: 'Abone a ou' },
   'shop.welcomeBadge': { fr: 'OFFRE DE BIENVENUE · UNE SEULE FOIS', rcf: 'OFR DE BYINVENI · IN SÈL FWA' },
-  'shop.starter': { fr: 'Pack Ti Batailleur', rcf: 'Pak Ti Batayèr' },
   'shop.takeOffer': { fr: 'Prendre l’offre', rcf: 'Pran lofèr' },
   'shop.bonus': { fr: '+{n} % offert', rcf: '+{n} % ofèr' },
 
@@ -1600,10 +1515,8 @@ export const DICT = {
     rcf: 'Rant dan in lékiri, gingn bonis XP ek grin !',
   },
   'guild.level': { fr: 'Niveau de l’écurie', rcf: 'Nivo lékiri' },
-  'guild.members': { fr: 'Membres', rcf: 'Manm' },
   'guild.xpBonus': { fr: 'Bonus XP en quête', rcf: 'Bonis XP an kést' },
   'guild.goldBonus': { fr: 'Bonus grains en quête', rcf: 'Bonis grin an kést' },
-  'guild.upgrade': { fr: 'Améliorer l’écurie', rcf: 'Amélyor lékiri' },
   'guild.leave': { fr: 'Quitter l’écurie', rcf: 'Kit lékiri' },
   'guild.join': { fr: 'Rejoindre', rcf: 'Rantré' },
 
@@ -1641,7 +1554,6 @@ export const DICT = {
     fr: 'Le paiement n’est pas encore branché : pour l’instant, c’est offert.',
     rcf: 'Le péman lé pa ankor branshé : pou lèr la, lé ofèr.',
   },
-  'iap.cancel': { fr: 'Annuler', rcf: 'Anilé' },
   'iap.takePiments': { fr: 'Recevoir 🌶️{n}', rcf: 'Rosovoir 🌶️{n}' },
   'iap.takePass': { fr: 'Activer le pass', rcf: 'Aktivé le pass' },
   'iap.takePack': { fr: 'Recevoir le pack', rcf: 'Rosovoir le pak' },

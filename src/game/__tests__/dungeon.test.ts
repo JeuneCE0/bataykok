@@ -55,3 +55,17 @@ describe('Route des Cirques', () => {
     }
   });
 });
+
+describe('textes des gardiens', () => {
+  it('chaque gardien porte sa propre description', () => {
+    // Le n°2 avait reçu la description du n°1, et tout le reste avait glissé
+    // d'un cran : onze gardiens sur treize se présentaient avec le texte de
+    // leur prédécesseur, et les deux derniers textes n'étaient jamais lus.
+    const vues = new Set<string>();
+    for (const b of BOSSES) {
+      assert.ok(!vues.has(b.flavorKey), `${b.name} reprend une description déjà servie`);
+      vues.add(b.flavorKey);
+    }
+    assert.equal(vues.size, BOSSES.length);
+  });
+});
