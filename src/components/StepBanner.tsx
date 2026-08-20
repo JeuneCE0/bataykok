@@ -18,6 +18,10 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
   const claimedSteps = useGame((s) => s.claimedSteps);
   const dungeonFloor = useGame((s) => s.dungeonFloor);
   const claimStep = useGame((s) => s.claimStep);
+  // Tous les hooks avant le moindre retour : `currentStep` renvoie null dès
+  // qu'une étape est franchie, et sortir plus tôt qu'au rendu précédent fait
+  // compter moins de hooks à React — « Rendered fewer hooks than expected ».
+  const t = useT();
 
   if (!player) return null;
   const step = currentStep({ player, stats, foundMitik, dungeonFloor, claimedSteps });
@@ -25,7 +29,6 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
 
   const done = claimedSteps.length;
   const total = STEPS.length;
-  const t = useT();
 
   return (
     <Pressable

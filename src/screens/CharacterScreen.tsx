@@ -86,6 +86,19 @@ export default function CharacterScreen() {
     setTimeout(() => setFlash(null), 2600);
   };
 
+  // Le tri du sak est mémoïsé : le hook doit vivre avant le retour anticipé,
+  // sinon un joueur absent (première ouverture, réinitialisation) ferait compter
+  // moins de hooks qu'au rendu précédent.
+  const bag = useMemo(
+    () =>
+      player
+        ? [...player.inventory].sort(
+            (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
+          )
+        : [],
+    [player]
+  );
+
   if (!player) return null;
   const cls = CLASSES[player.classId];
   const attrs = totalAttrs(player);
@@ -98,15 +111,6 @@ export default function CharacterScreen() {
     for (let i = 0; i < bulk; i++) total += attrCost(player.baseAttrs[a] + i);
     return total;
   };
-  // un tri qui compare chaque objet à l'équipement : à ne refaire que si le
-  // sak ou l'ékipman change, pas à chaque frappe dans un champ
-  const bag = useMemo(
-    () =>
-      [...player.inventory].sort(
-        (a, b) => compareToEquipped(b, player).diff - compareToEquipped(a, player).diff
-      ),
-    [player]
-  );
 
   const switcher = (
     <Segmented
