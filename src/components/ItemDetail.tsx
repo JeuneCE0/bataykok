@@ -58,7 +58,7 @@ export default function ItemDetail({
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.root}>
-        <LinearGradient colors={[`${col}2E`, '#0B0714']} style={[styles.card, { borderColor: col }]}>
+        <LinearGradient colors={[`${col}40`, '#140C20']} style={[styles.card, { borderColor: col }]}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.name}>{itemLabel(item, t)}</Text>
             <Text style={[styles.rarity, { color: col }]}>
@@ -210,6 +210,9 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxHeight: '90%',
+    // le dégradé du haut porte une alpha : sans fond opaque dessous, l'écran
+    // transparaissait à travers la fiche
+    backgroundColor: '#140C20',
     borderRadius: R.xl,
     borderWidth: BW.thick,
     padding: 16,
