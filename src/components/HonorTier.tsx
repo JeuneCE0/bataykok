@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { honorFloor, nextTier, tierForHonor } from '../game/ranks';
+import { RANK_TIERS, honorFloor, nextTier, tierForHonor } from '../game/ranks';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { Bar } from './ui';
+import RankBadge from './RankBadge';
 
 /**
  * Palier d'honneur du joueur.
@@ -28,7 +29,7 @@ export default function HonorTier() {
   return (
     <View style={[styles.card, { borderColor: `${tier.color}55` }]}>
       <View style={styles.head}>
-        <Text style={styles.icon}>{tier.icon}</Text>
+        <RankBadge tier={tier} index={RANK_TIERS.indexOf(tier)} size={46} />
         <View style={{ flex: 1 }}>
           <Text style={[styles.name, { color: tier.color }]} numberOfLines={1}>
             {t(tier.nameKey)}
