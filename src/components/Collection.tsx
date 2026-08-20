@@ -47,7 +47,7 @@ export default function Collection() {
                 <Bar
                   value={Math.min(n, 4)}
                   max={4}
-                  variant={steps >= 2 ? 'gold' : steps === 1 ? 'cane' : 'slate'}
+                  variant={steps >= 2 ? 'gold' : steps === 1 ? 'cane' : 'stone'}
                   height={6}
                 />
               </View>

@@ -43,6 +43,11 @@ export const G = {
   lagoon: ['#7FE3F7', '#2FC6E8', '#0E8FB0'] as const,
   mystic: ['#D6A8FF', '#B06BFF', '#7B2FD6'] as const,
   slate: ['#5B4A6E', '#3D3050', '#241B33'] as const,
+  // `slate` s'éteint sur la glissière des jauges (rgba(6,3,12,0.6)) : à
+  // 7 px de haut, la moitié sombre du dégradé s'y confond et un attribut
+  // rempli aux trois quarts se lit comme un attribut à zéro. `stone` reste
+  // neutre — l'or garde son rôle d'accent — mais se voit.
+  stone: ['#B6A9C9', '#8E7FA6', '#6A5C82'] as const,
   card: ['rgba(41,28,58,0.88)', 'rgba(21,13,34,0.92)'] as const,
   night: ['#160D22', '#0A0713'] as const,
 } as const;

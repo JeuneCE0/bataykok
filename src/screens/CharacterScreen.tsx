@@ -243,7 +243,7 @@ export default function CharacterScreen() {
                 <Bar
                   value={attrs[a]}
                   max={attrMax}
-                  variant={main ? 'gold' : 'slate'}
+                  variant={main ? 'gold' : 'stone'}
                   height={7}
                 />
               </View>
