@@ -73,6 +73,27 @@ export const DICT = {
     rcf: 'Doub sète rékonpans',
   },
 
+  'season.tier.roi': {
+    fr: 'Roi du rond',
+    rcf: 'Roi du rond',
+  },
+  'season.tier.podium': {
+    fr: 'Podium',
+    rcf: 'Podiom',
+  },
+  'season.tier.top10': {
+    fr: 'Top 10',
+    rcf: 'Top 10',
+  },
+  'season.tier.top25': {
+    fr: 'Top 25',
+    rcf: 'Top 25',
+  },
+  'season.tier.batayer': {
+    fr: 'Batailleur',
+    rcf: 'Batayèr',
+  },
+
   // ─── Duel entre amis ───────────────────────────────────────────────────
   'duel.title': {
     fr: 'Défier un ami',

@@ -10,12 +10,13 @@ import { CLASSES } from '../game/classes';
 import { playerArmor, playerToFighter, playerWeapon, totalAttrs } from '../game/formulas';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
-import { C, F, R } from '../theme';
+import { BW, C, F, OUTLINE, R, TEXT_OUTLINE } from '../theme';
 import HonorTier from '../components/HonorTier';
 
 const LADDER = generateLadder();
 const botById = new Map(LADDER.map((b) => [b.id, b]));
-const MEDALS = ['🥇', '🥈', '🥉'];
+/** Or, argent, bronze : le podium se voit à la couleur du socle, pas à un emoji. */
+const PODIUM = ['#FFC93C', '#D8DEE9', '#C98A5B'];
 
 export default function RankingScreen({
   onChallenge,
@@ -106,7 +107,7 @@ export default function RankingScreen({
           <Text style={styles.seasonSub}>
             {t('season.finished', {
               n: seasonPending.rank,
-              tier: tierForRank(seasonPending.rank).label,
+              tier: t(tierForRank(seasonPending.rank).labelKey),
             })}
           </Text>
           <Button
@@ -129,69 +130,82 @@ export default function RankingScreen({
               {t('season.current', { n: seasonNo, d: daysLeft })}
             </Text>
             <Text style={styles.seasonSub}>
-              {t('season.atYourRank', { tier: tier.label })} → 🌽{fmt(tier.grains)} · 🌶️
+              {t('season.atYourRank', { tier: t(tier.labelKey) })} → 🌽{fmt(tier.grains)} · 🌶️
               {tier.piments}
             </Text>
           </View>
         </View>
       </Card>
 
-      <Card>
-        {ladderOrder.map((id, i) => {
-          const isMe = id === 'me';
-          const bot = botById.get(id);
-          if (!isMe && !bot) return null;
-          const name = isMe ? player.name : bot!.name;
-          const level = isMe ? player.level : bot!.level;
-          const cls = CLASSES[isMe ? player.classId : bot!.classId];
+      {/* Chaque rang est une carte à part entière : en lignes séparées par
+          des filets, le classement se lisait comme un tableur. */}
+      {ladderOrder.map((id, i) => {
+        const isMe = id === 'me';
+        const bot = botById.get(id);
+        if (!isMe && !bot) return null;
+        const name = isMe ? player.name : bot!.name;
+        const level = isMe ? player.level : bot!.level;
+        const honor = isMe ? player.honor : Math.max(0, 400 - (i + 1) * 5);
+        const cls = CLASSES[isMe ? player.classId : bot!.classId];
+        const podium = i < 3 ? PODIUM[i] : null;
 
-          // top 15 + la zone autour du joueur
-          if (i > 14 && Math.abs(i - myIdx) > 3 && i < ladderOrder.length - 1) {
-            if (i === 15 && myIdx > 18) {
-              return (
-                <Text key={id} style={styles.dots}>
-                  ⋯
-                </Text>
-              );
-            }
-            return null;
+        // top 15 + la zone autour du joueur
+        if (i > 14 && Math.abs(i - myIdx) > 3 && i < ladderOrder.length - 1) {
+          if (i === 15 && myIdx > 18) {
+            return (
+              <Text key={id} style={styles.dots}>
+                ⋯
+              </Text>
+            );
           }
+          return null;
+        }
 
-          return (
-            <Pressable
-              key={id}
-              onPress={() => openProfile(id, i + 1)}
-              style={({ pressed }) => [
-                styles.row,
-                isMe && styles.meRow,
-                pressed && { opacity: 0.6 },
+        return (
+          <Pressable
+            key={id}
+            onPress={() => openProfile(id, i + 1)}
+            style={({ pressed }) => [
+              styles.row,
+              isMe && styles.meRow,
+              pressed && { opacity: 0.75 },
+            ]}
+          >
+            <View
+              style={[
+                styles.rankBox,
+                podium ? { backgroundColor: podium, borderColor: OUTLINE } : null,
+                isMe && !podium ? { borderColor: C.gold } : null,
               ]}
             >
-              <View
-                style={[
-                  styles.rankBox,
-                  i < 3 && { borderColor: C.gold, backgroundColor: 'rgba(255,201,60,0.12)' },
-                  isMe && { borderColor: C.gold },
-                ]}
-              >
-                <Text style={[styles.rank, i < 3 && { color: C.gold, fontSize: 15 }]}>
-                  {i < 3 ? MEDALS[i] : `${i + 1}`}
-                </Text>
-              </View>
-              <Text
-                style={[styles.name, isMe && { color: C.gold }]}
-                numberOfLines={1}
-              >
+              <Text style={[styles.rank, podium ? { color: C.ink } : null]}>{i + 1}</Text>
+            </View>
+
+            <View style={[styles.crest, { borderColor: cls.color }]}>
+              <Text style={styles.crestEmoji}>{cls.emoji}</Text>
+            </View>
+
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={[styles.name, isMe && { color: C.gold }]} numberOfLines={1}>
                 {name}
                 {isMe ? ` ${t('profile.me')}` : ''}
               </Text>
-              <Text style={[styles.cls, { color: cls.color }]}>{cls.emoji}</Text>
-              <Text style={styles.level}>niv. {level}</Text>
-              <Text style={styles.chevron}>›</Text>
-            </Pressable>
-          );
-        })}
-      </Card>
+              <Text style={[styles.cls, { color: cls.color }]} numberOfLines={1}>
+                {cls.name}
+              </Text>
+            </View>
+
+            <View style={styles.stats}>
+              <Text style={styles.statHonor} numberOfLines={1}>
+                🎖️ {fmt(honor)}
+              </Text>
+              <Text style={styles.statLevel} numberOfLines={1}>
+                {t('common.level', { n: level })}
+              </Text>
+            </View>
+          </Pressable>
+        );
+      })}
 
       <KokProfileModal
         profile={profile}
@@ -224,47 +238,60 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: C.hairlineSoft,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+    borderRadius: R.md,
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    backgroundColor: 'rgba(33,22,50,0.7)',
     gap: 8,
   },
   meRow: {
-    backgroundColor: 'rgba(255,201,60,0.10)',
-    borderRadius: R.sm,
-    borderBottomColor: 'transparent',
+    backgroundColor: 'rgba(255,201,60,0.14)',
+    borderColor: C.gold,
   },
   rankBox: {
-    width: 32,
-    height: 28,
+    width: 36,
+    height: 36,
     borderRadius: R.sm,
-    borderWidth: 1,
-    borderColor: C.hairlineSoft,
-    backgroundColor: 'rgba(6,3,12,0.4)',
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    backgroundColor: 'rgba(6,3,12,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   rank: {
     fontFamily: F.black,
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 15,
+    lineHeight: 20,
     color: C.textDim,
     includeFontPadding: false,
     textAlign: 'center',
   },
-  name: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text, flex: 1 },
-  cls: { fontSize: 15 },
-  level: {
-    fontFamily: F.semi,
-    fontSize: 12,
-    lineHeight: 16,
-    color: C.textDim,
-    width: 52,
-    textAlign: 'right',
+  crest: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: BW.thick,
+    backgroundColor: 'rgba(6,3,12,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  crestEmoji: { fontSize: 17, lineHeight: 22, includeFontPadding: false },
+  name: {
+    fontFamily: F.black,
+    fontSize: 15,
+    lineHeight: 20,
+    color: C.text,
+    includeFontPadding: false,
+    ...TEXT_OUTLINE,
+  },
+  cls: { fontFamily: F.semi, fontSize: 11, lineHeight: 15 },
+  stats: { alignItems: 'flex-end', gap: 2 },
+  statHonor: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.mystic },
+  statLevel: { fontFamily: F.semi, fontSize: 11, lineHeight: 15, color: C.textFaint },
   seasonRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   seasonTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   seasonSub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
-  chevron: { fontFamily: F.black, fontSize: 20, color: C.textFaint, marginLeft: -2 },
   dots: { color: C.textFaint, textAlign: 'center', fontSize: 17, paddingVertical: 8 },
 });

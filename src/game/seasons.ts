@@ -1,3 +1,5 @@
+import { TransKey } from '../i18n';
+
 /**
  * Saisons du rond : deux semaines, une récompense selon le rang atteint.
  * Sans reset du classement (frustrant tant que les adversaires sont simulés) —
@@ -8,18 +10,18 @@ export const SEASON_MS = SEASON_DAYS * 86_400_000;
 
 export interface SeasonTier {
   maxRank: number;
-  label: string;
+  labelKey: TransKey;
   grains: number;
   piments: number;
   icon: string;
 }
 
 export const SEASON_TIERS: SeasonTier[] = [
-  { maxRank: 1, label: 'Roi du rond', grains: 6000, piments: 50, icon: '👑' },
-  { maxRank: 3, label: 'Podium', grains: 3500, piments: 30, icon: '🥇' },
-  { maxRank: 10, label: 'Top 10', grains: 1800, piments: 15, icon: '🏆' },
-  { maxRank: 25, label: 'Top 25', grains: 900, piments: 7, icon: '🎖️' },
-  { maxRank: Infinity, label: 'Batayeur', grains: 300, piments: 2, icon: '🐓' },
+  { maxRank: 1, labelKey: 'season.tier.roi', grains: 6000, piments: 50, icon: '👑' },
+  { maxRank: 3, labelKey: 'season.tier.podium', grains: 3500, piments: 30, icon: '🥇' },
+  { maxRank: 10, labelKey: 'season.tier.top10', grains: 1800, piments: 15, icon: '🏆' },
+  { maxRank: 25, labelKey: 'season.tier.top25', grains: 900, piments: 7, icon: '🎖️' },
+  { maxRank: Infinity, labelKey: 'season.tier.batayer', grains: 300, piments: 2, icon: '🐓' },
 ];
 
 export function tierForRank(rank: number): SeasonTier {
