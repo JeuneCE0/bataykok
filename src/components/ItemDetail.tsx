@@ -16,6 +16,7 @@ import { BW, C, F, OUTLINE, R, SHADOW, SP, TEXT_OUTLINE } from '../theme';
 import ItemArt from './ItemArt';
 import {Button } from './ui';
 import CloseButton from './CloseButton';
+import SetCrest from './SetCrest';
 
 /**
  * Fiche d'un objet, en grand.
@@ -109,7 +110,7 @@ export default function ItemDetail({
             {set ? (
               <>
                 <Section title={t('item.setPiece')} />
-                <Line label={`${set.icon}  ${set.name}`} value={ATTR_LABELS[set.attr]} />
+                <Line blason={set.id} label={set.name} value={ATTR_LABELS[set.attr]} />
               </>
             ) : null}
 
@@ -177,14 +178,18 @@ function Line({
   value,
   fort,
   couleur,
+  blason,
 }: {
   label: string;
   value: string;
   fort?: boolean;
   couleur?: string;
+  /** panoplie : son écu tient lieu de puce */
+  blason?: string;
 }) {
   return (
     <View style={styles.line}>
+      {blason ? <SetCrest id={blason} size={18} /> : null}
       <Text style={styles.lineLabel} numberOfLines={1}>
         {label}
       </Text>

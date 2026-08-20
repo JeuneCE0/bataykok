@@ -6,9 +6,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#1a0f08",
+    "backgroundColor": "#0B0714",
     "splash": {
-      "backgroundColor": "#1a0f08",
+      "backgroundColor": "#0B0714",
       "resizeMode": "contain"
     },
     "ios": {
@@ -18,7 +18,7 @@
     "android": {
       "package": "fr.scalecorp.bataykok",
       "adaptiveIcon": {
-        "backgroundColor": "#1a0f08",
+        "backgroundColor": "#0B0714",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

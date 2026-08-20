@@ -10,7 +10,6 @@ export interface SetDef {
   id: string;
   name: string;
   attr: AttrId;
-  icon: string;
   color: string;
   /** bonus par pièce au-delà du seuil, exprimé en points d'attribut par niveau */
   perLevel: number;
@@ -26,7 +25,6 @@ export const SETS: SetDef[] = [
     id: 'mafate',
     name: 'Linz Mafate',
     attr: 'endurance',
-    icon: '🥾',
     color: '#3BD97E',
     perLevel: 0.9,
     look: { bodyColor: '#5d4037', combColor: '#7CFC00', tailPalette: 0, accessory: 6 },
@@ -35,7 +33,6 @@ export const SETS: SetDef[] = [
     id: 'volkan',
     name: 'Tenu Volkan',
     attr: 'force',
-    icon: '🌋',
     color: '#FF5A1F',
     perLevel: 0.9,
     look: { bodyColor: '#b5541c', combColor: '#ff7043', tailPalette: 8, accessory: 6 },
@@ -44,7 +41,6 @@ export const SETS: SetDef[] = [
     id: 'sega',
     name: 'Kostim Séga',
     attr: 'esprit',
-    icon: '🎵',
     color: '#B06BFF',
     perLevel: 0.9,
     look: { bodyColor: '#7b1fa2', combColor: '#FF00E5', tailPalette: 6, accessory: 7 },
@@ -53,7 +49,6 @@ export const SETS: SetDef[] = [
     id: 'gramoune',
     name: 'Plimaz Gramoune',
     attr: 'chance',
-    icon: '🪬',
     color: '#FFC93C',
     perLevel: 0.8,
     look: { bodyColor: '#C89B3C', combColor: '#f9a825', tailPalette: 5, accessory: 5 },
@@ -62,7 +57,6 @@ export const SETS: SetDef[] = [
     id: 'kanyar',
     name: 'Kanyar Malin',
     attr: 'adresse',
-    icon: '💨',
     color: '#2FC6E8',
     perLevel: 0.9,
     look: { bodyColor: '#1B4F72', combColor: '#00E5FF', tailPalette: 1, accessory: 8 },

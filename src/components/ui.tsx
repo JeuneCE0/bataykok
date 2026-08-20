@@ -313,6 +313,7 @@ export function SectionTitle({
 
 export function Chip({
   icon,
+  art,
   label,
   color = C.textDim,
   active,
@@ -321,6 +322,8 @@ export function Chip({
 }: {
   /** rendu dans son propre Text : mêler un emoji au libellé décentre la pilule */
   icon?: string;
+  /** dessin vectoriel à la place de l'emoji — blason de panoplie, par exemple */
+  art?: React.ReactNode;
   label: string;
   color?: string;
   active?: boolean;
@@ -337,7 +340,7 @@ export function Chip({
         style,
       ]}
     >
-      {icon ? <Text style={styles.chipIcon}>{icon}</Text> : null}
+      {art ?? (icon ? <Text style={styles.chipIcon}>{icon}</Text> : null)}
       <Text
         style={[styles.chipText, { color: active ? C.ink : color }]}
         numberOfLines={1}

@@ -13,6 +13,7 @@ import { useGame } from '../store/gameStore';
 import { C, F, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
 import { Button, Card, SectionTitle } from './ui';
+import SetCrest from './SetCrest';
 
 /**
  * Panoplies toutes faites.
@@ -53,7 +54,7 @@ export default function SetKits() {
                     pressed && { opacity: 0.75 },
                   ]}
                 >
-                  <Text style={{ fontSize: 31 }}>{def.icon}</Text>
+                  <SetCrest id={def.id} size={42} />
                   <Text style={[styles.kitName, { color: def.color }]} numberOfLines={2}>
                     {def.name}
                   </Text>
@@ -98,9 +99,10 @@ function PreviewModal({
       <View style={styles.root}>
         <LinearGradient colors={['#2A1A3D', '#0B0714']} style={styles.card}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={[styles.title, { color: def.color }]}>
-              {def.icon} {def.name}
-            </Text>
+            <View style={styles.titleRow}>
+              <SetCrest id={def.id} size={30} />
+              <Text style={[styles.title, { color: def.color }]}>{def.name}</Text>
+            </View>
             <View style={styles.stage}>
               {/* le coq porte déjà le look : on achète ce qu'on voit */}
               <Rooster
@@ -191,6 +193,12 @@ const styles = StyleSheet.create({
     borderColor: C.hairline,
     padding: 16,
     ...SHADOW.float,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   title: {
     fontFamily: F.black,

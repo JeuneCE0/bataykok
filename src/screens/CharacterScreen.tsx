@@ -46,6 +46,7 @@ import { auraColor } from '../game/power';
 import { itemLabel } from '../game/items';
 import ItemArt from '../components/ItemArt';
 import ItemDetail from '../components/ItemDetail';
+import SetCrest from '../components/SetCrest';
 
 const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
   off: '📴 Hors ligne',
@@ -367,7 +368,8 @@ export default function CharacterScreen() {
                   <VerdictBadge cmp={cmp} />
                   {it.setId && SET_BY_ID[it.setId] && (
                     <Chip
-                      label={`${SET_BY_ID[it.setId].icon} ${SET_BY_ID[it.setId].name}`}
+                      art={<SetCrest id={it.setId} size={13} />}
+                      label={SET_BY_ID[it.setId].name}
                       color={SET_BY_ID[it.setId].color}
                     />
                   )}

@@ -15,6 +15,7 @@ import { BW, C, F, R } from '../theme';
 import { Bar, Card, Chip, SectionTitle } from './ui';
 import { useT } from '../i18n/useT';
 import ItemArt from './ItemArt';
+import SetCrest from './SetCrest';
 
 /** {t('collection.album')} + panoplies : ce qu'on collectionne, et ce que ça rapporte. */
 export default function Collection() {
@@ -35,7 +36,7 @@ export default function Collection() {
           const steps = SET_THRESHOLDS.filter((t) => n >= t).length;
           return (
             <View key={def.id} style={styles.setRow}>
-              <Text style={{ fontSize: 20 }}>{def.icon}</Text>
+              <SetCrest id={def.id} size={28} />
               <View style={{ flex: 1, gap: 4 }}>
                 <Text
                   style={[styles.setName, steps > 0 && { color: def.color }]}

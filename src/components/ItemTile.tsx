@@ -13,6 +13,7 @@ import { BW, C, F, OUTLINE, R, SHADOW, SP, TEXT_OUTLINE } from '../theme';
 import ItemArt from './ItemArt';
 import { VerdictBadge } from './ItemCompare';
 import { Button } from './ui';
+import SetCrest from './SetCrest';
 
 /**
  * Tuile d'objet.
@@ -93,9 +94,12 @@ export default function ItemTile({
           </Text>
 
           {set ? (
-            <Text style={[styles.set, { color: set.color }]} numberOfLines={1}>
-              {set.icon} {set.name}
-            </Text>
+            <View style={styles.setRow}>
+              <SetCrest id={set.id} size={14} />
+              <Text style={[styles.set, { color: set.color }]} numberOfLines={1}>
+                {set.name}
+              </Text>
+            </View>
           ) : null}
 
           {cmp ? (
@@ -194,6 +198,7 @@ const styles = StyleSheet.create({
     color: C.textDim,
     textAlign: 'center',
   },
+  setRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   set: { fontFamily: F.black, fontSize: 11, lineHeight: 15 },
   verdict: { marginTop: SP.xxs },
   // pastille enfoncée : le prix n'est pas actionnable, il ne doit pas ressortir
