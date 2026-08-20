@@ -44,6 +44,8 @@ import { useGame } from '../store/gameStore';
 import { C, F, G, R } from '../theme';
 import { auraColor } from '../game/power';
 import { itemLabel } from '../game/items';
+import ItemArt from '../components/ItemArt';
+import ItemDetail from '../components/ItemDetail';
 
 const ONLINE_LABEL: Record<'off' | 'sync' | 'ok' | 'error', string> = {
   off: '📴 Hors ligne',
@@ -304,7 +306,11 @@ export default function CharacterScreen() {
                 ]}
                 onPress={() => it && setSelected(it)}
               >
-                <Text style={{ fontSize: 20, opacity: it ? 1 : 0.35 }}>{SLOT_ICONS[s]}</Text>
+                {it ? (
+                  <ItemArt slot={s} rarity={it.rarity} size={30} />
+                ) : (
+                  <Text style={{ fontSize: 20, opacity: 0.3 }}>{SLOT_ICONS[s]}</Text>
+                )}
                 <Text
                   style={[styles.slotLabel, col ? { color: col } : null]}
                   numberOfLines={2}
@@ -347,7 +353,7 @@ export default function CharacterScreen() {
                   { borderColor: RARITY_COLORS[it.rarity], backgroundColor: `${RARITY_COLORS[it.rarity]}1A` },
                 ]}
               >
-                <Text style={{ fontSize: 17 }}>{SLOT_ICONS[it.slot]}</Text>
+                <ItemArt slot={it.slot} rarity={it.rarity} size={26} />
               </Pressable>
               <View style={{ flex: 1, gap: 4 }}>
                 <Text style={[styles.invName, { color: RARITY_COLORS[it.rarity] }]} numberOfLines={1}>
@@ -384,34 +390,34 @@ export default function CharacterScreen() {
         )}
       </Card>
 
-      {selected && (
-        <Card glow={RARITY_COLORS[selected.rarity]}>
-          <Text style={[styles.invName, { color: RARITY_COLORS[selected.rarity], fontSize: 15 }]}>
-            {selected.name}
-          </Text>
-          <Chip
-            label={RARITY_LABELS[selected.rarity]}
-            color={RARITY_COLORS[selected.rarity]}
-            style={{ alignSelf: 'flex-start', marginVertical: 8 }}
-          />
-          <Text style={styles.invStats}>{itemStats(selected)}</Text>
-          <CompareLines cmp={compareToEquipped(selected, player)} />
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, alignItems: 'center' }}>
-            {player.equipment[selected.slot]?.id !== selected.id && (
-              <Button
-                size="sm"
-                variant={compareToEquipped(selected, player).diff > 0 ? 'cane' : 'slate'}
-                label={t('common.equip')}
-                onPress={() => {
-                  equipItem(selected);
-                  setSelected(null);
-                }}
-              />
-            )}
-            <GhostButton label={t('common.close')} onPress={() => setSelected(null)} />
-          </View>
-        </Card>
-      )}
+      {/* Le détail vivait dans une carte au bas de l'écran : il fallait
+          faire défiler pour le lire, et rien n'y montrait la pièce. */}
+      <ItemDetail
+        item={selected}
+        cmp={selected ? compareToEquipped(selected, player) : undefined}
+        onClose={() => setSelected(null)}
+        primaryLabel={
+          selected && player.equipment[selected.slot]?.id !== selected.id
+            ? t('common.equip')
+            : undefined
+        }
+        primaryVariant={
+          selected && compareToEquipped(selected, player).diff > 0 ? 'cane' : 'slate'
+        }
+        onPrimary={() => {
+          if (selected) equipItem(selected);
+          setSelected(null);
+        }}
+        onSell={
+          selected && player.equipment[selected.slot]?.id !== selected.id
+            ? () => {
+                if (selected) sellItem(selected);
+                setSelected(null);
+              }
+            : undefined
+        }
+      />
+
     </ScrollView>
     </View>
   );

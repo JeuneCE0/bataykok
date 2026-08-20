@@ -33,6 +33,7 @@ import { itemLabel } from '../game/items';
 import SetKits from '../components/SetKits';
 import DailyDeal from '../components/DailyDeal';
 import ItemTile from '../components/ItemTile';
+import ItemDetail from '../components/ItemDetail';
 
 const PIMENT_PACKS = [
   { piments: 50, price: '0,99 €', tag: null, bonus: 0 },
@@ -43,7 +44,7 @@ const PIMENT_PACKS = [
 export default function ShopScreen() {
   const t = useT();
   const [tab, setTab] = useState<'bazar' | 'plimaz' | 'lotel'>('bazar');
-  const [open, setOpen] = useState<string | null>(null);
+  const [detail, setDetail] = useState<Item | null>(null);
   const player = useGame((s) => s.player);
   const shop = useGame((s) => s.shop);
   const buyItem = useGame((s) => s.buyItem);
@@ -136,12 +137,28 @@ export default function ShopScreen() {
               actionLabel={t('common.buy')}
               actionVariant={cmp.diff > 0 ? 'cane' : 'gold'}
               onAction={() => buyItem({ ...it, price: priceOf(it.price) })}
-              onPress={() => setOpen(open === it.id ? null : it.id)}
+              onPress={() => setDetail(it)}
               disabled={player.grains < priceOf(it.price)}
             />
           </FadeIn>
         ))}
       </View>
+
+      <ItemDetail
+        item={detail}
+        cmp={detail ? compareToEquipped(detail, player) : undefined}
+        price={detail ? priceOf(detail.price) : undefined}
+        onClose={() => setDetail(null)}
+        primaryLabel={t('common.buy')}
+        primaryVariant={
+          detail && compareToEquipped(detail, player).diff > 0 ? 'cane' : 'gold'
+        }
+        primaryDisabled={!!detail && player.grains < priceOf(detail.price)}
+        onPrimary={() => {
+          if (detail) buyItem({ ...detail, price: priceOf(detail.price) });
+          setDetail(null);
+        }}
+      />
 
       <GhostButton
         icon="🔄"

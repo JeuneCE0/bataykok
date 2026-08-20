@@ -3,13 +3,14 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
-import { fmt, SLOT_ICONS } from '../game/formulas';
+import { fmt } from '../game/formulas';
 import { RARITY_COLORS, RARITY_LABELS, itemLabel, itemStats } from '../game/items';
 import { ItemComparison } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { Item } from '../game/types';
 import { useT } from '../i18n/useT';
 import { BW, C, F, OUTLINE, R, SHADOW, SP, TEXT_OUTLINE } from '../theme';
+import ItemArt from './ItemArt';
 import { VerdictBadge } from './ItemCompare';
 import { Button } from './ui';
 
@@ -83,7 +84,7 @@ export default function ItemTile({
               </Defs>
               <Circle cx={39} cy={39} r={39} fill={`url(#b${item.id})`} />
             </Svg>
-            <Text style={styles.icon}>{SLOT_ICONS[item.slot]}</Text>
+            <ItemArt slot={item.slot} rarity={item.rarity} size={46} />
             <View style={[styles.pedestal, { backgroundColor: col }]} />
           </View>
 

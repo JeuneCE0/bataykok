@@ -73,6 +73,32 @@ export const DICT = {
     rcf: 'Doub sète rékonpans',
   },
 
+  // ─── Fiche d'objet ─────────────────────────────────────────────────────
+  'item.resale': {
+    fr: 'Revente',
+    rcf: 'Revant',
+  },
+  'item.stats': {
+    fr: 'Ce que ça donne',
+    rcf: 'Sak i donn',
+  },
+  'item.vsEquipped': {
+    fr: 'Face à ce que tu portes',
+    rcf: 'Kont sak ou i port',
+  },
+  'item.slot': {
+    fr: 'Emplacement',
+    rcf: 'Plas',
+  },
+  'item.setPiece': {
+    fr: 'Pièce de panoplie',
+    rcf: 'Pyès de panopli',
+  },
+  'item.uniqueLore': {
+    fr: 'Légende',
+    rcf: 'Lézand',
+  },
+
   // ─── Messages d'erreur ─────────────────────────────────────────────────
   'referral.shareFail': {
     fr: 'Partage impossible sur cet appareil.',

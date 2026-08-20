@@ -39,6 +39,7 @@ import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
+import ItemArt from '../components/ItemArt';
 
 export default function MarketScreen() {
   const t = useT();
@@ -141,7 +142,7 @@ export default function MarketScreen() {
                   <Card glow={cmp.diff > 0 ? C.cane : undefined} compact>
                     <View style={styles.row}>
                       <View style={[styles.icon, { borderColor: col }]}>
-                        <Text style={{ fontSize: 20 }}>{SLOT_ICONS[l.item.slot]}</Text>
+                        <ItemArt slot={l.item.slot} rarity={l.item.rarity} size={30} />
                       </View>
                       <View style={{ flex: 1, gap: 4 }}>
                         <Text style={[styles.name, { color: col }]} numberOfLines={1}>
@@ -218,7 +219,7 @@ export default function MarketScreen() {
                 const on = selling?.id === it.id;
                 return (
                   <View key={it.id} style={[styles.pick, on && { borderColor: col }]}>
-                    <Text style={{ fontSize: 17 }}>{SLOT_ICONS[it.slot]}</Text>
+                    <ItemArt slot={it.slot} rarity={it.rarity} size={26} />
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.name, { color: col }]} numberOfLines={1}>
                         {itemLabel(it, t)}

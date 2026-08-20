@@ -11,6 +11,7 @@ import { useT } from '../i18n/useT';
 import { C, F, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
 import { Button, Card, Chip, GhostButton, SectionTitle } from './ui';
+import ItemArt from './ItemArt';
 
 const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
 const SLOTS: SlotId[] = [
@@ -134,9 +135,11 @@ export default function KokProfileModal({
                         key={sl}
                         style={[styles.slot, col ? { borderColor: col } : null]}
                       >
-                        <Text style={{ fontSize: 17, opacity: it ? 1 : 0.3 }}>
-                          {SLOT_ICONS[sl]}
-                        </Text>
+                        {it ? (
+                          <ItemArt slot={sl} rarity={it.rarity} size={26} />
+                        ) : (
+                          <Text style={{ fontSize: 17, opacity: 0.3 }}>{SLOT_ICONS[sl]}</Text>
+                        )}
                         <Text
                           style={[styles.slotLabel, col ? { color: col } : null]}
                           numberOfLines={2}

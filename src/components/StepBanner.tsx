@@ -47,19 +47,26 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
         ]}
       >
         <View style={[styles.icon, step.ready && { borderColor: C.cane }]}>
-          <Text style={{ fontSize: 20 }}>{step.def.icon}</Text>
+          <Text style={{ fontSize: 17 }}>{step.def.icon}</Text>
         </View>
 
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.kicker}>
-            CHEMIN DU TI KOK · {done}/{total}
-          </Text>
-          <Text style={styles.title} numberOfLines={1}>
-            {t(step.def.titleKey)}
-          </Text>
-          <Text style={styles.hint} numberOfLines={2}>
+        {/* Deux lignes au lieu de trois : le bandeau s'affiche sur *tous* les
+            écrans, chaque ligne qu'il prend est prise à l'écran lui-même. Le
+            compteur passe en pastille plutôt qu'en ligne à part. */}
+        <View style={{ flex: 1, gap: 1 }}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title} numberOfLines={1}>
+              {t(step.def.titleKey)}
+            </Text>
+            <View style={styles.count}>
+              <Text style={styles.countText}>
+                {done}/{total}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.hint} numberOfLines={1}>
             {step.ready
-              ? `Bravo ! Récupère ${step.def.grains > 0 ? `🌽${step.def.grains}` : ''} ${
+              ? `🎁 ${step.def.grains > 0 ? `🌽${step.def.grains}` : ''} ${
                   step.def.piments > 0 ? `🌶️${step.def.piments}` : ''
                 }`
               : t(step.def.hintKey)}
@@ -86,33 +93,43 @@ const styles = StyleSheet.create({
     gap: 8,
     marginHorizontal: 12,
     marginTop: 8,
-    padding: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     borderRadius: R.lg,
     borderWidth: 1,
   },
   icon: {
-    width: 40,
-    height: 40,
-    borderRadius: R.md,
+    width: 32,
+    height: 32,
+    borderRadius: R.sm,
     borderWidth: 1,
     borderColor: C.hairline,
     backgroundColor: 'rgba(6,3,12,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  kicker: {
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  count: {
+    borderRadius: R.pill,
+    borderWidth: 1,
+    borderColor: C.hairline,
+    backgroundColor: 'rgba(6,3,12,0.5)',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+  },
+  countText: {
     fontFamily: F.black,
     fontSize: 11,
     lineHeight: 15,
-    letterSpacing: 1,
     color: C.textDim,
+    includeFontPadding: false,
   },
-  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text, flex: 1 },
   hint: { fontFamily: F.regular, fontSize: 12, color: C.textDim, lineHeight: 17 },
   cta: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
