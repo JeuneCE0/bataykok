@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { COSMETIC_BY_ID, cosmeticsForLook, ownsValue } from '../cosmetics';
-import { GUILDS, GUILD_BONUS_SCALE, donationTiers } from '../guilds';
+import { GUILDS, GUILD_BONUS_SCALE, GUILD_DAILY_CAP, donationTiers } from '../guilds';
 import { SETS } from '../sets';
 
 describe('écurie', () => {
@@ -37,6 +37,24 @@ describe('écurie', () => {
     for (let i = 1; i < tiers.length; i++) {
       assert.ok(tiers[i] > tiers[i - 1], 'montants dans le désordre');
     }
+  });
+
+  it('aucun montant proposé ne peut être refusé par le plafond du jour', () => {
+    // Le serveur refuse au-delà de 50 000 par 24 h. Un joueur à 87 000 grains
+    // se voyait proposer 52 000 : un bouton qui échoue à tous les coups.
+    for (const bourse of [60_000, 87_000, 400_000]) {
+      for (const deja of [0, 20_000, 49_500, 50_000]) {
+        const tiers = donationTiers(bourse, deja);
+        assert.ok(
+          tiers.every((n) => deja + n <= GUILD_DAILY_CAP),
+          `palier refusé d'avance (bourse ${bourse}, déjà ${deja}) : ${tiers.join(', ')}`
+        );
+      }
+    }
+  });
+
+  it('le plafond atteint ne propose plus rien', () => {
+    assert.deepEqual(donationTiers(100_000, GUILD_DAILY_CAP), []);
   });
 
   it('une bourse vide ne propose rien', () => {

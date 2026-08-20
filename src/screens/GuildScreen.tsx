@@ -38,6 +38,7 @@ export default function GuildScreen() {
   const joinGuild = useGame((s) => s.joinGuild);
   const leaveGuild = useGame((s) => s.leaveGuild);
   const donateGuild = useGame((s) => s.donateGuild);
+  const donneAujourdhui = useGame((s) => s.guildDonatedToday);
   const setGuildLevel = useGame((s) => s.setGuildLevel);
 
   const [board, setBoard] = useState<GuildBoardRow[]>([]);
@@ -118,7 +119,7 @@ export default function GuildScreen() {
                 label={`${fmt(mine.pot)} / ${fmt(mine.threshold)}`}
               />
               <View style={styles.donateRow}>
-                {donationTiers(player.grains).map((montant) => (
+                {donationTiers(player.grains, donneAujourdhui).map((montant) => (
                   <Button
                     key={montant}
                     style={styles.donateBtn}

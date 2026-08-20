@@ -153,6 +153,8 @@ interface GameState {
   activeQuest: ActiveQuest | null;
   motivation: number;
   dodosToday: number;
+  /** versé à la caisse commune depuis minuit — borne les paliers proposés */
+  guildDonatedToday: number;
   lastDaily: string;
   arenaTickets: number;
   /** date de régénération du prochain jeton */
@@ -393,6 +395,7 @@ export const useGame = create<GameState>()(
         activeQuest: null,
         motivation: MAX_MOTIVATION,
         dodosToday: 0,
+        guildDonatedToday: 0,
         lastDaily: today(),
         arenaTickets: BASE_ARENA_TICKETS,
         nextTicketAt: 0,
@@ -464,6 +467,7 @@ export const useGame = create<GameState>()(
             shop: shopRotation(1),
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
+            guildDonatedToday: 0,
             lastDaily: today(),
             arenaTickets: BASE_ARENA_TICKETS,
             nextTicketAt: 0,
@@ -505,6 +509,7 @@ export const useGame = create<GameState>()(
             activeQuest: null,
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
+            guildDonatedToday: 0,
             arenaTickets: BASE_ARENA_TICKETS,
             nextTicketAt: 0,
             shop: [],
@@ -546,6 +551,7 @@ export const useGame = create<GameState>()(
             lastDaily: today(),
             motivation: MAX_MOTIVATION,
             dodosToday: 0,
+            guildDonatedToday: 0,
             quests: s.activeQuest ? s.quests : generateQuests(s.player.level),
             shop: shopRotation(s.player.level),
             dailyMissions: rollDailyMissions(today()),
@@ -977,6 +983,7 @@ export const useGame = create<GameState>()(
           set({
             player: { ...cur.player, grains: Math.max(0, cur.player.grains - amount) },
             guildLevel: res.level,
+            guildDonatedToday: cur.guildDonatedToday + amount,
           });
           return res;
         },
@@ -1579,7 +1586,7 @@ export const useGame = create<GameState>()(
     },
     {
       name: 'batay-kok-save',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => AsyncStorage),
       /**
        * Le merge de zustand est **shallow**.
@@ -1608,6 +1615,9 @@ export const useGame = create<GameState>()(
             honorPeak: s.player.honorPeak ?? s.player.honor ?? 100,
           };
         }
+
+        // v4 : compteur de dons du jour — absent, il rendait NaN au premier don
+        s.guildDonatedToday = s.guildDonatedToday ?? 0;
 
         const questObsolete = (q: { titleKey?: unknown } | null | undefined) =>
           !!q && q.titleKey === undefined;

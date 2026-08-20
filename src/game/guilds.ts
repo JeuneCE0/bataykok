@@ -59,13 +59,24 @@ export const GUILD_BONUS_SCALE = 30;
  * Ici il y a toujours au moins une somme à portée, et l'échelle suit celui qui
  * a de quoi donner.
  */
-export function donationTiers(grains: number): number[] {
+/**
+ * Plafond de dons par 24 h — la même valeur que `donate_to_guild` (migration
+ * 0012). Sans elle côté client, le plus gros palier d'un joueur fortuné
+ * dépassait le plafond et le bouton échouait à tous les coups.
+ */
+export const GUILD_DAILY_CAP = 50_000;
+
+export function donationTiers(grains: number, donneAujourdhui = 0): number[] {
+  const marge = Math.max(0, GUILD_DAILY_CAP - donneAujourdhui);
+  const plafond = Math.min(grains, marge);
   const arrondi = (n: number) => {
     if (n < 100) return Math.max(10, Math.round(n / 10) * 10);
     if (n < 1000) return Math.round(n / 50) * 50;
     return Math.round(n / 500) * 500;
   };
-  const brut = [grains * 0.1, grains * 0.3, grains * 0.6].map(arrondi);
+  const brut = [grains * 0.1, grains * 0.3, grains * 0.6]
+    .map((n) => Math.min(n, plafond))
+    .map(arrondi);
   // dédoublonner : mieux vaut deux boutons distincts que trois identiques
-  return [...new Set(brut)].filter((n) => n >= 10 && n <= grains);
+  return [...new Set(brut)].filter((n) => n >= 10 && n <= plafond);
 }
