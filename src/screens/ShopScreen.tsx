@@ -365,7 +365,17 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 12, paddingBottom: 32 },
   // deux colonnes : la tuile a besoin de hauteur pour poser sa pièce
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' },
+  // Le badge de niveau déborde de 8 px au-dessus de sa tuile : sans marge ni
+  // écart de rangée suffisants, il chevauchait le bouton du dessus et les
+  // tuiles de la rangée précédente.
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 8,
+    rowGap: 20,
+    marginTop: 16,
+    alignItems: 'stretch',
+  },
   gridCell: { width: '48%' },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   itemIcon: {

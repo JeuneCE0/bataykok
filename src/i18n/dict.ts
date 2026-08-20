@@ -603,6 +603,19 @@ export const DICT = {
     rcf: 'Okin ékipman su sèt plas',
   },
 
+  'cosmetic.tail.rayonvolkan': {
+    fr: 'Queue Rayon Volkan',
+    rcf: 'Ké Rayon Volkan',
+  },
+  'cosmetic.tail.mahaveli': {
+    fr: 'Queue Lo Mahavéli',
+    rcf: 'Ké Lo Mahavéli',
+  },
+  'cosmetic.peiSection': {
+    fr: 'Aux couleurs du péi',
+    rcf: 'O kouler du péi',
+  },
+
   // ─── Objets uniques ────────────────────────────────────────────────────
   'unique.zepron_sitarane.name': {
     fr: 'Éperons de Sitarane',

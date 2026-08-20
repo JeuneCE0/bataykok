@@ -102,7 +102,10 @@ export default function App() {
             ) : (
               <View style={{ flex: 1 }}>
                 {!combatActive && <Hud />}
-                {!combatActive && <StepBanner onGo={setTab} />}
+                {/* Le fil rouge ne vit que sur l'écran d'accueil : partout
+                    ailleurs il répétait une consigne pour un écran qu'on avait
+                    déjà quitté, et mangeait de la hauteur. */}
+                {!combatActive && tab === 'kok' && <StepBanner onGo={setTab} />}
                 <View style={{ flex: 1 }}>
                   {tab === 'kok' && <CharacterScreen />}
                   {tab === 'quetes' && <QuestScreen />}

@@ -51,6 +51,10 @@ export const TAIL_PALETTES: string[][] = [
   ['#2E0854', '#7D26CD', '#E066FF'],
   ['#0B0B0B', '#3A3A3A', '#6E6E6E'],
   ['#FF6B00', '#FF3B00', '#FFD000'],
+  // La Réunion n'a pas de drapeau officiel : ce sont les deux étendards les
+  // plus portés dans l'île. On les nomme pour ce qu'ils sont.
+  ['#0038A8', '#E4002B', '#FFD700'], // Rayon Volkan (« drapeau du volcan »)
+  ['#E4002B', '#0038A8', '#00A650'], // Lo Mahavéli
 ];
 
 export const ACCESSORIES = [
@@ -82,6 +86,8 @@ export const COSMETICS: CosmeticDef[] = [
   { id: 'tail.mistik', kind: 'tail', nameKey: 'cosmetic.tail.mistik', value: 6, rarity: 'rar', grains: 5200 },
   { id: 'tail.lonbraz', kind: 'tail', nameKey: 'cosmetic.tail.lonbraz', value: 7, rarity: 'lezand', piments: 14 },
   { id: 'tail.volkan', kind: 'tail', nameKey: 'cosmetic.tail.volkan', value: 8, rarity: 'lezand', piments: 14 },
+  { id: 'tail.rayonvolkan', kind: 'tail', nameKey: 'cosmetic.tail.rayonvolkan', value: 9, rarity: 'mitik', piments: 22 },
+  { id: 'tail.mahaveli', kind: 'tail', nameKey: 'cosmetic.tail.mahaveli', value: 10, rarity: 'mitik', piments: 22 },
 
   // ─── Accessoires ───
   { id: 'acc.kouronn', kind: 'accessory', nameKey: 'cosmetic.acc.kouronn', value: 5, rarity: 'lezand', piments: 18 },
