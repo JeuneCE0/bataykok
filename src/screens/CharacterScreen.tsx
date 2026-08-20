@@ -183,12 +183,12 @@ export default function CharacterScreen() {
             <StatTile icon="❤️" label="PV" value={fmt(maxHp(fighter))} tint={C.piment} />
             <StatTile
               icon="🗡️"
-              label="Dégâts"
+              label={t('profile.damage')}
               value={`${weapon.min}–${weapon.max}`}
               tint={C.ember}
             />
-            <StatTile icon="🛡️" label="Armure" value={`${playerArmor(player)}`} tint={C.lagoon} />
-            <StatTile icon="⚡" label="Puissance" value={fmt(power)} tint={C.gold} />
+            <StatTile icon="🛡️" label={t('profile.armor')} value={`${playerArmor(player)}`} tint={C.lagoon} />
+            <StatTile icon="⚡" label={t('profile.power')} value={fmt(power)} tint={C.gold} />
           </View>
         </View>
 

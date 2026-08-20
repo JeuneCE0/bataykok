@@ -64,6 +64,29 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  'shop.exchangeRate': {
+    fr: '1 🌶️ = 🌽{n} à ton niveau',
+    rcf: '1 🌶️ = 🌽{n} a out nivo',
+  },
+  'quest.doubleReward': {
+    fr: 'Doubler cette récompense',
+    rcf: 'Doub sète rékonpans',
+  },
+
+  // ─── Série de connexions ───────────────────────────────────────────────
+  'daily.streakDay': {
+    fr: 'Jour {n} d’affilée',
+    rcf: 'Zour {n} de suit',
+  },
+  'daily.claim': {
+    fr: 'Récupérer',
+    rcf: 'Ramas',
+  },
+  'daily.claimed': {
+    fr: 'Allons combattre !',
+    rcf: 'Anon batayé !',
+  },
+
   // ─── Hôtel des ventes (suite) ──────────────────────────────────────────
   'market.pick': {
     fr: 'Choisir',

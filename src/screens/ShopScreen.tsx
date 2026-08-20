@@ -153,7 +153,7 @@ export default function ShopScreen() {
                 {open === it.id ? (
                   <CompareLines cmp={cmp} />
                 ) : (
-                  <Text style={styles.more}>Toucher pour comparer en détail</Text>
+                  <Text style={styles.more}>{t('kok.tapCompare')}</Text>
                 )}
               </Pressable>
               <Button
@@ -230,9 +230,9 @@ export default function ShopScreen() {
         accent={C.piment}
       />
       <Card>
-        <SectionTitle icon="🔥">Piments → grains</SectionTitle>
+        <SectionTitle icon="🔥">{t('shop.exchange')}</SectionTitle>
         <Text style={T.dim}>
-          1 🌶️ = 🌽{fmt(grainsPerPiment(player.level))} à ton niveau
+          {t('shop.exchangeRate', { n: fmt(grainsPerPiment(player.level)) })}
         </Text>
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
           {[1, 5, 10].map((n) => (
@@ -252,7 +252,7 @@ export default function ShopScreen() {
           <Text style={[styles.starterTag, { color: C.mystic }]}>
             ABONMAN · 30 JOUR
           </Text>
-          <Text style={styles.starterTitle}>Pass Ti Planteur</Text>
+          <Text style={styles.starterTitle}>{t('shop.pass')}</Text>
         </View>
         <View style={{ gap: 5, marginBottom: 12 }}>
           <Text style={styles.passLine}>🌶️ 20 piments chaque jour</Text>

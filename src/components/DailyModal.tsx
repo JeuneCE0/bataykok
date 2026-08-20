@@ -49,7 +49,7 @@ export default function DailyModal() {
         <Animated.View style={{ transform: [{ scale }], width: '100%' }}>
           <LinearGradient colors={['#241533', '#0E0818']} style={styles.card}>
             <Text style={styles.kicker}>{t('daily.kabar')}</Text>
-            <Text style={styles.title}>Jour {loginStreak} d'affilée</Text>
+            <Text style={styles.title}>{t('daily.streakDay', { n: loginStreak })}</Text>
             <Text style={styles.sub}>
               {t('daily.comeback')}
             </Text>
@@ -96,7 +96,7 @@ export default function DailyModal() {
               full
               size="lg"
               variant={got ? 'slate' : 'gold'}
-              label={got ? 'Anon batayé !' : 'Récupérer'}
+              label={got ? t('daily.claimed') : t('daily.claim')}
               onPress={() => {
                 if (got) {
                   setGot(null);

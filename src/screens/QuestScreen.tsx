@@ -213,7 +213,7 @@ export default function QuestScreen() {
                 <AdButton
                   kind="double"
                   full
-                  label="Doubler cette récompense"
+                  label={t('quest.doubleReward')}
                 />
               )}
             </Card>
