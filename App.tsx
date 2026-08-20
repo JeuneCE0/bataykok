@@ -35,6 +35,7 @@ import { TransKey } from './src/i18n';
 import { useT } from './src/i18n/useT';
 import { useGame } from './src/store/gameStore';
 import { C, F, G, R } from './src/theme';
+import OfferModal from './src/components/OfferModal';
 
 type Tab = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
@@ -102,6 +103,7 @@ export default function App() {
             ) : (
               <View style={{ flex: 1 }}>
                 {!combatActive && <Hud />}
+                {!combatActive && <OfferModal />}
                 {/* Le fil rouge ne vit que sur l'écran d'accueil : partout
                     ailleurs il répétait une consigne pour un écran qu'on avait
                     déjà quitté, et mangeait de la hauteur. */}

@@ -73,6 +73,72 @@ export const DICT = {
     rcf: 'Doub sète rékonpans',
   },
 
+  // ─── Offres payantes ───────────────────────────────────────────────────
+  'offer.ti_batayer.name': {
+    fr: 'Pack Ti Batailleur',
+    rcf: 'Pak Ti Batayèr',
+  },
+  'offer.ti_batayer.pitch': {
+    fr: 'De quoi partir du bon pied dans le rond.',
+    rcf: 'De koi parti du bon pié dann rond.',
+  },
+  'offer.sak_volkan.name': {
+    fr: 'Sac du Volcan',
+    rcf: 'Sak Volkan',
+  },
+  'offer.sak_volkan.pitch': {
+    fr: 'Le coup de pouce qui fait passer un palier.',
+    rcf: 'Le kou de pous ki fé pass in palié.',
+  },
+  'offer.trezor_gramoune.name': {
+    fr: 'Trésor du Gramoune',
+    rcf: 'Trézor Gramoune',
+  },
+  'offer.trezor_gramoune.pitch': {
+    fr: 'Ce que le vieux a mis toute sa vie à mettre de côté.',
+    rcf: 'Sak le vyé la mète de koté tout son vi.',
+  },
+  'offer.kof_zanset.name': {
+    fr: 'Coffre des Ancêtres',
+    rcf: 'Kof dé Zanset',
+  },
+  'offer.kof_zanset.pitch': {
+    fr: 'La réserve des anciens. On l’ouvre une fois.',
+    rcf: 'La rézèrv bann ansien. I ouvèr in kou.',
+  },
+  'offer.badge': {
+    fr: 'OFFRE LIMITÉE',
+    rcf: 'OFR LIMITÉ',
+  },
+  'offer.saving': {
+    fr: '−{n} %',
+    rcf: '−{n} %',
+  },
+  'offer.contains': {
+    fr: 'Ce que tu reçois',
+    rcf: 'Sak ou i gingn',
+  },
+  'offer.itemOf': {
+    fr: '1 pièce {rarity}',
+    rcf: '1 pyès {rarity}',
+  },
+  'offer.expires': {
+    fr: 'Se termine dans {t}',
+    rcf: 'I fini dan {t}',
+  },
+  'offer.take': {
+    fr: 'Prendre l’offre',
+    rcf: 'Pran lofèr',
+  },
+  'offer.later': {
+    fr: 'Plus tard',
+    rcf: 'Pli tar',
+  },
+  'offer.proto': {
+    fr: 'Achat intégré non branché — pour le prototype, l’offre est offerte.',
+    rcf: 'Asha intégré pa branshé — pou le prototip, lofèr lé ofèr.',
+  },
+
   // ─── Fiche d'objet ─────────────────────────────────────────────────────
   'item.resale': {
     fr: 'Revente',

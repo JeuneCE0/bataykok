@@ -19,6 +19,7 @@ import {
 import { albumXpBonus, itemAlbumKey } from '../game/album';
 import { BOSSES, KEY_PIMENT_COST, MAX_KEYS } from '../game/dungeons';
 import { eventLuck, eventOfDay } from '../game/events';
+import { OFFER_BY_ID } from '../game/offers';
 import { Lang } from '../i18n';
 import { COSMETIC_BY_ID, cosmeticsForLook } from '../game/cosmetics';
 import { honorFloor } from '../game/ranks';
@@ -172,6 +173,10 @@ interface GameState {
   adsToday: number;
   adNextAt: number;
   starterPackBought: boolean;
+  /** offres payantes déjà prises */
+  offersTaken: string[];
+  /** jour de la dernière offre montrée — une par jour au plus */
+  offerShownDay: string | null;
   /** vrai pendant l'animation d'un combat : l'UI passe en mode scène */
   combatActive: boolean;
   /** état de la liaison multijoueur, pour qu'un échec ne soit jamais muet */
@@ -252,6 +257,9 @@ interface GameState {
   claimStreak: () => { grains: number; piments: number } | null;
   watchAd: (kind: AdKind) => boolean;
   buyStarterPack: () => void;
+  /** encaisse une offre payante et la retire du catalogue proposé */
+  takeOffer: (id: string) => void;
+  markOfferShown: (day: string) => void;
   setCombatActive: (v: boolean) => void;
   setOnlineState: (v: GameState['onlineState']) => void;
   setSfxOn: (v: boolean) => void;
@@ -403,6 +411,8 @@ export const useGame = create<GameState>()(
         adsToday: 0,
         adNextAt: 0,
         starterPackBought: false,
+        offersTaken: [],
+        offerShownDay: null,
         combatActive: false,
         onlineState: 'off',
         sfxOn: true,
@@ -470,6 +480,8 @@ export const useGame = create<GameState>()(
             adsToday: 0,
             adNextAt: 0,
             starterPackBought: false,
+        offersTaken: [],
+        offerShownDay: null,
             chestNextAt: 0,
             album: [],
             passUntil: 0,
@@ -509,6 +521,8 @@ export const useGame = create<GameState>()(
             adsToday: 0,
             adNextAt: 0,
             starterPackBought: false,
+        offersTaken: [],
+        offerShownDay: null,
             chestNextAt: 0,
             album: [],
             passUntil: 0,
@@ -1521,6 +1535,32 @@ export const useGame = create<GameState>()(
           });
           return PASS_DAILY_PIMENTS;
         },
+
+        /**
+         * Encaisse une offre payante.
+         *
+         * Aucun achat intégré n'est branché : la contrepartie est créditée
+         * telle quelle. Le jour où RevenueCat entrera, c'est ici que le reçu
+         * sera vérifié avant de créditer.
+         */
+        takeOffer: (id) => {
+          const s = get();
+          const o = OFFER_BY_ID[id];
+          if (!s.player || !o || s.offersTaken.includes(id)) return;
+          const p: PlayerState = {
+            ...s.player,
+            grains: s.player.grains + o.grains,
+            piments: s.player.piments + o.piments,
+            inventory: [...s.player.inventory],
+          };
+          if (o.itemRarity && p.inventory.length < 24) {
+            p.inventory.push(generateItem(p.level, undefined, o.itemRarity));
+          }
+          set({ player: p, offersTaken: [...s.offersTaken, id] });
+          trackEvent('offer_taken', { id, price: o.price });
+        },
+
+        markOfferShown: (day) => set({ offerShownDay: day }),
 
         buyStarterPack: () => {
           const s = get();
