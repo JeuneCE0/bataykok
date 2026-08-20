@@ -306,3 +306,22 @@ export function itemStats(it: Item): string {
 export function itemLabel(it: Item, t: (k: TransKey) => string): string {
   return it.uniqueId ? t(`unique.${it.uniqueId}.name` as TransKey) : it.name;
 }
+
+/**
+ * Prix maximal acceptable à l'hôtel des ventes.
+ *
+ * Miroir de la contrainte `market_price_plausible` posée en base (migration
+ * 0010) : le serveur borne le prix par la valeur plausible de l'objet, pour
+ * qu'on ne puisse pas lister à 100 millions, acheter avec un compte jetable et
+ * encaisser. Sans cette copie côté client, une mise en vente trop chère
+ * revenait avec un « impossible » sans explication.
+ *
+ * Les deux formules doivent rester identiques ; le test le vérifie.
+ */
+export function marketPriceCeiling(level: number, rarity: Rarity): number {
+  const mult = RARITY_MULT[rarity] ?? 1;
+  // `Math.round` et non `Math.floor` : la conversion `::bigint` de Postgres
+  // arrondit. Tronquer plaçait le plafond client 400 grains sous celui du
+  // serveur sur près de la moitié des cas — sans danger, mais faux.
+  return Math.round((1 + level * 0.42) * mult * 4 * 3) * 400;
+}

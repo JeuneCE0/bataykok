@@ -53,7 +53,7 @@ export default function App() {
   const ensureDaily = useGame((s) => s.ensureDaily);
   const regenTickets = useGame((s) => s.regenTickets);
   useOnlineSync();
-  const [tab, setTab] = useState<Tab>('bazar');
+  const [tab, setTab] = useState<Tab>('kok');
   const [fontsLoaded] = useFonts({
     Baloo2_500Medium,
     Baloo2_600SemiBold,

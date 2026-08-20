@@ -12,6 +12,7 @@ import {
   rarityRank,
   isTopRarity,
   itemValue,
+  marketPriceCeiling,
   rollRarity,
   shopRotation,
 } from '../items';
@@ -418,6 +419,42 @@ describe('rotation du Bazar', () => {
     for (let i = 0; i < 200; i++) {
       for (const it of shopRotation(45)) {
         assert.notEqual(it.rarity, 'zanset', 'un unique en boutique');
+      }
+    }
+  });
+});
+
+describe('plafond de l’hôtel des ventes', () => {
+  // Valeurs relevées sur la base : `item_value_ceiling(niveau, gamme) * 400`.
+  // Les deux formules doivent coïncider — sinon le client accepte un prix que
+  // le serveur refuse, et le joueur reçoit un « impossible » sans explication.
+  const SERVEUR: Record<number, Partial<Record<Rarity, number>>> = {
+    1: { commun: 6800, korek: 9200, kalite: 12400, rar: 16400, lezand: 22000, mitik: 30000, zanset: 44400 },
+    7: { commun: 18800, korek: 25600, kalite: 34000, rar: 45200, lezand: 60400, mitik: 83200, zanset: 122800 },
+    20: { commun: 45200, korek: 60800, kalite: 81200, rar: 108400, lezand: 144400, mitik: 198400, zanset: 293200 },
+    50: { commun: 105600, korek: 142400, kalite: 190000, rar: 253600, lezand: 338000, mitik: 464800, zanset: 686400 },
+  };
+
+  it('le plafond client reproduit celui de la base', () => {
+    for (const [niveau, gammes] of Object.entries(SERVEUR)) {
+      for (const [gamme, attendu] of Object.entries(gammes)) {
+        assert.equal(
+          marketPriceCeiling(Number(niveau), gamme as Rarity),
+          attendu,
+          `niveau ${niveau} / ${gamme}`
+        );
+      }
+    }
+  });
+
+  it('un objet généré se liste toujours sous le plafond', () => {
+    for (const r of RARITY_ORDER) {
+      for (const lvl of [1, 10, 30, 50]) {
+        const it = generateItem(lvl, undefined, r);
+        assert.ok(
+          it.price <= marketPriceCeiling(it.level, it.rarity),
+          `${r} niv ${lvl} : prix ${it.price} au-dessus du plafond`
+        );
       }
     }
   });

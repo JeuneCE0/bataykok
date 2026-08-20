@@ -64,6 +64,36 @@ export const DICT = {
   // ─── HUD ───────────────────────────────────────────────────────────────
   'hud.xp': { fr: '{cur} / {max} XP', rcf: '{cur} / {max} XP' },
 
+  // ─── Hôtel des ventes (suite) ──────────────────────────────────────────
+  'market.pick': {
+    fr: 'Choisir',
+    rcf: 'Choizi',
+  },
+  'market.picked': {
+    fr: 'Choisi',
+    rcf: 'Choizi',
+  },
+  'market.quote': {
+    fr: 'Cote du marché : ~🌽{med} ({n} ventes · de 🌽{min} à 🌽{max})',
+    rcf: 'Kot du marshé : ~🌽{med} ({n} vant · de 🌽{min} a 🌽{max})',
+  },
+  'market.noQuote': {
+    fr: 'Pas encore de vente comparable. Le Bazar rachète à 🌽{n}.',
+    rcf: 'Pankor de vant konparab. Le Bazar i rashète a 🌽{n}.',
+  },
+  'market.max': {
+    fr: 'Prix maximal : 🌽{n}',
+    rcf: 'Pri maksimom : 🌽{n}',
+  },
+  'market.tooHigh': {
+    fr: 'Trop cher pour cet objet — 🌽{n} au maximum.',
+    rcf: 'Tro shèr pou sa — 🌽{n} o maksimom.',
+  },
+  'market.failed': {
+    fr: 'Mise en vente impossible.',
+    rcf: 'Mis an vant inposib.',
+  },
+
   // ─── Défis du jour ─────────────────────────────────────────────────────
   'mission.q2': {
     fr: 'Fais 2 quêtes',

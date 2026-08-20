@@ -14,7 +14,14 @@ import {
 } from '../components/ui';
 import { ATTR_LABELS } from '../game/classes';
 import { fmt, SLOT_ICONS } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS, itemStats } from '../game/items';
+import {
+  RARITY_COLORS,
+  RARITY_LABELS,
+  itemLabel,
+  itemStats,
+  marketPriceCeiling,
+  resaleValue,
+} from '../game/items';
 import { compareToEquipped } from '../game/power';
 import { AttrId, Item } from '../game/types';
 import {
@@ -32,7 +39,6 @@ import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
 import { C, F, R } from '../theme';
 import { CompareLines, VerdictBadge } from '../components/ItemCompare';
-import { itemLabel } from '../game/items';
 
 export default function MarketScreen() {
   const t = useT();
@@ -224,7 +230,7 @@ export default function MarketScreen() {
                     <Button
                       size="sm"
                       variant={on ? 'cane' : 'slate'}
-                      label={on ? '✓' : 'Choizi'}
+                      label={on ? `✓ ${t('market.picked')}` : t('market.pick')}
                       onPress={() => {
                         setSelling(on ? null : it);
                         setPrice('');
@@ -241,18 +247,24 @@ export default function MarketScreen() {
               <SectionTitle icon="💰">{t('market.price')}</SectionTitle>
               <Text style={styles.quote}>
                 {quote && quote.sales > 0
-                  ? `Cote du marché : ~🌽${fmt(quote.median)} (${quote.sales} vant · de ${fmt(
-                      quote.min
-                    )} à ${fmt(quote.max)})`
-                  : `Pas encore de vente comparable. Le Bazar rachète à 🌽${fmt(
-                      Math.round(selling.price * 0.4)
-                    )}.`}
+                  ? t('market.quote', {
+                      med: fmt(quote.median),
+                      n: quote.sales,
+                      min: fmt(quote.min),
+                      max: fmt(quote.max),
+                    })
+                  : t('market.noQuote', { n: fmt(resaleValue(selling)) })}
+              </Text>
+              <Text style={styles.quote}>
+                {t('market.max', {
+                  n: fmt(marketPriceCeiling(selling.level, selling.rarity)),
+                })}
               </Text>
               <View style={styles.priceRow}>
                 <TextInput
                   style={styles.input}
                   value={price}
-                  onChangeText={(t) => setPrice(t.replace(/[^0-9]/g, ''))}
+                  onChangeText={(saisie) => setPrice(saisie.replace(/[^0-9]/g, ''))}
                   placeholder={String(quote?.median ?? selling.price)}
                   placeholderTextColor={C.textFaint}
                   keyboardType="number-pad"
@@ -263,11 +275,18 @@ export default function MarketScreen() {
                   disabled={!price || Number(price) < 1 || busy}
                   onPress={async () => {
                     const p = Number(price);
+                    const plafond = marketPriceCeiling(selling.level, selling.rarity);
+                    // le serveur refuse au-delà (contrainte market_price_plausible) :
+                    // autant le dire ici plutôt que de rendre un « impossible » sec
+                    if (p > plafond) {
+                      setMsg(t('market.tooHigh', { n: fmt(plafond) }));
+                      return;
+                    }
                     setBusy(true);
                     const ok = await listItem(selling, p);
                     setBusy(false);
                     if (!ok) {
-                      setMsg('Mise en vente impossible.');
+                      setMsg(t('market.failed'));
                       return;
                     }
                     removeItem(selling.id);
