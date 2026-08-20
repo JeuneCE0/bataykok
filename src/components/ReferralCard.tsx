@@ -88,10 +88,7 @@ export default function ReferralCard() {
         <SectionTitle icon="🤝">{t('referral.title')}</SectionTitle>
 
         {onlineState !== 'ok' ? (
-          <Text style={styles.offline}>
-            Il faut être en ligne pour parrainer. Ton code arrive dès que la
-            connexion revient.
-          </Text>
+          <Text style={styles.offline}>{t('referral.offline')}</Text>
         ) : (
           <>
             <Text style={styles.intro}>

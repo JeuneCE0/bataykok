@@ -45,6 +45,7 @@ export default function MarketScreen() {
   const t = useT();
   const player = useGame((s) => s.player);
   const onlineState = useGame((s) => s.onlineState);
+  const retryOnline = useGame((s) => s.retryOnline);
   const removeItem = useGame((s) => s.removeItem);
   const addItem = useGame((s) => s.addItem);
   const spendGrains = useGame((s) => s.spendGrains);
@@ -71,7 +72,13 @@ export default function MarketScreen() {
       if (sales.length === 0) return;
       const total = sales.reduce((s, x) => s + Math.round(x.price * (1 - MARKET_FEE)), 0);
       grantBonus({ grains: total });
-      setMsg(`💰 ${sales.length} ventes conclues — +🌽${fmt(total)} (commission ${MARKET_FEE * 100} %)`);
+      setMsg(
+        t('market.salesClaimed', {
+          n: sales.length,
+          total: fmt(total),
+          fee: MARKET_FEE * 100,
+        })
+      );
     });
   }, [onlineState, reload, grantBonus]);
 
@@ -89,11 +96,22 @@ export default function MarketScreen() {
     return (
       <ScrollView style={styles.root} contentContainerStyle={styles.content}>
         <ScreenTitle title={t('market.title')} sub={t('market.sub')} accent={C.lagoon} />
+        {/* L'écran restait vide et sans issue : un texte en dur (donc en
+            français même en kréol) et rien à toucher. */}
         <Card>
-          <Text style={T.dim}>
-            L’hôtel ne fonctionne qu’en ligne. Dès que la connexion revient, les
-            annonces apparaissent ici.
-          </Text>
+          <View style={styles.offline}>
+            <Text style={styles.offlineSign}>📡</Text>
+            <Text style={styles.offlineTitle}>{t('market.offlineTitle')}</Text>
+            <Text style={[T.dim, { textAlign: 'center' }]}>{t('market.offlineBody')}</Text>
+            <Button
+              variant="lagoon"
+              label={t('market.retry')}
+              icon="🔄"
+              onPress={retryOnline}
+              disabled={onlineState === 'sync'}
+              style={{ marginTop: 12 }}
+            />
+          </View>
         </Card>
       </ScrollView>
     );
@@ -293,7 +311,7 @@ export default function MarketScreen() {
                     removeItem(selling.id);
                     setSelling(null);
                     setPrice('');
-                    setMsg(`🏷️ ${selling.name} est en vente pour 🌽${fmt(p)}.`);
+                    setMsg(t('market.listed', { name: selling.name, price: fmt(p) }));
                     void reload();
                   }}
                 />
@@ -310,6 +328,9 @@ export default function MarketScreen() {
 }
 
 const styles = StyleSheet.create({
+  offline: { alignItems: 'center', gap: 8, paddingVertical: 12 },
+  offlineSign: { fontSize: 40, lineHeight: 52 },
+  offlineTitle: { fontFamily: F.black, fontSize: 17, lineHeight: 23, color: C.text },
   root: { flex: 1 },
   content: { padding: 12, paddingBottom: 32 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },

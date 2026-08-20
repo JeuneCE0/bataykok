@@ -15,6 +15,7 @@ export function useOnlineSync() {
   const setOnlineState = useGame((s) => s.setOnlineState);
   const applyDefenses = useGame((s) => s.applyDefenses);
   const setGuildLevel = useGame((s) => s.setGuildLevel);
+  const nonce = useGame((s) => s.onlineNonce);
   const claimed = useRef(false);
   // L'écurie fait partie de la signature : sans elle, rejoindre une écurie ne
   // remontait pas au serveur avant le prochain changement de niveau ou de
@@ -25,7 +26,7 @@ export function useOnlineSync() {
         Object.keys(player.equipment).length
       }:${dungeonFloor}:${albumSize}:${Math.round(player.grains / 500)}:${
         player.guildId ?? '-'
-      }`
+      }:${nonce}`
     : '';
   const last = useRef<string>('');
 

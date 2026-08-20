@@ -82,12 +82,12 @@ export default function FreeChest() {
 
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={styles.title}>
-            {ready ? 'Ton coffre est prêt !' : 'Coffre en préparation'}
+            {ready ? t('chest.ready') : t('chest.brewing')}
           </Text>
           <Text style={styles.sub}>
             {ready
-              ? 'Grains, piments ou un ékipman — au hasard.'
-              : `Disponible dans ${formatLong(remaining)}`}
+              ? t('chest.contents')
+              : t('chest.availableIn', { t: formatLong(remaining) })}
           </Text>
 
         </View>

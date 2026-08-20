@@ -70,14 +70,10 @@ export default function ShopScreen() {
   if (!player) return null;
 
   const mockBuy = (n: number, price: string) => {
-    Alert.alert(
-      'Achat simulé 💳',
-      `Dans la vraie app, ceci ouvrirait l'achat intégré App Store / Play Store (${price}). Pour le prototype, les piments sont offerts !`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: `Recevoir 🌶️${n}`, onPress: () => addPiments(n) },
-      ]
-    );
+    Alert.alert(`${t('iap.title')} · ${price}`, t('iap.body'), [
+      { text: t('iap.cancel'), style: 'cancel' },
+      { text: t('iap.takePiments', { n }), onPress: () => addPiments(n) },
+    ]);
   };
 
   const switcher = (
@@ -277,16 +273,12 @@ export default function ShopScreen() {
             variant="mystic"
             size="lg"
             label={t('shop.subscribe')}
-              sub="6,99 € / mois"
+              sub={t('shop.perMonth', { price: '6,99 €' })}
             onPress={() =>
-              Alert.alert(
-                'Abonnement simulé 💳',
-                'En prod : abonnement RevenueCat (6,99 €/mois). Pour le prototype, il est offert !',
-                [
-                  { text: 'Annuler', style: 'cancel' },
-                  { text: 'Activer le pass', onPress: buyPass },
-                ]
-              )
+              Alert.alert(t('iap.title'), t('iap.body'), [
+                { text: t('iap.cancel'), style: 'cancel' },
+                { text: t('iap.takePass'), onPress: buyPass },
+              ])
             }
           />
         )}
@@ -321,14 +313,10 @@ export default function ShopScreen() {
             label={t('shop.takeOffer')}
                 sub="−62 %"
             onPress={() =>
-              Alert.alert(
-                'Achat simulé 💳',
-                'En prod : achat intégré App Store / Play Store (2,99 €). Pour le prototype, le pack est offert !',
-                [
-                  { text: 'Annuler', style: 'cancel' },
-                  { text: 'Recevoir le pack', onPress: buyStarterPack },
-                ]
-              )
+              Alert.alert(t('iap.title'), t('iap.body'), [
+                { text: t('iap.cancel'), style: 'cancel' },
+                { text: t('iap.takePack'), onPress: buyStarterPack },
+              ])
             }
           />
         </Card>

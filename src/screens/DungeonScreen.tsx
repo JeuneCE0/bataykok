@@ -64,16 +64,14 @@ export default function DungeonScreen() {
           const r = applyBossResult(won, fight.boss.floor, damage);
           setOutcome({
             won,
-            title: won ? '🏆 GARDIEN VINKU !' : '💀 SA LA PA PASSÉ…',
+            title: won ? t('dungeon.bossWon') : t('dungeon.bossLost'),
             gold: r?.grains ?? 0,
             xp: r?.xp ?? 0,
             piments: won ? fight.boss.reward.piments : 0,
             itemName: r?.item?.name ?? null,
             itemColor: r?.item ? RARITY_COLORS[r.item.rarity] : undefined,
             levels: r?.levels ?? 0,
-            note: won
-              ? null
-              : `Tu lui as retiré ${Math.round(damage * 100)} % de sa vie. Renforce ton kok, puis reviens.`,
+            note: won ? null : t('dungeon.bossNote', { p: Math.round(damage * 100) }),
           });
           setFight(null);
         }}

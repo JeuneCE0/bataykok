@@ -183,6 +183,8 @@ interface GameState {
   combatActive: boolean;
   /** état de la liaison multijoueur, pour qu'un échec ne soit jamais muet */
   onlineState: 'off' | 'sync' | 'ok' | 'error';
+  /** incrémenté par « réessayer » : relance la synchro sans autre changement */
+  onlineNonce: number;
   /** réglages audio (persistés) */
   sfxOn: boolean;
   musicOn: boolean;
@@ -264,6 +266,7 @@ interface GameState {
   markOfferShown: (day: string) => void;
   setCombatActive: (v: boolean) => void;
   setOnlineState: (v: GameState['onlineState']) => void;
+  retryOnline: () => void;
   setSfxOn: (v: boolean) => void;
   setLang: (v: Lang) => void;
   setMusicOn: (v: boolean) => void;
@@ -418,6 +421,7 @@ export const useGame = create<GameState>()(
         offerShownDay: null,
         combatActive: false,
         onlineState: 'off',
+        onlineNonce: 0,
         sfxOn: true,
         musicOn: true,
         // le jeu se passe à La Réunion : le kréol est la langue par défaut
@@ -1247,6 +1251,7 @@ export const useGame = create<GameState>()(
         setCombatActive: (v) => set({ combatActive: v }),
 
         setOnlineState: (v) => set({ onlineState: v }),
+        retryOnline: () => set((st) => ({ onlineNonce: st.onlineNonce + 1 })),
 
         setLang: (v) => set({ lang: v }),
 
@@ -1628,7 +1633,7 @@ export const useGame = create<GameState>()(
         }
         return s;
       },
-      partialize: ({ combatActive, onlineState, pendingDefenses, ...rest }) =>
+      partialize: ({ combatActive, onlineState, onlineNonce, pendingDefenses, ...rest }) =>
         rest as GameState,
     }
   )

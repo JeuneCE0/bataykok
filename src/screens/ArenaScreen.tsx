@@ -141,9 +141,9 @@ export default function ArenaScreen() {
             itemColor: r.item ? RARITY_COLORS[r.item.rarity] : undefined,
             note: won
               ? r.streak >= 2
-                ? `🔥 ${r.streak} victoires d’affilée`
+                ? t('arena.streak', { n: r.streak })
                 : null
-              : 'Ton kok a pris un coup, mais il a appris. Entraîne-le !',
+              : t('arena.lossNote'),
           });
           setFight(null);
         }}

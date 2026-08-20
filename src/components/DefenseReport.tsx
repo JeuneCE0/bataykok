@@ -56,15 +56,13 @@ export default function DefenseReport() {
         >
           <LinearGradient colors={['#2A1A3D', '#0E0818']} style={styles.card}>
             <Text style={styles.kicker}>{t('defense.title')}</Text>
-            <Text style={styles.title}>
-              {defenses.length} combats sur ton kok
-            </Text>
+            <Text style={styles.title}>{t('defense.count', { n: defenses.length })}</Text>
             <Text style={styles.sub}>
               {won === defenses.length
-                ? 'Ton kok a tout repoussé. Beau travail !'
+                ? t('defense.allHeld')
                 : won === 0
-                  ? "Personne n’a été repoussé. Il faut renforcer ton kok."
-                  : `${won} défenses gagnées sur ${defenses.length}.`}
+                  ? t('defense.noneHeld')
+                  : t('defense.someHeld', { n: won, total: defenses.length })}
             </Text>
 
             <View style={styles.totals}>
