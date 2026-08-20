@@ -112,22 +112,14 @@ export default function DungeonScreen() {
 
       {/* Clés */}
       <Card compact>
-        <View style={styles.keyRow}>
-          <View style={{ flexDirection: 'row', gap: 4 }}>
-            {Array.from({ length: MAX_KEYS }, (_, i) => (
-              <Text key={i} style={{ fontSize: 20, opacity: i < keys ? 1 : 0.22 }}>
-                🗝️
-              </Text>
-            ))}
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.keyTitle}>
-              {keys > 0 ? t('dungeon.keys', { n: keys }) : t('dungeon.noKey')}
-            </Text>
-            <Text style={styles.keySub}>
-              {t('dungeon.keySources')}
-            </Text>
-          </View>
+        {/* Les clés occupaient une colonne à gauche : il ne restait qu'un tiers
+            de largeur au texte, qui se cassait en trois lignes dont un mot
+            seul. Titre et achat en tête, jauge et provenance sur toute la
+            largeur. */}
+        <View style={styles.keyHead}>
+          <Text style={styles.keyTitle}>
+            {keys > 0 ? t('dungeon.keys', { n: keys }) : t('dungeon.noKey')}
+          </Text>
           <Button
             size="sm"
             variant="piment"
@@ -136,6 +128,14 @@ export default function DungeonScreen() {
             disabled={player.piments < KEY_PIMENT_COST || keys >= MAX_KEYS}
           />
         </View>
+        <View style={styles.keyRow}>
+          {Array.from({ length: MAX_KEYS }, (_, i) => (
+            <Text key={i} style={{ fontSize: 22, opacity: i < keys ? 1 : 0.22 }}>
+              🗝️
+            </Text>
+          ))}
+        </View>
+        <Text style={styles.keySub}>{t('dungeon.keySources')}</Text>
         {keys < MAX_KEYS && (
           <AdButton kind="key" full label={t('dungeon.adKey')} />
         )}
@@ -266,9 +266,10 @@ export default function DungeonScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 12, paddingBottom: 32 },
-  keyRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  keyHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  keyRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
   keyTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
-  keySub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
+  keySub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim, marginTop: 6 },
   outcomeTitle: {
     fontFamily: F.black,
     fontSize: 20,
