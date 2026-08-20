@@ -14,7 +14,9 @@ import { fmt, maxHp } from '../game/formulas';
 import { CombatResult, CombatRound, Fighter } from '../game/types';
 import { play } from '../lib/sound';
 import { useGame } from '../store/gameStore';
-import { C, F, G, R, SHADOW } from '../theme';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+
+import { BW, C, F, G, OUTLINE, R, SHADOW, TEXT_OUTLINE } from '../theme';
 import Rooster from './Rooster';
 import { Button, GhostButton, Well } from './ui';
 import { useT } from '../i18n/useT';
@@ -473,13 +475,25 @@ function FighterSide({
           ],
         }}
       >
-        <View style={[styles.fighterHalo, { backgroundColor: cls.color }]} />
+        {/* Éclat de classe et socle : le combattant flottait sur un disque
+            plat, sans ancrage ni identité de classe lisible. */}
+        <Svg width={150} height={150} style={styles.fighterHalo}>
+          <Defs>
+            <RadialGradient id={`h${side}`} cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor={cls.color} stopOpacity={0.5} />
+              <Stop offset="0.65" stopColor={cls.color} stopOpacity={0.16} />
+              <Stop offset="1" stopColor={cls.color} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={75} cy={75} r={75} fill={`url(#h${side})`} />
+        </Svg>
         <Rooster
           appearance={fighter.appearance}
           size={116}
           flip={side === 'right'}
           alive
         />
+        <View style={[styles.pedestal, { backgroundColor: cls.color }]} />
         {/* flash d'impact */}
         <Animated.View
           pointerEvents="none"
@@ -504,15 +518,29 @@ function FighterSide({
         </Animated.Text>
       )}
 
+      {/* Emblème de classe : savoir à qui on a affaire sans lire le nom */}
+      <View style={[styles.classBadge, { borderColor: cls.color }]}>
+        <Text style={styles.classEmoji}>{cls.emoji}</Text>
+        <Text style={[styles.className, { color: cls.color }]} numberOfLines={1}>
+          {cls.name}
+        </Text>
+      </View>
+
       <Text style={styles.fighterName} numberOfLines={1}>
         {fighter.name}
       </Text>
 
       <View style={styles.hpTrack}>
+        {/* À zéro, le remplissage garde la largeur de son cap arrondi et
+            laissait un point de couleur dans une jauge censée être vide. */}
         <Animated.View
           style={[
             StyleSheet.absoluteFill,
             {
+              opacity: width.interpolate({
+                inputRange: [0, 0.001, 1],
+                outputRange: [0, 1, 1],
+              }),
               width: width.interpolate({
                 inputRange: [0, 1],
                 outputRange: ['0%', '100%'],
@@ -635,15 +663,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   fighterCol: { flex: 1, alignItems: 'center', gap: 8 },
-  fighterHalo: {
+  pedestal: {
     position: 'absolute',
+    bottom: 6,
     alignSelf: 'center',
-    top: 14,
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    opacity: 0.13,
+    width: 76,
+    height: 8,
+    borderRadius: 4,
+    opacity: 0.42,
   },
+  classBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: R.pill,
+    borderWidth: BW.thick,
+    backgroundColor: 'rgba(6,3,12,0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    alignSelf: 'center',
+  },
+  classEmoji: { fontSize: 11, lineHeight: 15, includeFontPadding: false },
+  className: {
+    fontFamily: F.black,
+    fontSize: 11,
+    lineHeight: 15,
+    includeFontPadding: false,
+  },
+  fighterHalo: { position: 'absolute', alignSelf: 'center', top: -4 },
   flash: {
     position: 'absolute',
     top: 0,
@@ -672,23 +719,27 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.85)',
     textShadowRadius: 6,
   },
+  // Capsule épaisse plutôt qu'un filet : la vie est l'information la plus
+  // regardée du combat, elle doit se lire d'un coup d'œil.
   hpTrack: {
-    width: '94%',
-    height: 18,
-    borderRadius: 10,
-    backgroundColor: 'rgba(6,3,12,0.65)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.6)',
+    width: '96%',
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(6,3,12,0.75)',
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    borderTopColor: 'rgba(0,0,0,0.9)',
     overflow: 'hidden',
     justifyContent: 'center',
   },
   hpText: {
     fontFamily: F.black,
-    fontSize: 11,
-    color: '#fff',
+    fontSize: 13,
+    lineHeight: 17,
+    color: '#FFF8F0',
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowRadius: 3,
+    includeFontPadding: false,
+    ...TEXT_OUTLINE,
   },
   vsWrap: { paddingTop: 32 },
   vsBadge: {
