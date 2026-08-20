@@ -14,10 +14,18 @@ tell application "System Events" to tell process "Simulator"
   return (item 1 of b as text) & " " & (item 2 of b as text) & " " & (item 1 of s as text) & " " & (item 2 of s as text)
 end tell' | tr -d ',')
 
-# Le Simulator récent dessine la barre de titre en surimpression : la fenêtre
-# correspond exactement à l'écran de l'appareil, d'où une simple homothétie.
-SX=$(python3 -c "print(round($WX + $X * $WW / $IW))")
-SY=$(python3 -c "print(round($WY + $Y * $WH / $IH))")
+# La fenêtre ne correspond **pas** à l'écran de l'appareil : elle contient une
+# barre de titre et le cadre du téléphone. L'ancienne homothétie plein cadre
+# se trompait de 34 px en vertical — assez pour manquer un bouton de 44 px et
+# faire croire que les taps ne partaient pas.
+#
+# Ratios mesurés en repérant une même bande de couleur dans une capture de la
+# fenêtre et dans la capture de l'appareil :
+#   écran utile   = 88,19 % de la largeur de fenêtre
+#   marge gauche  =  5,90 % de la largeur
+#   marge haute   =  7,61 % de la hauteur (barre de titre + cadre)
+SX=$(python3 -c "print(round($WX + 0.0590 * $WW + $X * 0.8819 * $WW / $IW))")
+SY=$(python3 -c "print(round($WY + 0.0761 * $WH + $Y * 0.8819 * $WW / $IW))")
 
 cliclick "c:$SX,$SY"
 echo "tap image($X,$Y) → écran($SX,$SY)  [fenêtre ${WW}x${WH} @ $WX,$WY]"

@@ -1,4 +1,5 @@
 import { AdKind } from '../game/progress';
+import { trackEvent } from './analytics';
 
 /**
  * Pubs récompensées (AdMob).
@@ -87,13 +88,18 @@ const UNITES: Record<AdKind, string | undefined> = {
 };
 
 /**
- * En développement on ne sert **jamais** de vraie annonce : les impressions
+ * On ne sert **jamais** de vraie annonce hors production : les impressions
  * d'un développeur sur son propre inventaire sont du trafic invalide, et
  * Google ferme les comptes pour ça.
+ *
+ * `EXPO_PUBLIC_ADMOB_TEST` couvre les builds internes, où `__DEV__` est faux
+ * alors qu'on veut quand même des annonces de test — sans lui, un build de
+ * recette tape sur des blocs neufs qui ne remplissent pas encore, et on ne
+ * peut rien vérifier.
  */
 function unite(kind: AdKind): string {
   const test = sdk!.TestIds.REWARDED;
-  if (__DEV__) return test;
+  if (__DEV__ || process.env.EXPO_PUBLIC_ADMOB_TEST === '1') return test;
   return UNITES[kind] ?? test;
 }
 
@@ -136,6 +142,7 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     let gagnee = false;
     let termine = false;
+    let raison = 'delai';
     let detacher: () => void = () => {};
 
     const finir = (ok: boolean) => {
@@ -143,6 +150,7 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
       termine = true;
       clearTimeout(minuteur);
       detacher();
+      if (!ok) trackEvent('ad_failed', { kind, raison });
       resolve(ok);
     };
 
@@ -170,7 +178,12 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
       // fermer avant la fin est un cas normal, pas une erreur : on résout sur
       // ce que Google a réellement confirmé
       pub.addAdEventListener(AdEventType.CLOSED, () => finir(gagnee)),
-      pub.addAdEventListener(AdEventType.ERROR, () => finir(false)),
+      // une pub qui ne vient pas a toujours une raison (pas de remplissage,
+      // réseau, bloc inconnu) : l'avaler rendait le diagnostic impossible
+      pub.addAdEventListener(AdEventType.ERROR, (e) => {
+        raison = (e as { code?: string } | undefined)?.code ?? 'inconnue';
+        finir(false);
+      }),
     ];
     detacher = () => arrets.forEach((arret) => arret());
 
