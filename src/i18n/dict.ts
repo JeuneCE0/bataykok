@@ -94,6 +94,15 @@ export const DICT = {
     rcf: 'Batayèr',
   },
 
+  'chest.piments': {
+    fr: '{n} piments',
+    rcf: '{n} piman',
+  },
+  'chest.grains': {
+    fr: '{n} grains',
+    rcf: '{n} grin',
+  },
+
   // ─── Duel entre amis ───────────────────────────────────────────────────
   'duel.title': {
     fr: 'Défier un ami',

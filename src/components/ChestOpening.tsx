@@ -3,10 +3,13 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, Modal, StyleSheet, Text, View } from 'react-native';
 
 import { fmt } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemLabel } from '../game/items';
 import { Item } from '../game/types';
 import { play } from '../lib/sound';
-import { C, F, G, R, SHADOW } from '../theme';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+
+import { BW, C, F, G, OUTLINE, R, SHADOW } from '../theme';
+import ItemArt from './ItemArt';
 import { Button } from './ui';
 import { useT } from '../i18n/useT';
 
@@ -106,11 +109,12 @@ export default function ChestOpening({
     return <Modal visible={false} transparent animationType="fade" />;
 
   const rare = loot.item ? RARITY_COLORS[loot.item.rarity] : C.gold;
+  // le nom d'un unique est une clé de traduction, pas du texte
   const label = loot.item
-    ? loot.item.name
+    ? itemLabel(loot.item, t)
     : loot.piments > 0
-      ? `${loot.piments} piments`
-      : `${fmt(loot.grains)} grains`;
+      ? t('chest.piments', { n: loot.piments })
+      : t('chest.grains', { n: fmt(loot.grains) });
   const icon = loot.item ? '🎁' : loot.piments > 0 ? '🌶️' : '🌽';
 
   return (
@@ -251,20 +255,49 @@ export default function ChestOpening({
             },
           ]}
         >
+          {/* Même anatomie que les fiches d'objet : le nom en haut, la prise
+              posée sur son éclat, le détail en capsule enfoncée. La récompense
+              du coffre est le moment le plus fort du jeu — elle ne peut pas
+              être la seule à ressembler à une simple étiquette. */}
           <LinearGradient
-            colors={[`${rare}44`, 'rgba(10,7,19,0.92)']}
+            colors={[`${rare}44`, '#140C20']}
             style={[styles.rewardCard, { borderColor: rare }, SHADOW.float]}
           >
-            <Text style={styles.rewardIcon}>{icon}</Text>
-            <Text style={[styles.rewardLabel, { color: rare }]}>{label}</Text>
-            {loot.item && (
-              <Text style={styles.rarity}>
-                {RARITY_LABELS[loot.item.rarity]} · niv. {loot.item.level}
-              </Text>
-            )}
-            {!loot.item && loot.grains > 0 && loot.piments > 0 && (
-              <Text style={styles.rarity}>🌽 {fmt(loot.grains)}</Text>
-            )}
+            <Text style={[styles.rewardLabel, { color: rare }]} numberOfLines={2}>
+              {label}
+            </Text>
+
+            <View style={styles.prize}>
+              <Svg width={140} height={140} style={StyleSheet.absoluteFill}>
+                <Defs>
+                  <RadialGradient id="cg" cx="50%" cy="50%" r="50%">
+                    <Stop offset="0" stopColor={rare} stopOpacity={0.55} />
+                    <Stop offset="1" stopColor={rare} stopOpacity={0} />
+                  </RadialGradient>
+                </Defs>
+                <Circle cx={70} cy={70} r={70} fill="url(#cg)" />
+              </Svg>
+              {loot.item ? (
+                <ItemArt slot={loot.item.slot} rarity={loot.item.rarity} size={82} />
+              ) : (
+                <Text style={styles.rewardIcon}>{icon}</Text>
+              )}
+              <View style={[styles.prizePedestal, { backgroundColor: rare }]} />
+            </View>
+
+            <View style={styles.detailWell}>
+              {loot.item ? (
+                <Text style={styles.rarity}>
+                  {RARITY_LABELS[loot.item.rarity]} · {t('common.level', { n: loot.item.level })}
+                </Text>
+              ) : (
+                <Text style={styles.rarity}>
+                  {loot.grains > 0 ? `🌽 ${fmt(loot.grains)}` : ''}
+                  {loot.grains > 0 && loot.piments > 0 ? '   ' : ''}
+                  {loot.piments > 0 ? `🌶️ ${loot.piments}` : ''}
+                </Text>
+              )}
+            </View>
           </LinearGradient>
 
           <Button
@@ -307,9 +340,32 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 24,
     borderRadius: R.xl,
-    borderWidth: 2,
+    borderWidth: BW.thick,
+    // le dégradé du haut porte une alpha : sans fond opaque dessous, l'écran
+    // transparaissait à travers la révélation
+    backgroundColor: '#140C20',
     minWidth: 240,
     gap: 4,
+  },
+  prize: { height: 140, alignItems: 'center', justifyContent: 'center' },
+  prizePedestal: {
+    position: 'absolute',
+    bottom: 18,
+    width: 76,
+    height: 8,
+    borderRadius: 4,
+    opacity: 0.42,
+  },
+  detailWell: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    borderRadius: R.md,
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    borderTopColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: C.well,
+    paddingVertical: 8,
+    marginTop: 8,
   },
   rewardIcon: { fontSize: 44 },
   rewardLabel: {
