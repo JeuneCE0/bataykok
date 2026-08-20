@@ -37,7 +37,7 @@ xcrun simctl openurl "$SIM" "exp://127.0.0.1:$PORT" >/dev/null 2>&1 || true
 # Le bundle fait ~6,6 Mo : Expo Go met une bonne dizaine de secondes à le
 # télécharger et à peindre. On patiente en enchaînant des captures — un `sleep`
 # se fait interrompre selon l'environnement d'exécution, une capture non.
-for _ in $(seq 1 30); do
+for _ in $(seq 1 55); do
   xcrun simctl io "$SIM" screenshot "$OUT" >/dev/null 2>&1 || true
 done
 xcrun simctl io "$SIM" screenshot "$OUT" >/dev/null 2>&1

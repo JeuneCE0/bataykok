@@ -32,6 +32,7 @@ import { C, F, G, R } from '../theme';
 import { itemLabel } from '../game/items';
 import SetKits from '../components/SetKits';
 import DailyDeal from '../components/DailyDeal';
+import ItemTile from '../components/ItemTile';
 
 const PIMENT_PACKS = [
   { piments: 50, price: '0,99 €', tag: null, bonus: 0 },
@@ -122,52 +123,26 @@ export default function ShopScreen() {
 
       <AdButton kind="grains" full />
 
-      {shopWithCompare.map(({ it, cmp }, si) => {
-        const col = RARITY_COLORS[it.rarity];
-        return (
-          <FadeIn key={it.id} index={si}>
-          <Card glow={cmp.diff > 0 ? C.cane : undefined} compact>
-            <View style={styles.itemRow}>
-              <View style={[styles.itemIcon, { borderColor: col, backgroundColor: `${col}1A` }]}>
-                <Text style={{ fontSize: 24 }}>{SLOT_ICONS[it.slot]}</Text>
-              </View>
-              <Pressable
-                style={{ flex: 1, gap: 4 }}
-                onPress={() => setOpen(open === it.id ? null : it.id)}
-              >
-                <Text style={[styles.itemName, { color: col }]} numberOfLines={1}>
-                  {itemLabel(it, t)}
-                </Text>
-                <View style={styles.chipLine}>
-                  <VerdictBadge cmp={cmp} />
-                  {it.setId && SET_BY_ID[it.setId] && (
-                    <Chip
-                      label={SET_BY_ID[it.setId].icon}
-                      color={SET_BY_ID[it.setId].color}
-                    />
-                  )}
-                </View>
-                <Text style={styles.itemStats} numberOfLines={2}>
-                  {RARITY_LABELS[it.rarity]} · niv. {it.level} · {itemStats(it)}
-                </Text>
-                {open === it.id ? (
-                  <CompareLines cmp={cmp} />
-                ) : (
-                  <Text style={styles.more}>{t('kok.tapCompare')}</Text>
-                )}
-              </Pressable>
-              <Button
-                size="sm"
-                variant={cmp.diff > 0 ? 'cane' : 'gold'}
-                label={`🌽${fmt(priceOf(it.price))}`}
-                onPress={() => buyItem({ ...it, price: priceOf(it.price) })}
-                disabled={player.grains < priceOf(it.price)}
-              />
-            </View>
-          </Card>
+      {/* Grille de tuiles plutôt qu'une liste de lignes : un objet doit se voir
+          comme un objet, pas comme une entrée de tableau. */}
+      <View style={styles.grid}>
+        {shopWithCompare.map(({ it, cmp }, si) => (
+          <FadeIn key={it.id} index={si} style={styles.gridCell}>
+            <ItemTile
+              item={it}
+              cmp={cmp}
+              price={priceOf(it.price)}
+              badge={t('common.level', { n: it.level })}
+              actionLabel={t('common.buy')}
+              actionVariant={cmp.diff > 0 ? 'cane' : 'gold'}
+              onAction={() => buyItem({ ...it, price: priceOf(it.price) })}
+              onPress={() => setOpen(open === it.id ? null : it.id)}
+              disabled={player.grains < priceOf(it.price)}
+            />
           </FadeIn>
-        );
-      })}
+        ))}
+      </View>
+
       <GhostButton
         icon="🔄"
         label={`${t('shop.reroll')} · 🌶️1`}
@@ -372,6 +347,9 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { padding: 12, paddingBottom: 32 },
+  // deux colonnes : la tuile a besoin de hauteur pour poser sa pièce
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' },
+  gridCell: { width: '48%' },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   itemIcon: {
     width: 46,
