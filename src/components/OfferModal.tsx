@@ -11,7 +11,8 @@ import { useT } from '../i18n/useT';
 import { play } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { BW, C, F, OUTLINE, R, SHADOW, SP, TEXT_OUTLINE } from '../theme';
-import { Button, GhostButton } from './ui';
+import {Button } from './ui';
+import CloseButton from './CloseButton';
 
 /**
  * Offre payante du jour.
@@ -66,9 +67,12 @@ export default function OfferModal() {
             colors={[`${offer.color}44`, '#140C20']}
             style={[styles.card, { borderColor: offer.color }]}
           >
+          <CloseButton onPress={fermer} />
             <View>
               {/* L'urgence en haut : un compte à rebours qui passe sous le pli
                   ne presse personne. */}
+              {/* La croix occupe le coin droit : le compte à rebours se range
+                  à gauche, contre le badge. */}
               <View style={styles.badgeRow}>
                 <View style={[styles.badge, { backgroundColor: offer.color }]}>
                   <Text style={styles.badgeText}>{t('offer.badge')}</Text>
@@ -78,6 +82,7 @@ export default function OfferModal() {
                     ⏳ {formatUntil(nextDailyReset() - now)}
                   </Text>
                 </View>
+                <View style={{ flex: 1 }} />
               </View>
 
               <Text style={styles.name}>{t(offer.nameKey)}</Text>
@@ -138,11 +143,6 @@ export default function OfferModal() {
               style={{ marginTop: SP.md }}
             />
             <Text style={styles.proto}>{t('offer.proto')}</Text>
-            <GhostButton
-              label={t('offer.later')}
-              onPress={fermer}
-              style={{ alignSelf: 'center', marginTop: SP.xs }}
-            />
           </LinearGradient>
         </Animated.View>
       </View>
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     padding: 16,
     ...SHADOW.float,
   },
-  badgeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 44 },
   badge: { borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 4 },
   badgeText: {
     fontFamily: F.black,

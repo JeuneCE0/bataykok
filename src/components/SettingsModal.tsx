@@ -8,6 +8,7 @@ import { play, syncMusic } from '../lib/sound';
 import { useGame } from '../store/gameStore';
 import { C, F, R, SHADOW } from '../theme';
 import { Button, Card, SectionTitle } from './ui';
+import CloseButton from './CloseButton';
 
 /** Réglages du jeu : langue, son, compte. */
 export default function SettingsModal({
@@ -32,6 +33,7 @@ export default function SettingsModal({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.root}>
         <LinearGradient colors={['#2A1A3D', '#0B0714']} style={styles.sheet}>
+          <CloseButton onPress={onClose} />
           <View style={styles.grip} />
           <Text style={styles.title}>{t('settings.title')}</Text>
           <Text style={styles.sub}>{t('settings.sub')}</Text>
@@ -102,7 +104,7 @@ export default function SettingsModal({
             </Card>
           </ScrollView>
 
-          <Button full size="lg" label={t('common.close')} onPress={onClose} style={{ marginTop: 8 }} />
+
         </LinearGradient>
       </View>
     </Modal>

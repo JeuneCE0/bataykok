@@ -14,7 +14,8 @@ import { TransKey } from '../i18n';
 import { useT } from '../i18n/useT';
 import { BW, C, F, OUTLINE, R, SHADOW, SP, TEXT_OUTLINE } from '../theme';
 import ItemArt from './ItemArt';
-import { Button, GhostButton } from './ui';
+import {Button } from './ui';
+import CloseButton from './CloseButton';
 
 /**
  * Fiche d'un objet, en grand.
@@ -59,6 +60,7 @@ export default function ItemDetail({
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.root}>
         <LinearGradient colors={[`${col}40`, '#140C20']} style={[styles.card, { borderColor: col }]}>
+          <CloseButton onPress={onClose} />
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.name}>{itemLabel(item, t)}</Text>
             <Text style={[styles.rarity, { color: col }]}>
@@ -159,11 +161,7 @@ export default function ItemDetail({
               style={{ marginTop: SP.sm }}
             />
           ) : null}
-          <GhostButton
-            label={t('common.close')}
-            onPress={onClose}
-            style={{ alignSelf: 'center', marginTop: SP.sm }}
-          />
+
         </LinearGradient>
       </View>
     </Modal>

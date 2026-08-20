@@ -10,8 +10,9 @@ import { AttrId, Attributes, ClassId, Item, SlotId } from '../game/types';
 import { useT } from '../i18n/useT';
 import { C, F, R, SHADOW } from '../theme';
 import Rooster from './Rooster';
-import { Button, Card, Chip, GhostButton, SectionTitle } from './ui';
+import {Button, Card, Chip, SectionTitle } from './ui';
 import ItemArt from './ItemArt';
+import CloseButton from './CloseButton';
 
 const ATTRS: AttrId[] = ['force', 'adresse', 'esprit', 'endurance', 'chance'];
 const SLOTS: SlotId[] = [
@@ -77,6 +78,7 @@ export default function KokProfileModal({
     <Modal visible transparent animationType="fade">
       <View style={styles.root}>
         <LinearGradient colors={['#2A1A3D', '#0B0714']} style={styles.card}>
+          <CloseButton onPress={onClose} />
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.head}>
               <View style={styles.portrait}>
@@ -171,22 +173,18 @@ export default function KokProfileModal({
           </ScrollView>
 
           {onChallenge && !profile.isMe ? (
-            <View style={styles.footer}>
-              <Button
-                full
-                size="lg"
-                variant="ember"
-                icon="⚔️"
-                label={t('rond.challenge')}
-                sub={challengeHint}
-                disabled={challengeDisabled}
-                onPress={onChallenge}
-              />
-              <GhostButton label={t('common.close')} onPress={onClose} style={{ alignSelf: 'center' }} />
-            </View>
-          ) : (
-            <Button full size="lg" label={t('common.close')} onPress={onClose} style={{ marginTop: 12 }} />
-          )}
+            <Button
+              full
+              size="lg"
+              variant="ember"
+              icon="⚔️"
+              label={t('rond.challenge')}
+              sub={challengeHint}
+              disabled={challengeDisabled}
+              onPress={onChallenge}
+              style={{ marginTop: 12 }}
+            />
+          ) : null}
         </LinearGradient>
       </View>
     </Modal>
