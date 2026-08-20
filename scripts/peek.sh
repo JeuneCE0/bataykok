@@ -14,9 +14,13 @@ SIM=${SIM_UDID:-A3D6F827-2FDA-40BF-8E3B-2504ABC1E7BE}
 PORT=${METRO_PORT:-8082}
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+# Le trap ne suffit pas : un dépassement de délai extérieur tue le script sans
+# le déclencher, et App.tsx reste sur l'onglet forcé — c'est parti une fois
+# dans un commit. On restaure donc aussi au démarrage si une sauvegarde traîne.
+[ -f "$ROOT/App.tsx.peekbak" ] && mv -f "$ROOT/App.tsx.peekbak" "$ROOT/App.tsx"
 cp "$ROOT/App.tsx" "$ROOT/App.tsx.peekbak"
-restore() { mv -f "$ROOT/App.tsx.peekbak" "$ROOT/App.tsx"; }
-trap restore EXIT
+restore() { [ -f "$ROOT/App.tsx.peekbak" ] && mv -f "$ROOT/App.tsx.peekbak" "$ROOT/App.tsx"; }
+trap restore EXIT INT TERM
 
 sed -i '' "s|useState<Tab>('[a-z]*')|useState<Tab>('$TAB')|" "$ROOT/App.tsx"
 
