@@ -22,6 +22,38 @@ try {
 
 export const pubsReelles = sdk !== null;
 
+type Att = typeof import('expo-tracking-transparency');
+let att: Att | null = null;
+try {
+  att = require('expo-tracking-transparency') as Att;
+} catch {
+  att = null;
+}
+
+let suiviDemande = false;
+
+/**
+ * Le prompt iOS de suivi publicitaire.
+ *
+ * Volontairement **pas** au premier lancement : posée à froid, la question se
+ * fait refuser par réflexe et l'IDFA est perdu pour de bon — on ne peut la
+ * poser qu'une fois. Juste avant la première pub que le joueur a lui-même
+ * demandée, elle a un contexte, donc une chance d'être acceptée. Un refus ne
+ * bloque rien : les annonces passent en non-personnalisé.
+ */
+async function demanderSuivi(): Promise<void> {
+  if (!att || suiviDemande) return;
+  suiviDemande = true;
+  try {
+    const actuel = await att.getTrackingPermissionsAsync();
+    if (actuel.canAskAgain && actuel.status === 'undetermined') {
+      await att.requestTrackingPermissionsAsync();
+    }
+  } catch {
+    // pas de suivi : les pubs restent servies, simplement moins ciblées
+  }
+}
+
 /**
  * Un bloc par emplacement : sans ça, le rapport AdMob agrège tout et on ne
  * peut pas savoir lequel mérite de rester.
@@ -76,8 +108,9 @@ export async function initPubs(): Promise<void> {
  * que la vidéo est allée au bout. Ne lève jamais : un échec de pub ne doit
  * pas remonter dans l'interface autrement que par « pas de récompense ».
  */
-export function montrerPub(kind: AdKind): Promise<boolean> {
-  if (!sdk) return Promise.resolve(false);
+export async function montrerPub(kind: AdKind): Promise<boolean> {
+  if (!sdk) return false;
+  await demanderSuivi();
   const { RewardedAd, RewardedAdEventType, AdEventType } = sdk;
 
   return new Promise((resolve) => {
