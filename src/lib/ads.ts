@@ -11,13 +11,33 @@ import { AdKind } from '../game/progress';
  * Les identifiants de blocs vivent dans l'environnement, jamais dans le code :
  * passer du test au réel est un changement de configuration, pas de version.
  */
+import { TurboModuleRegistry } from 'react-native';
+
 type Sdk = typeof import('react-native-google-mobile-ads');
 
+/**
+ * Sonder le module natif **avant** d'importer le paquet.
+ *
+ * Se contenter d'un `require` dans un try/catch ne suffit pas : selon
+ * l'environnement, l'import réussit alors que le natif manque, et l'erreur ne
+ * sort qu'à la première utilisation — donc dans une promesse, donc en rejet
+ * non capturé qui laissait le bouton figé.
+ */
+function natifPresent(): boolean {
+  try {
+    return TurboModuleRegistry.get('RNGoogleMobileAdsRewardedModule') !== null;
+  } catch {
+    return false;
+  }
+}
+
 let sdk: Sdk | null = null;
-try {
-  sdk = require('react-native-google-mobile-ads') as Sdk;
-} catch {
-  sdk = null;
+if (natifPresent()) {
+  try {
+    sdk = require('react-native-google-mobile-ads') as Sdk;
+  } catch {
+    sdk = null;
+  }
 }
 
 export const pubsReelles = sdk !== null;
@@ -113,7 +133,7 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
   await demanderSuivi();
   const { RewardedAd, RewardedAdEventType, AdEventType } = sdk;
 
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     let gagnee = false;
     let termine = false;
     let detacher: () => void = () => {};
@@ -128,7 +148,15 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
 
     const minuteur = setTimeout(() => finir(false), DELAI_CHARGEMENT_MS);
 
-    const pub = RewardedAd.createForAdRequest(unite(kind));
+    // tout ce bloc peut lever si le SDK n'est pas dans l'état attendu ; une
+    // exception ici rejetait la promesse, et l'appelant restait en chargement
+    let pub: ReturnType<typeof RewardedAd.createForAdRequest>;
+    try {
+      pub = RewardedAd.createForAdRequest(unite(kind));
+    } catch {
+      finir(false);
+      return;
+    }
     const arrets = [
       pub.addAdEventListener(RewardedAdEventType.LOADED, () => {
         // le minuteur ne couvre que le chargement : une fois la vidéo à
@@ -151,5 +179,5 @@ export async function montrerPub(kind: AdKind): Promise<boolean> {
     } catch {
       finir(false);
     }
-  });
+  }).catch(() => false);
 }

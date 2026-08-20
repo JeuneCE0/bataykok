@@ -38,6 +38,7 @@ export default function AdButton({
 
   const [playing, setPlaying] = useState(false);
   const [chargement, setChargement] = useState(false);
+  const [echec, setEchec] = useState(false);
   const [left, setLeft] = useState(AD_SECONDS);
   const [now, setNow] = useState(Date.now());
   const pulse = useRef(new Animated.Value(0)).current;
@@ -89,11 +90,18 @@ export default function AdButton({
       return;
     }
     setChargement(true);
-    // une pub refusée, coupée ou indisponible ne donne rien — et ne dit rien
-    // non plus : le bouton redevient simplement cliquable
-    const vue = await montrerPub(kind);
-    setChargement(false);
-    if (vue) encaisser();
+    setEchec(false);
+    try {
+      const vue = await montrerPub(kind);
+      // une pub coupée avant la fin ne donne rien ; une pub qui n'a pas pu
+      // s'afficher doit le dire, sinon le joueur croit à un bouton mort
+      if (vue) encaisser();
+      else setEchec(true);
+    } finally {
+      // sans ce `finally`, la moindre erreur laissait le bouton figé en
+      // chargement — c'est exactement ce qui s'est produit
+      setChargement(false);
+    }
   };
 
   return (
@@ -137,7 +145,9 @@ export default function AdButton({
                   ? t('ad.outOfAds')
                   : chargement
                     ? t('ad.loading')
-                    : waiting > 0
+                    : echec
+                      ? t('ad.unavailable')
+                      : waiting > 0
                       ? t('ad.waiting', { n: waiting })
                       : `${offer.icon} ${offer.reward} · gratuit`}
               </Text>
