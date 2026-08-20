@@ -41,7 +41,7 @@ const PIMENT_PACKS = [
 
 export default function ShopScreen() {
   const t = useT();
-  const [tab, setTab] = useState<'bazar' | 'plimaz' | 'lotel'>('lotel');
+  const [tab, setTab] = useState<'bazar' | 'plimaz' | 'lotel'>('bazar');
   const [open, setOpen] = useState<string | null>(null);
   const player = useGame((s) => s.player);
   const shop = useGame((s) => s.shop);
