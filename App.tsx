@@ -155,6 +155,9 @@ function TabBar({
               pressed && !on ? { opacity: 0.6 } : null,
             ]}
           >
+            {/* L'onglet actif se dresse sur un socle biseauté ; les autres
+                s'enfoncent dans une plaque. Une pastille dorée et un emoji
+                pâli ne faisaient pas la différence assez fort. */}
             {on ? (
               <LinearGradient
                 colors={G.gold}
@@ -162,11 +165,11 @@ function TabBar({
                 end={{ x: 0, y: 1 }}
                 style={styles.tabPill}
               >
-                <Text style={styles.tabIcon}>{item.icon}</Text>
+                <Text style={styles.tabIconOn}>{item.icon}</Text>
               </LinearGradient>
             ) : (
               <View style={styles.tabPillOff}>
-                <Text style={[styles.tabIcon, { opacity: 0.55 }]}>{item.icon}</Text>
+                <Text style={styles.tabIcon}>{item.icon}</Text>
               </View>
             )}
             {alerts[item.id] && !on && <View style={styles.tabDot} />}
@@ -215,37 +218,53 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 8,
     paddingHorizontal: 4,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,246,232,0.10)',
+    borderTopWidth: 3,
+    borderTopColor: 'rgba(6,3,12,0.9)',
   },
   tab: { flex: 1, alignItems: 'center', gap: 4 },
   tabPill: {
-    width: 46,
-    height: 30,
-    borderRadius: R.pill,
+    width: 52,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(6,3,12,0.75)',
+    // l'actif se soulève : ombre portée dorée + décalage vers le haut
+    marginTop: -6,
     shadowColor: C.gold,
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.55,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
+  // l'inactif s'enfonce dans une plaque sombre
   tabPillOff: {
-    width: 46,
-    height: 30,
-    borderRadius: R.pill,
+    width: 52,
+    height: 40,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(6,3,12,0.7)',
+    borderTopColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(6,3,12,0.5)',
   },
-  tabIcon: { fontSize: 17 },
+  tabIcon: { fontSize: 20, opacity: 0.6 },
+  tabIconOn: { fontSize: 24 },
   tabLabel: {
     fontFamily: F.black,
     fontSize: 11,
     lineHeight: 15,
-    color: C.textDim,
+    color: C.textFaint,
     letterSpacing: 0.1,
   },
-  tabLabelOn: { color: C.gold },
+  tabLabelOn: {
+    color: C.gold,
+    textShadowColor: 'rgba(6,3,12,0.85)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
+  },
   tabDot: {
     position: 'absolute',
     top: 1,
