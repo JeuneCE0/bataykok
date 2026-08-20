@@ -73,6 +73,50 @@ export const DICT = {
     rcf: 'Doub sète rékonpans',
   },
 
+  // ─── Messages d'erreur ─────────────────────────────────────────────────
+  'referral.shareFail': {
+    fr: 'Partage impossible sur cet appareil.',
+    rcf: 'Partaz inposib su sèt aparèy.',
+  },
+  'market.withdrawn': {
+    fr: 'Annonce retirée, l’objet est revenu dans ton sac.',
+    rcf: 'Danons ôté, le zafèr la rovnu dan out sak.',
+  },
+  'market.noGrains': {
+    fr: 'Pas assez de grains.',
+    rcf: 'Pa asé de grin.',
+  },
+  'market.bagFull': {
+    fr: 'Ton sac est plein — achat annulé.',
+    rcf: 'Out sak lé plin — asha anilé.',
+  },
+
+  // ─── Donjon (suite) ────────────────────────────────────────────────────
+  'dungeon.keys': {
+    fr: '{n} clé en poche',
+    rcf: '{n} klé dan poch',
+  },
+  'dungeon.keys_n': {
+    fr: '{n} clés en poche',
+    rcf: '{n} klé dan poch',
+  },
+  'dungeon.noKey': {
+    fr: 'Plus de clé',
+    rcf: 'Pu de klé',
+  },
+  'dungeon.keySources': {
+    fr: '1 offerte par jour · coffre des défis · 1 quête sur 12 · pub',
+    rcf: '1 ofèr shak zour · kof dé défi · 1 kést su 12 · pib',
+  },
+  'dungeon.cleared_n': {
+    fr: '{n} / {total} gardiens vaincus',
+    rcf: '{n} / {total} gardien vinkri',
+  },
+  'dungeon.fight': {
+    fr: 'Affronter le gardien',
+    rcf: 'Afront le gardien',
+  },
+
   // ─── Série de connexions ───────────────────────────────────────────────
   'daily.streakDay': {
     fr: 'Jour {n} d’affilée',

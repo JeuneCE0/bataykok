@@ -170,7 +170,7 @@ export default function GuildScreen() {
         <GhostButton
           label={t('guild.leave')}
           onPress={leaveGuild}
-          style={{ alignSelf: 'center', marginTop: 6 }}
+          style={{ alignSelf: 'center', marginTop: 8 }}
         />
       </ScrollView>
     );
@@ -187,7 +187,7 @@ export default function GuildScreen() {
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View style={styles.emblemBox}>
-              <Text style={{ fontSize: 26 }}>{g.emblem}</Text>
+              <Text style={{ fontSize: 24 }}>{g.emblem}</Text>
             </View>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.guildName}>{g.name}</Text>
@@ -242,14 +242,14 @@ function BonusLine({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
-  crest: { alignItems: 'center', marginTop: 6 },
+  content: { padding: 12, paddingBottom: 32 },
+  crest: { alignItems: 'center', marginTop: 8 },
   crestEmblem: {
-    fontSize: 46,
+    fontSize: 44,
     textShadowColor: 'rgba(255,201,60,0.5)',
     textShadowRadius: 20,
   },
-  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   guildLevel: {
     fontFamily: F.black,
     fontSize: 44,
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
     textShadowRadius: 16,
   },
   bonusHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  bonusLabel: { fontFamily: F.semi, fontSize: 13.5, lineHeight: 18, color: C.textDim },
-  bonusValue: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20 },
+  bonusLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
+  bonusValue: { fontFamily: F.black, fontSize: 15, lineHeight: 20 },
   emblemBox: {
     width: 54,
     height: 54,
@@ -270,43 +270,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  guildName: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
+  guildName: { fontFamily: F.black, fontSize: 20, lineHeight: 26, color: C.text },
   motto: {
     fontFamily: F.regular,
     fontStyle: 'italic',
-    fontSize: 13.5,
-    lineHeight: 19,
-    color: C.textDim,
-  },
-  members: { ...T.tiny, color: C.textFaint, marginVertical: 10 },
-  potHint: {
-    fontFamily: F.regular,
-    fontSize: 12.5,
+    fontSize: 13,
     lineHeight: 17,
     color: C.textDim,
-    marginBottom: 10,
+  },
+  members: { ...T.tiny, color: C.textFaint, marginVertical: 8 },
+  potHint: {
+    fontFamily: F.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    color: C.textDim,
+    marginBottom: 8,
   },
   donateRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
   donateBtn: { flex: 1, alignSelf: 'auto' },
   msg: {
     fontFamily: F.black,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 17,
     color: C.gold,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
-  donated: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17, color: C.gold },
-  guildChips: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  donated: { fontFamily: F.bold, fontSize: 12, lineHeight: 16, color: C.gold },
+  guildChips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   memberRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
   meRow: { borderBottomColor: 'transparent' },
-  member: { fontFamily: F.semi, fontSize: 14.5, lineHeight: 20, color: C.textDim },
+  member: { fontFamily: F.semi, fontSize: 15, lineHeight: 20, color: C.textDim },
   memberMe: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.gold },
 });

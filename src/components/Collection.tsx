@@ -35,8 +35,8 @@ export default function Collection() {
           const steps = SET_THRESHOLDS.filter((t) => n >= t).length;
           return (
             <View key={def.id} style={styles.setRow}>
-              <Text style={{ fontSize: 19 }}>{def.icon}</Text>
-              <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ fontSize: 20 }}>{def.icon}</Text>
+              <View style={{ flex: 1, gap: 4 }}>
                 <Text
                   style={[styles.setName, steps > 0 && { color: def.color }]}
                   numberOfLines={1}
@@ -113,20 +113,20 @@ const styles = StyleSheet.create({
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 7,
+    gap: 8,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
-  setName: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.textDim },
+  setName: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.textDim },
   setCount: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.text },
-  setBonus: { fontFamily: F.bold, fontSize: 11.5, lineHeight: 15 },
+  setBonus: { fontFamily: F.bold, fontSize: 11, lineHeight: 15 },
   hint: {
     fontFamily: F.regular,
     fontSize: 12,
     lineHeight: 16,
     color: C.textFaint,
-    marginTop: 10,
+    marginTop: 8,
   },
   albumHead: {
     flexDirection: 'row',
@@ -135,14 +135,14 @@ const styles = StyleSheet.create({
   },
   albumSub: {
     fontFamily: F.regular,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
-    marginBottom: 10,
+    marginBottom: 8,
   },
-  grid: { gap: 5 },
-  gridRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  gridIcon: { fontSize: 16, width: 24 },
+  grid: { gap: 4 },
+  gridRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  gridIcon: { fontSize: 15, width: 24 },
   cell: {
     flex: 1,
     height: 26,

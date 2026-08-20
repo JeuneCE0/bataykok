@@ -40,7 +40,7 @@ export default function ProfileCard({
           <Rooster appearance={player.appearance} size={132} aura={auraColor(player)} />
         </View>
 
-        <View style={{ flex: 1, gap: 6 }}>
+        <View style={{ flex: 1, gap: 8 }}>
           <Text style={styles.name} numberOfLines={1}>
             {player.name}
           </Text>
@@ -92,18 +92,18 @@ const styles = StyleSheet.create({
     borderRadius: R.xl,
     borderWidth: 2,
     borderColor: 'rgba(255,201,60,0.35)',
-    padding: 18,
+    padding: 16,
     gap: 12,
   },
   header: { alignItems: 'center' },
   brand: {
     fontFamily: F.black,
-    fontSize: 26,
-    lineHeight: 33,
+    fontSize: 24,
+    lineHeight: 32,
     color: C.gold,
     letterSpacing: 1,
   },
-  tagline: { fontFamily: F.semi, fontSize: 11.5, lineHeight: 15, color: C.textDim },
+  tagline: { fontFamily: F.semi, fontSize: 11, lineHeight: 15, color: C.textDim },
   body: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   portrait: { width: 132, alignItems: 'center', justifyContent: 'center' },
   halo: {
@@ -113,20 +113,20 @@ const styles = StyleSheet.create({
     borderRadius: 54,
     opacity: 0.16,
   },
-  name: { fontFamily: F.black, fontSize: 22, lineHeight: 28, color: C.text },
-  cls: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 18 },
+  name: { fontFamily: F.black, fontSize: 20, lineHeight: 26, color: C.text },
+  cls: { fontFamily: F.bold, fontSize: 13, lineHeight: 17 },
   stats: { gap: 4 },
-  stat: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  stat: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   statLabel: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim, flex: 1 },
-  statValue: { fontFamily: F.black, fontSize: 13.5, lineHeight: 18, color: C.text },
+  statValue: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.text },
   record: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: C.hairlineSoft,
   },
-  recordItem: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  recordItem: { fontFamily: F.bold, fontSize: 12, lineHeight: 16, color: C.textDim },
   codeBox: {
     alignItems: 'center',
     backgroundColor: 'rgba(255,201,60,0.10)',
@@ -137,17 +137,17 @@ const styles = StyleSheet.create({
   },
   codeLabel: {
     fontFamily: F.black,
-    fontSize: 9.5,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1.4,
     color: C.textFaint,
   },
   code: {
     fontFamily: F.black,
-    fontSize: 26,
-    lineHeight: 33,
+    fontSize: 24,
+    lineHeight: 32,
     letterSpacing: 4,
     color: C.gold,
   },
-  codeHint: { fontFamily: F.semi, fontSize: 11.5, lineHeight: 15, color: C.textDim },
+  codeHint: { fontFamily: F.semi, fontSize: 11, lineHeight: 15, color: C.textDim },
 });

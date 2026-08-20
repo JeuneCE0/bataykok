@@ -33,10 +33,10 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-    marginBottom: 6,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
+    gap: 8,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: R.pill,
     borderWidth: 1,
   },
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 3,
     height: 3,
-    borderRadius: 2,
+    borderRadius: 1,
     backgroundColor: C.textFaint,
   },
   desc: {

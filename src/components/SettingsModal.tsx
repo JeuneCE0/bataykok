@@ -102,7 +102,7 @@ export default function SettingsModal({
             </Card>
           </ScrollView>
 
-          <Button full size="lg" label={t('common.close')} onPress={onClose} style={{ marginTop: 10 }} />
+          <Button full size="lg" label={t('common.close')} onPress={onClose} style={{ marginTop: 8 }} />
         </LinearGradient>
       </View>
     </Modal>
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: C.hairline,
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 26,
+    paddingTop: 8,
+    paddingBottom: 24,
     ...SHADOW.float,
   },
   grip: {
@@ -194,24 +194,24 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: F.black,
     fontSize: 24,
-    lineHeight: 31,
+    lineHeight: 32,
     color: C.text,
     textAlign: 'center',
   },
   sub: {
     fontFamily: F.regular,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',
     marginBottom: 8,
   },
-  langs: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  langs: { flexDirection: 'row', gap: 8, marginTop: 4 },
   lang: {
     flex: 1,
     alignItems: 'center',
     gap: 2,
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: R.lg,
     borderWidth: 1.5,
@@ -219,18 +219,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6,3,12,0.45)',
   },
   langOn: { borderColor: C.gold, backgroundColor: 'rgba(255,201,60,0.10)' },
-  langFlag: { fontSize: 26, lineHeight: 32 },
+  langFlag: { fontSize: 24, lineHeight: 32 },
   langLabel: {
     fontFamily: F.black,
-    fontSize: 14.5,
-    lineHeight: 19,
+    fontSize: 15,
+    lineHeight: 20,
     color: C.text,
     textAlign: 'center',
     includeFontPadding: false,
   },
   langSub: {
     fontFamily: F.regular,
-    fontSize: 11.5,
+    fontSize: 11,
     lineHeight: 15,
     color: C.textFaint,
     textAlign: 'center',
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     borderBottomColor: C.hairlineSoft,
   },
   label: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
-  rowHint: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  rowHint: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim },
   hint: {
     fontFamily: F.regular,
     fontSize: 12,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  line: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
-  lineLabel: { fontFamily: F.semi, fontSize: 14, lineHeight: 19, color: C.textDim },
-  lineValue: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.text },
+  line: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
+  lineLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
+  lineValue: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.text },
 });

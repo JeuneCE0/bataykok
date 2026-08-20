@@ -76,11 +76,11 @@ export default function FreeChest() {
             colors={ready ? G.gold : G.slate}
             style={[styles.chest, ready ? SHADOW.glowGold : null]}
           >
-            <Text style={{ fontSize: 30 }}>{ready ? '🧰' : '⏳'}</Text>
+            <Text style={{ fontSize: 31 }}>{ready ? '🧰' : '⏳'}</Text>
           </LinearGradient>
         </Animated.View>
 
-        <View style={{ flex: 1, gap: 3 }}>
+        <View style={{ flex: 1, gap: 4 }}>
           <Text style={styles.title}>
             {ready ? 'Ton coffre est prêt !' : 'Coffre en préparation'}
           </Text>
@@ -129,6 +129,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
   },
-  title: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20, color: C.text },
-  sub: { fontFamily: F.regular, fontSize: 13, lineHeight: 18, color: C.textDim },
+  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  sub: { fontFamily: F.regular, fontSize: 13, lineHeight: 17, color: C.textDim },
 });

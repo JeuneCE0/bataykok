@@ -51,6 +51,67 @@ export type GradientKey = keyof typeof G;
 
 export const R = { sm: 10, md: 14, lg: 20, xl: 28, pill: 999 } as const;
 
+/**
+ * Échelle d'espacement, en pas de 4.
+ *
+ * Le relevé d'avant cette grille donnait vingt valeurs distinctes (1, 2, 3, 5,
+ * 6, 7, 9, 11, 14, 18, 22, 26…) posées au jugé écran par écran. Les jeux qui
+ * paraissent « propres » ne le doivent pas à leur palette mais à cette
+ * discipline : tout se cale sur la même trame, donc rien ne flotte.
+ */
+export const SP = {
+  xxs: 2,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+} as const;
+
+/**
+ * Épaisseurs de trait.
+ *
+ * Le trait épais et sombre est la signature du genre : chaque élément se
+ * détache comme un autocollant posé sur le fond, au lieu de s'y fondre.
+ */
+export const BW = { hair: 1, thick: 2, chunky: 3 } as const;
+
+/** Contour sombre des éléments interactifs — c'est lui qui « découpe » la forme. */
+export const OUTLINE = 'rgba(6,3,12,0.75)';
+
+/**
+ * Échelle typographique.
+ *
+ * Vingt tailles cohabitaient, dont neuf en demi-points (9,5 · 10,5 · 11,5 …).
+ * Neuf suffisent — et les trois dernières sont des tailles d'affichage, à
+ * réserver aux moments qui doivent occuper l'écran.
+ */
+export const FS = {
+  micro: 11,
+  caption: 12,
+  small: 13,
+  body: 15,
+  title: 17,
+  h2: 20,
+  h1: 24,
+  display: 31,
+  hero: 44,
+  giant: 64,
+} as const;
+
+/**
+ * Contour de texte.
+ *
+ * Un titre clair sur un fond clair perd ses bords ; le liseré sombre le tient
+ * lisible partout, et c'est ce qui donne aux gros chiffres leur présence.
+ */
+export const TEXT_OUTLINE = {
+  textShadowColor: 'rgba(6,3,12,0.85)',
+  textShadowOffset: { width: 0, height: 2 },
+  textShadowRadius: 3,
+} as const;
+
 /** Ombres portées — la profondeur fait 80 % du « premium » sur mobile. */
 export const SHADOW = {
   card: {
@@ -98,20 +159,20 @@ export const TYPO = {
   display: {
     fontFamily: F.black,
     fontSize: 31,
-    lineHeight: 40,
+    lineHeight: 41,
     letterSpacing: 0.3,
     color: C.text,
   } as TextStyle,
   h1: {
     fontFamily: F.black,
-    fontSize: 23,
-    lineHeight: 30,
+    fontSize: 24,
+    lineHeight: 32,
     color: C.text,
   } as TextStyle,
   h2: {
     fontFamily: F.bold,
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: 17,
+    lineHeight: 22,
     color: C.text,
   } as TextStyle,
   label: {
@@ -125,19 +186,19 @@ export const TYPO = {
   body: {
     fontFamily: F.regular,
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 20,
     color: C.text,
   } as TextStyle,
   dim: {
     fontFamily: F.regular,
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
   } as TextStyle,
   tiny: {
     fontFamily: F.semi,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
   } as TextStyle,
   num: {

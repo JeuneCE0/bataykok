@@ -359,7 +359,7 @@ export default function CombatView({
       </Well>
 
       {finished ? (
-        <View style={{ gap: 10, alignItems: 'center' }}>
+        <View style={{ gap: 8, alignItems: 'center' }}>
           <Animated.View style={{ transform: [{ scale: winScale }] }}>
             <LinearGradient
               colors={result.winner === 0 ? G.gold : G.slate}
@@ -524,7 +524,7 @@ function FighterSide({
             colors={G[barVariant]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={{ flex: 1, borderRadius: 7 }}
+            style={{ flex: 1, borderRadius: 10 }}
           />
         </Animated.View>
         <Text style={styles.hpText}>{fmt(Math.max(0, Math.round(hp)))} PV</Text>
@@ -605,25 +605,27 @@ const PARTICLES = [
 ];
 
 const styles = StyleSheet.create({
-  combatRoot: { flex: 1, padding: 14, paddingTop: 20 },
+  combatRoot: { flex: 1, padding: 12, paddingTop: 16 },
   scene: { flex: 1, justifyContent: 'center', gap: 4 },
   stageGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: 220 },
-  stageHead: { alignItems: 'center', marginBottom: 6 },
+  stageHead: { alignItems: 'center', marginBottom: 8 },
   stageTitle: {
     fontFamily: F.black,
-    fontSize: 21,
-    lineHeight: 27,
+    fontSize: 20,
+    lineHeight: 26,
     color: C.ember,
     letterSpacing: 0.8,
   },
-  roundCount: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  roundCount: { fontFamily: F.bold, fontSize: 12, lineHeight: 16, color: C.textDim },
   fightersWrap: { justifyContent: 'flex-end' },
   ringFloor: {
     position: 'absolute',
     left: '2%',
     right: '2%',
-    bottom: 34,
+    bottom: 32,
     height: 130,
+    // ellipse du sol : rayon volontairement hors échelle, il doit dépasser la
+    // moitié de la hauteur pour que la forme se ferme
     borderRadius: 300,
     transform: [{ scaleY: 0.38 }],
   },
@@ -632,7 +634,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
-  fighterCol: { flex: 1, alignItems: 'center', gap: 6 },
+  fighterCol: { flex: 1, alignItems: 'center', gap: 8 },
   fighterHalo: {
     position: 'absolute',
     alignSelf: 'center',
@@ -673,7 +675,7 @@ const styles = StyleSheet.create({
   hpTrack: {
     width: '94%',
     height: 18,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: 'rgba(6,3,12,0.65)',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.6)',
@@ -682,13 +684,13 @@ const styles = StyleSheet.create({
   },
   hpText: {
     fontFamily: F.black,
-    fontSize: 11.5,
+    fontSize: 11,
     color: '#fff',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.9)',
     textShadowRadius: 3,
   },
-  vsWrap: { paddingTop: 44 },
+  vsWrap: { paddingTop: 32 },
   vsBadge: {
     width: 40,
     height: 40,
@@ -699,7 +701,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.35)',
     ...SHADOW.glowEmber,
   },
-  vsText: { fontFamily: F.black, fontSize: 14, color: '#FFF8F0' },
+  vsText: { fontFamily: F.black, fontSize: 13, color: '#FFF8F0' },
   floatDmg: {
     position: 'absolute',
     top: 26,
@@ -717,14 +719,14 @@ const styles = StyleSheet.create({
   },
   roundText: {
     fontFamily: F.semi,
-    fontSize: 14.5,
+    fontSize: 15,
     color: C.text,
     textAlign: 'center',
     lineHeight: 20,
   },
   logLine: { fontFamily: F.regular, fontSize: 13, marginBottom: 4, lineHeight: 18 },
   winBanner: {
-    paddingHorizontal: 26,
+    paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: R.pill,
     borderWidth: 2,

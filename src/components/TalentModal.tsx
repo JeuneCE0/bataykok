@@ -55,7 +55,7 @@ export default function TalentModal() {
               {t('talent.warn')}
             </Text>
 
-            <View style={{ gap: 10, marginTop: 16 }}>
+            <View style={{ gap: 8, marginTop: 16 }}>
               {tier.choices.map((c) => (
                 <Pressable
                   key={c.id}
@@ -71,7 +71,7 @@ export default function TalentModal() {
                     end={{ x: 1, y: 1 }}
                     style={styles.choiceIcon}
                   >
-                    <Text style={{ fontSize: 22 }}>{c.icon}</Text>
+                    <Text style={{ fontSize: 20 }}>{c.icon}</Text>
                   </LinearGradient>
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.choiceTitle}>{t(c.titleKey)}</Text>
@@ -94,34 +94,34 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,2,8,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 16,
   },
   card: {
     borderRadius: R.xl,
     borderWidth: 1,
     borderColor: C.hairline,
-    padding: 22,
+    padding: 24,
     ...SHADOW.float,
   },
   kicker: {
     fontFamily: F.black,
-    fontSize: 10.5,
-    lineHeight: 14,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1.6,
     color: C.ember,
     textAlign: 'center',
   },
   title: {
     fontFamily: F.black,
-    fontSize: 27,
-    lineHeight: 34,
+    fontSize: 24,
+    lineHeight: 32,
     color: C.gold,
     textAlign: 'center',
   },
   sub: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',
   },
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    padding: 11,
+    padding: 12,
     borderRadius: R.lg,
     borderWidth: 1.5,
     borderColor: C.hairline,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  choiceTitle: { fontFamily: F.black, fontSize: 16.5, lineHeight: 21, color: C.text },
-  choiceDesc: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.textDim },
+  choiceTitle: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
+  choiceDesc: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
   arrow: { fontFamily: F.black, fontSize: 24, color: C.gold },
 });

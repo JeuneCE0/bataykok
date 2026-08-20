@@ -47,7 +47,7 @@ export default function StepBanner({ onGo }: { onGo: (tab: TabId) => void }) {
         ]}
       >
         <View style={[styles.icon, step.ready && { borderColor: C.cane }]}>
-          <Text style={{ fontSize: 19 }}>{step.def.icon}</Text>
+          <Text style={{ fontSize: 20 }}>{step.def.icon}</Text>
         </View>
 
         <View style={{ flex: 1, gap: 2 }}>
@@ -83,10 +83,10 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     marginHorizontal: 12,
     marginTop: 8,
-    padding: 10,
+    padding: 8,
     borderRadius: R.lg,
     borderWidth: 1,
   },
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
   },
   kicker: {
     fontFamily: F.black,
-    fontSize: 10,
-    lineHeight: 14,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1,
     color: C.textDim,
   },
-  title: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
-  hint: { fontFamily: F.regular, fontSize: 12.5, color: C.textDim, lineHeight: 17 },
+  title: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  hint: { fontFamily: F.regular, fontSize: 12, color: C.textDim, lineHeight: 17 },
   cta: {
     width: 34,
     height: 34,
@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { fontFamily: F.black, fontSize: 18, color: C.ink, marginTop: -2 },
+  ctaText: { fontFamily: F.black, fontSize: 17, color: C.ink, marginTop: -2 },
 });

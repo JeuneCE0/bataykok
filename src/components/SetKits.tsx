@@ -36,7 +36,7 @@ export default function SetKits() {
       <Card>
         <SectionTitle icon="🎽">{t('setkit.title')}</SectionTitle>
         <Text style={styles.sub}>{t('setkit.sub')}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
           <View style={styles.row}>
             {SETS.map((def) => {
               const price = setKitPrice(def.id);
@@ -53,7 +53,7 @@ export default function SetKits() {
                     pressed && { opacity: 0.75 },
                   ]}
                 >
-                  <Text style={{ fontSize: 30 }}>{def.icon}</Text>
+                  <Text style={{ fontSize: 31 }}>{def.icon}</Text>
                   <Text style={[styles.kitName, { color: def.color }]} numberOfLines={2}>
                     {def.name}
                   </Text>
@@ -145,7 +145,7 @@ function PreviewModal({
                 onClose();
               }
             }}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 8 }}
           />
           <Button full variant="slate" label={t('common.close')} onPress={onClose} style={{ marginTop: 8 }} />
         </LinearGradient>
@@ -155,8 +155,8 @@ function PreviewModal({
 }
 
 const styles = StyleSheet.create({
-  sub: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim, marginTop: 2 },
-  row: { flexDirection: 'row', gap: 10, paddingRight: 4 },
+  sub: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim, marginTop: 2 },
+  row: { flexDirection: 'row', gap: 8, paddingRight: 4 },
   kit: {
     width: 104,
     alignItems: 'center',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   kitName: {
     fontFamily: F.black,
-    fontSize: 12.5,
+    fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',
     includeFontPadding: false,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,2,8,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 18,
+    padding: 16,
   },
   card: {
     width: '100%',
@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
     borderRadius: R.xl,
     borderWidth: 1,
     borderColor: C.hairline,
-    padding: 18,
+    padding: 16,
     ...SHADOW.float,
   },
   title: {
     fontFamily: F.black,
-    fontSize: 22,
-    lineHeight: 29,
+    fontSize: 20,
+    lineHeight: 26,
     textAlign: 'center',
   },
   stage: { alignItems: 'center', paddingVertical: 4 },
@@ -204,12 +204,12 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: R.pill,
     paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingVertical: 4,
     backgroundColor: 'rgba(6,3,12,0.5)',
   },
   pillText: { fontFamily: F.black, fontSize: 12, lineHeight: 16, includeFontPadding: false },
   bonusBox: {
-    marginTop: 14,
+    marginTop: 12,
     padding: 12,
     borderRadius: R.md,
     backgroundColor: 'rgba(6,3,12,0.5)',
@@ -219,8 +219,8 @@ const styles = StyleSheet.create({
   },
   bonusLine: {
     fontFamily: F.bold,
-    fontSize: 14,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.text,
     textAlign: 'center',
   },
@@ -230,6 +230,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     color: C.textFaint,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
 });

@@ -124,7 +124,7 @@ export default function MarketScreen() {
             icon="🔄"
             label={t('market.refresh')}
             onPress={reload}
-            style={{ alignSelf: 'center', marginVertical: 6 }}
+            style={{ alignSelf: 'center', marginVertical: 8 }}
           />
           {listings.length === 0 ? (
             <Card>
@@ -141,7 +141,7 @@ export default function MarketScreen() {
                   <Card glow={cmp.diff > 0 ? C.cane : undefined} compact>
                     <View style={styles.row}>
                       <View style={[styles.icon, { borderColor: col }]}>
-                        <Text style={{ fontSize: 22 }}>{SLOT_ICONS[l.item.slot]}</Text>
+                        <Text style={{ fontSize: 20 }}>{SLOT_ICONS[l.item.slot]}</Text>
                       </View>
                       <View style={{ flex: 1, gap: 4 }}>
                         <Text style={[styles.name, { color: col }]} numberOfLines={1}>
@@ -157,7 +157,7 @@ export default function MarketScreen() {
                         <Text style={styles.seller}>Vendu par {l.sellerName}</Text>
                         {open === l.id && <CompareLines cmp={cmp} />}
                       </View>
-                      <View style={{ alignItems: 'flex-end', gap: 6 }}>
+                      <View style={{ alignItems: 'flex-end', gap: 8 }}>
                         <Text style={styles.price}>🌽 {fmt(l.price)}</Text>
                         {l.isMine ? (
                           <GhostButton
@@ -165,7 +165,7 @@ export default function MarketScreen() {
                             onPress={async () => {
                               const it = await cancelListing(l.id);
                               if (it && addItem(it)) {
-                                setMsg('Annonce retirée, objet remis dans ton sak.');
+                                setMsg(t('market.withdrawn'));
                                 void reload();
                               }
                             }}
@@ -182,10 +182,10 @@ export default function MarketScreen() {
                               if (!r.ok) {
                                 setMsg(r.error);
                               } else if (!spendGrains(r.price)) {
-                                setMsg('Pas assez de grains.');
+                                setMsg(t('market.noGrains'));
                               } else if (!addItem(r.item)) {
                                 grantBonus({ grains: r.price });
-                                setMsg('Ton sak est plein — achat annulé.');
+                                setMsg(t('market.bagFull'));
                               } else {
                                 setMsg(`✅ ${itemLabel(r.item, t)} — dan out sak !`);
                               }
@@ -218,7 +218,7 @@ export default function MarketScreen() {
                 const on = selling?.id === it.id;
                 return (
                   <View key={it.id} style={[styles.pick, on && { borderColor: col }]}>
-                    <Text style={{ fontSize: 18 }}>{SLOT_ICONS[it.slot]}</Text>
+                    <Text style={{ fontSize: 17 }}>{SLOT_ICONS[it.slot]}</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.name, { color: col }]} numberOfLines={1}>
                         {itemLabel(it, t)}
@@ -310,8 +310,8 @@ export default function MarketScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  content: { padding: 12, paddingBottom: 32 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   icon: {
     width: 46,
     height: 46,
@@ -321,20 +321,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  name: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20 },
-  chips: { flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center' },
-  stats: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
-  seller: { fontFamily: F.semi, fontSize: 11.5, lineHeight: 15, color: C.textFaint },
+  name: { fontFamily: F.black, fontSize: 15, lineHeight: 20 },
+  chips: { flexDirection: 'row', gap: 4, flexWrap: 'wrap', alignItems: 'center' },
+  stats: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim },
+  seller: { fontFamily: F.semi, fontSize: 11, lineHeight: 15, color: C.textFaint },
   price: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.gold },
   pick: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
-  quote: { fontFamily: F.semi, fontSize: 13.5, lineHeight: 19, color: C.lagoon },
+  quote: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.lagoon },
   priceRow: { flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 12 },
   input: {
     flex: 1,
@@ -343,11 +343,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.hairline,
     color: C.text,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 15,
     fontFamily: F.black,
   },
   fee: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textFaint, marginTop: 8 },
-  msg: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 19, color: C.cane },
+  msg: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.cane },
 });

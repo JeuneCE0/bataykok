@@ -74,7 +74,7 @@ export default function DailyMissions() {
         }
         style={[styles.chest, allClaimed && !chestClaimed ? SHADOW.glowGold : null]}
       >
-        <Text style={{ fontSize: 26 }}>{chestClaimed ? '📭' : '🧰'}</Text>
+        <Text style={{ fontSize: 24 }}>{chestClaimed ? '📭' : '🧰'}</Text>
         <View style={{ flex: 1 }}>
           <Text style={styles.chestTitle}>{t('daily.chest')}</Text>
           <Text style={styles.chestSub}>
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 7,
+    gap: 8,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
@@ -115,21 +115,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontFamily: F.bold, fontSize: 14.5, lineHeight: 19, color: C.text, flex: 1 },
+  title: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text, flex: 1 },
   done: { color: C.textFaint, textDecorationLine: 'line-through' },
   count: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.textDim },
   reward: { fontFamily: F.bold, fontSize: 12, lineHeight: 16, color: C.gold },
-  check: { fontSize: 18 },
+  check: { fontSize: 17 },
   chest: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     marginTop: 12,
-    padding: 10,
+    padding: 8,
     borderRadius: R.md,
     borderWidth: 1,
     borderColor: C.hairlineSoft,
   },
   chestTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
-  chestSub: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  chestSub: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim },
 });

@@ -65,7 +65,7 @@ export function CompareLines({ cmp }: { cmp: ItemComparison }) {
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 9,
+    paddingHorizontal: 8,
     minHeight: 24,
     borderRadius: R.pill,
     borderWidth: 1,
@@ -75,16 +75,16 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontFamily: F.black,
-    fontSize: 11.5,
-    lineHeight: 14,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 0.2,
     textAlign: 'center',
     includeFontPadding: false,
   },
-  lines: { gap: 3, marginTop: 6 },
+  lines: { gap: 4, marginTop: 8 },
   line: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  lineLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.textDim },
-  lineDelta: { fontFamily: F.black, fontSize: 13, lineHeight: 18 },
-  vs: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textFaint, marginTop: 3 },
-  none: { fontFamily: F.regular, fontSize: 12.5, color: C.textFaint, marginTop: 4 },
+  lineLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
+  lineDelta: { fontFamily: F.black, fontSize: 13, lineHeight: 17 },
+  vs: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textFaint, marginTop: 4 },
+  none: { fontFamily: F.regular, fontSize: 12, color: C.textFaint, marginTop: 4 },
 });

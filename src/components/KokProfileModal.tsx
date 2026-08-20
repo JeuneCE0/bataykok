@@ -82,7 +82,7 @@ export default function KokProfileModal({
                 <View style={[styles.halo, { backgroundColor: cls.color }]} />
                 <Rooster appearance={profile.appearance} size={116} />
               </View>
-              <View style={{ flex: 1, gap: 6 }}>
+              <View style={{ flex: 1, gap: 8 }}>
                 <Text style={styles.name} numberOfLines={1}>
                   {profile.name}
                   {profile.isMe ? ` ${t('profile.me')}` : ''}
@@ -134,7 +134,7 @@ export default function KokProfileModal({
                         key={sl}
                         style={[styles.slot, col ? { borderColor: col } : null]}
                       >
-                        <Text style={{ fontSize: 18, opacity: it ? 1 : 0.3 }}>
+                        <Text style={{ fontSize: 17, opacity: it ? 1 : 0.3 }}>
                           {SLOT_ICONS[sl]}
                         </Text>
                         <Text
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,2,8,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 18,
+    padding: 16,
   },
   card: {
     width: '100%',
@@ -221,10 +221,10 @@ const styles = StyleSheet.create({
     borderRadius: R.xl,
     borderWidth: 1,
     borderColor: C.hairline,
-    padding: 18,
+    padding: 16,
     ...SHADOW.float,
   },
-  head: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   portrait: { width: 116, alignItems: 'center', justifyContent: 'center' },
   halo: {
     position: 'absolute',
@@ -233,17 +233,17 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     opacity: 0.16,
   },
-  name: { fontFamily: F.black, fontSize: 21, lineHeight: 27, color: C.text },
-  cls: { fontFamily: F.bold, fontSize: 14, lineHeight: 19 },
-  chips: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  record: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginVertical: 12 },
+  name: { fontFamily: F.black, fontSize: 20, lineHeight: 26, color: C.text },
+  cls: { fontFamily: F.bold, fontSize: 13, lineHeight: 17 },
+  chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  record: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginVertical: 12 },
   line: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: 4,
   },
-  lineLabel: { fontFamily: F.semi, fontSize: 14, lineHeight: 19, color: C.textDim },
+  lineLabel: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
   lineValue: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   slots: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   slot: {
@@ -256,30 +256,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 4,
-    gap: 3,
+    gap: 4,
   },
   slotLabel: {
     fontFamily: F.bold,
-    fontSize: 9.5,
-    lineHeight: 12,
+    fontSize: 11,
+    lineHeight: 15,
     color: C.textDim,
     textAlign: 'center',
   },
-  guild: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
+  guild: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   motto: {
     fontFamily: F.regular,
     fontStyle: 'italic',
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 17,
     color: C.textDim,
   },
   footer: { marginTop: 12, gap: 8 },
   hint: {
     fontFamily: F.regular,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textFaint,
-    marginTop: 10,
+    marginTop: 8,
     textAlign: 'center',
   },
 });

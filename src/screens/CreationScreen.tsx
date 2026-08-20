@@ -78,7 +78,7 @@ export default function CreationScreen() {
                     : { borderColor: C.hairline },
                 ]}
               >
-                <Text style={{ fontSize: 19, opacity: on ? 1 : 0.5 }}>{c.emoji}</Text>
+                <Text style={{ fontSize: 20, opacity: on ? 1 : 0.5 }}>{c.emoji}</Text>
               </LinearGradient>
             </Pressable>
           );
@@ -86,7 +86,7 @@ export default function CreationScreen() {
       </View>
 
       {/* Scène : le coq sur son podium */}
-      <Card glow={cls.color} style={{ paddingTop: 0 }}>
+      <Card glow={cls.color} style={{ paddingTop: 2 }}>
         <View style={styles.stage}>
           <View
             style={[
@@ -195,7 +195,7 @@ export default function CreationScreen() {
         variant="ember"
         size="lg"
         full
-        style={{ marginTop: 10, ...SHADOW.glowEmber }}
+        style={{ marginTop: 8, ...SHADOW.glowEmber }}
         onPress={() => createPlayer(name, cls.id, appearance)}
         disabled={!name.trim()}
       />
@@ -233,11 +233,11 @@ function Swatch({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 16, paddingBottom: 48 },
-  header: { alignItems: 'center', marginTop: 10, marginBottom: 14 },
+  content: { padding: 12, paddingBottom: 32 },
+  header: { alignItems: 'center', marginTop: 8, marginBottom: 12 },
   brand: {
     fontFamily: F.black,
-    fontSize: 42,
+    fontSize: 44,
     color: C.gold,
     letterSpacing: 1,
     textShadowColor: 'rgba(255,90,31,0.55)',
@@ -254,8 +254,8 @@ const styles = StyleSheet.create({
   classRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 9,
-    marginBottom: 10,
+    gap: 8,
+    marginBottom: 8,
   },
   classDot: {
     width: 46,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: 8,
   },
   halo: {
     position: 'absolute',
@@ -292,8 +292,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  arrowText: { fontFamily: F.black, fontSize: 26, color: C.gold, marginTop: -6 },
-  className: { fontFamily: F.black, fontSize: 26, textAlign: 'center', marginTop: 6 },
+  arrowText: { fontFamily: F.black, fontSize: 24, color: C.gold, marginTop: -6 },
+  className: { fontFamily: F.black, fontSize: 24, textAlign: 'center', marginTop: 8 },
   classSub: {
     fontFamily: F.semi,
     fontSize: 13,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   chipRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
     marginVertical: 8,
     flexWrap: 'wrap',
   },
@@ -322,9 +322,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: C.textFaint,
     marginTop: 12,
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  swatchRow: { flexDirection: 'row', gap: 9, flexWrap: 'wrap', alignItems: 'center' },
+  swatchRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' },
   swatch: {
     width: 34,
     height: 34,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   palette: {
     width: 46,
     height: 30,
-    borderRadius: 9,
+    borderRadius: 10,
     overflow: 'hidden',
     flexDirection: 'row',
     borderWidth: 2,
@@ -357,9 +357,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.hairline,
     color: C.text,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 15,
     fontFamily: F.bold,
   },
 });

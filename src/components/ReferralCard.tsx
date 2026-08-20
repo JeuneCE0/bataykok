@@ -71,7 +71,7 @@ export default function ReferralCard() {
         await Share.share({ message: shareText(state?.code ?? null) });
       }
     } catch {
-      setMsg('Partage impossible sur cet appareil.');
+      setMsg(t('referral.shareFail'));
     }
   };
 
@@ -105,7 +105,7 @@ export default function ReferralCard() {
                   <Text style={styles.codeLabel}>{t('referral.code')}</Text>
                   <Text style={styles.code}>{state.code}</Text>
                 </View>
-                <View style={{ flex: 1, gap: 6 }}>
+                <View style={{ flex: 1, gap: 8 }}>
                   <Button
                     full
                     size="sm"
@@ -187,8 +187,8 @@ export default function ReferralCard() {
 
 const styles = StyleSheet.create({
   offscreen: { position: 'absolute', left: -9999, top: -9999 },
-  intro: { fontFamily: F.regular, fontSize: 13.5, lineHeight: 19, color: C.textDim },
-  offline: { fontFamily: F.regular, fontSize: 13.5, lineHeight: 19, color: C.textDim },
+  intro: { fontFamily: F.regular, fontSize: 13, lineHeight: 17, color: C.textDim },
+  offline: { fontFamily: F.regular, fontSize: 13, lineHeight: 17, color: C.textDim },
   codeRow: { flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 12 },
   codeBox: {
     alignItems: 'center',
@@ -201,19 +201,19 @@ const styles = StyleSheet.create({
   },
   codeLabel: {
     fontFamily: F.black,
-    fontSize: 9,
-    lineHeight: 12,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1.3,
     color: C.textFaint,
   },
   code: {
     fontFamily: F.black,
-    fontSize: 21,
-    lineHeight: 27,
+    fontSize: 20,
+    lineHeight: 26,
     letterSpacing: 3,
     color: C.gold,
   },
-  chips: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 12 },
+  chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginTop: 12 },
   redeem: { flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 12 },
   input: {
     flex: 1,
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.hairline,
     color: C.text,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 15,
     letterSpacing: 2,
     fontFamily: F.black,
   },
-  msg: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 19, color: C.cane, marginTop: 10 },
+  msg: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.cane, marginTop: 8 },
 });

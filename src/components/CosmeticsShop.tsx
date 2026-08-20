@@ -185,29 +185,29 @@ function Swatch({ kind, value }: { kind: CosmeticKind; value: string | number })
     );
   }
   const ICONS = ['🚫', '🎗️', '🕶️', '👒', '📿', '👑', '⛑️', '🌺', '🥽'];
-  return <Text style={{ fontSize: 26 }}>{ICONS[value as number] ?? '❔'}</Text>;
+  return <Text style={{ fontSize: 24 }}>{ICONS[value as number] ?? '❔'}</Text>;
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
+  content: { padding: 12, paddingBottom: 32 },
   stage: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 8,
   },
   buyRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
-  pendingName: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
-  pendingRarity: { fontFamily: F.bold, fontSize: 12.5, lineHeight: 17 },
+  pendingName: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  pendingRarity: { fontFamily: F.bold, fontSize: 12, lineHeight: 16 },
   hint: {
     fontFamily: F.regular,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textFaint,
     textAlign: 'center',
-    marginTop: 6,
+    marginTop: 8,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, marginTop: 4 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
   tile: {
     width: 62,
     height: 62,
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontFamily: F.black,
-    fontSize: 9.5,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 15,
     color: C.gold,
     textAlign: 'center',
   },

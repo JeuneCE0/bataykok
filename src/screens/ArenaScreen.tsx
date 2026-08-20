@@ -243,7 +243,7 @@ export default function ArenaScreen() {
 
       <Card compact>
         <View style={styles.ticketRow}>
-          <View style={{ flexDirection: 'row', gap: 6 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             {Array.from({ length: maxTickets }, (_, i) => (
               <View
                 key={i}
@@ -315,11 +315,11 @@ export default function ArenaScreen() {
                     <Text style={styles.rankBadgeText}>#{rank}</Text>
                   </View>
                 </View>
-                <View style={{ flex: 1, gap: 5 }}>
+                <View style={{ flex: 1, gap: 4 }}>
                   <Text style={styles.opName} numberOfLines={1}>
                     {bot.name}
                   </Text>
-                  <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                  <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
                     <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
                     <Chip label={`Niv. ${bot.level}`} color={C.textDim} />
                     <Chip label={t(chance.key)} color={chance.color} active />
@@ -345,12 +345,12 @@ export default function ArenaScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
+  content: { padding: 12, paddingBottom: 32 },
   rankBanner: {
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   ticketRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   ticket: {
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6,3,12,0.4)',
   },
   ticketTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
-  ticketSub: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  ticketSub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
   rewardTitle: {
     fontFamily: F.black,
     fontSize: 20,
@@ -383,10 +383,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     color: C.text,
-    marginBottom: 10,
+    marginBottom: 8,
   },
-  cooldownTime: { fontFamily: F.black, fontSize: 36, lineHeight: 44, color: C.ember },
-  opRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  cooldownTime: { fontFamily: F.black, fontSize: 31, lineHeight: 41, color: C.ember },
+  opRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   opPortrait: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
   opHalo: {
     position: 'absolute',
@@ -403,27 +403,27 @@ const styles = StyleSheet.create({
     borderRadius: R.pill,
     borderWidth: 1,
     borderColor: C.hairline,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
   rankBadgeText: {
     fontFamily: F.black,
-    fontSize: 10.5,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 15,
     color: C.gold,
     includeFontPadding: false,
     textAlign: 'center',
   },
   opName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
   gainRow: { flexDirection: 'row', gap: 16, flexWrap: 'wrap', marginBottom: 8 },
-  gain: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
-  bonusRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  gain: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  bonusRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   levelUp: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.gold, marginTop: 8 },
-  streak: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.ember, marginTop: 8 },
+  streak: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.ember, marginTop: 8 },
   consolation: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
     marginTop: 8,
   },

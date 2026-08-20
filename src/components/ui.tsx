@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import { play } from '../lib/sound';
-import { C, F, G, GradientKey, R, SHADOW, TYPO } from '../theme';
+import { BW, C, F, G, GradientKey, OUTLINE, R, SHADOW, SP, TYPO } from '../theme';
 
 // ─── Surfaces ────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ export function Card({
         end={{ x: 0.6, y: 1 }}
         style={[
           styles.card,
-          compact ? { padding: 10 } : null,
+          compact ? { padding: 8 } : null,
           glow ? { borderColor: glow } : null,
           tint ? { backgroundColor: tint } : null,
         ]}
@@ -96,10 +96,10 @@ export function Button({
 }) {
   const pad =
     size === 'lg'
-      ? { paddingVertical: 15, paddingHorizontal: 24 }
+      ? { paddingVertical: 16, paddingHorizontal: 24 }
       : size === 'sm'
         ? { paddingVertical: 8, paddingHorizontal: 12 }
-        : { paddingVertical: 11, paddingHorizontal: 16 };
+        : { paddingVertical: 12, paddingHorizontal: 16 };
   const font = size === 'lg' ? 18 : size === 'sm' ? 13 : 15;
   // un bouton éteint doit rester lisible : on change de couleur plutôt que
   // de baisser l'opacité, qui délavait le texte sur les fonds clairs
@@ -332,7 +332,7 @@ export function Chip({
       style={[
         styles.chip,
         active
-          ? { backgroundColor: color, borderColor: color }
+          ? { backgroundColor: color, borderColor: OUTLINE, borderWidth: BW.thick }
           : { borderColor: 'rgba(255,246,232,0.16)' },
         style,
       ]}
@@ -370,7 +370,7 @@ export function StatRow({
     <View style={[styles.statRow, style]}>
       {items.map((it, i) => (
         <View key={i} style={styles.stat}>
-          <Text style={{ fontSize: 13.5 }}>{it.icon}</Text>
+          <Text style={{ fontSize: 13 }}>{it.icon}</Text>
           <Text style={[styles.statValue, it.color ? { color: it.color } : null]}>
             {it.value}
           </Text>
@@ -443,12 +443,14 @@ export function Segmented<T extends string>({
 export const T = TYPO;
 
 const styles = StyleSheet.create({
-  cardWrap: { borderRadius: R.lg, marginVertical: 6 },
+  cardWrap: { borderRadius: R.lg, marginVertical: 8 },
   card: {
     borderRadius: R.lg,
-    borderWidth: 1,
+    // La carte est sombre sur fond sombre : un contour noir n'y ferait rien.
+    // C'est le liseré clair (cardShine) et l'ombre portée qui la détachent.
+    borderWidth: BW.hair,
     borderColor: C.hairline,
-    padding: 14,
+    padding: SP.lg,
     overflow: 'hidden',
   },
   cardShine: {
@@ -459,14 +461,22 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.22)',
   },
+  // Renfoncement : tout ce qui n'est pas actionnable s'enfonce au lieu de
+  // ressortir. C'est ce qui distingue au premier regard une jauge d'un bouton.
   well: {
     backgroundColor: C.well,
     borderRadius: R.md,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.5)',
-    padding: 10,
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    borderTopColor: 'rgba(0,0,0,0.85)',
+    padding: SP.md,
   },
-  btnBase: { borderRadius: R.md, overflow: 'hidden' },
+  btnBase: {
+    borderRadius: R.md,
+    overflow: 'hidden',
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+  },
   btnFace: {
     borderRadius: R.md,
     alignItems: 'center',
@@ -480,15 +490,16 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     textAlign: 'center',
     includeFontPadding: false,
-    textShadowColor: 'rgba(0,0,0,0.18)',
+    // le liseré tient le texte lisible sur n'importe quel dégradé
+    textShadowColor: 'rgba(6,3,12,0.35)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 2,
   } as TextStyle,
   ghost: {
     alignSelf: 'flex-start',
     minHeight: 34,
     justifyContent: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     borderRadius: R.pill,
     borderWidth: 1,
     borderColor: C.hairline,
@@ -497,19 +508,19 @@ const styles = StyleSheet.create({
   ghostText: {
     fontFamily: F.bold,
     fontSize: 13,
-    lineHeight: 16,
+    lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',
     includeFontPadding: false,
   },
-  btnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  btnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   btnIcon: { includeFontPadding: false },
   btnLabels: { alignItems: 'center', flexShrink: 1 },
   btnSub: {
     fontFamily: F.semi,
     textAlign: 'center',
     includeFontPadding: false,
-    marginTop: 1,
+    marginTop: 2,
   },
   barOuter: {
     // sans cela, un parent en `alignItems: 'center'` réduit la barre à sa
@@ -536,11 +547,11 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
     textShadowOffset: { width: 0, height: 1 },
   } as TextStyle,
-  screenTitle: { alignItems: 'center', marginTop: 4, marginBottom: 10 },
+  screenTitle: { alignItems: 'center', marginTop: 4, marginBottom: 8 },
   screenSub: {
     fontFamily: F.regular,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',
     marginTop: -2,
@@ -549,13 +560,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-    marginBottom: 10,
+    gap: 8,
+    marginBottom: 8,
   },
   chip: {
     flexDirection: 'row',
-    gap: 5,
-    paddingHorizontal: 11,
+    gap: 4,
+    paddingHorizontal: 12,
     // Baloo 2 assoit sa ligne de base très bas : avec un lineHeight généreux
     // le glyphe remonte et le texte paraît collé au bord haut. On centre donc
     // dans une hauteur fixe plutôt que de jouer sur le padding.
@@ -568,14 +579,14 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontFamily: F.bold,
-    fontSize: 12.5,
-    lineHeight: 15,
+    fontSize: 12,
+    lineHeight: 16,
     letterSpacing: 0.2,
     textAlign: 'center',
     includeFontPadding: false,
   },
   // l'emoji porte sa propre police : sa boîte de ligne doit rester la sienne
-  chipIcon: { fontSize: 12, lineHeight: 15, includeFontPadding: false },
+  chipIcon: { fontSize: 12, lineHeight: 16, includeFontPadding: false },
   statRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
   statGrid: {
     flexDirection: 'row',
@@ -583,25 +594,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6,3,12,0.4)',
     borderWidth: 1,
     borderColor: C.hairlineSoft,
-    paddingVertical: 9,
+    paddingVertical: 8,
   },
-  statCell: { flex: 1, alignItems: 'center', gap: 3 },
-  statCellIcon: { fontSize: 14, lineHeight: 18, includeFontPadding: false },
+  statCell: { flex: 1, alignItems: 'center', gap: 4 },
+  statCellIcon: { fontSize: 13, lineHeight: 17, includeFontPadding: false },
   statCellValue: {
     fontFamily: F.black,
-    fontSize: 13.5,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.text,
     textAlign: 'center',
     includeFontPadding: false,
   },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  statValue: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.text },
+  statValue: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.text },
   segWrap: {
     flexDirection: 'row',
     gap: 4,
-    marginHorizontal: 14,
-    marginTop: 10,
+    marginHorizontal: 12,
+    marginTop: 8,
     padding: 4,
     borderRadius: R.pill,
     backgroundColor: 'rgba(6,3,12,0.5)',
@@ -618,7 +629,7 @@ const styles = StyleSheet.create({
   segBtnOn: { backgroundColor: 'rgba(255,201,60,0.18)' },
   segText: {
     fontFamily: F.bold,
-    fontSize: 13.5,
+    fontSize: 13,
     lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',

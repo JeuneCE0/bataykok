@@ -111,7 +111,7 @@ export default function RankingScreen({
           </Text>
           <Button
             full
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 8 }}
             label={t('season.claim')}
             sub={`🌽 ${fmt(tierForRank(seasonPending.rank).grains)} · 🌶️ ${
               tierForRank(seasonPending.rank).piments
@@ -218,16 +218,16 @@ export default function RankingScreen({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
-  badges: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 6 },
+  content: { padding: 12, paddingBottom: 32 },
+  badges: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 8 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 9,
+    paddingVertical: 8,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
-    gap: 10,
+    gap: 8,
   },
   meRow: {
     backgroundColor: 'rgba(255,201,60,0.10)',
@@ -246,25 +246,25 @@ const styles = StyleSheet.create({
   },
   rank: {
     fontFamily: F.black,
-    fontSize: 13.5,
+    fontSize: 13,
     lineHeight: 17,
     color: C.textDim,
     includeFontPadding: false,
     textAlign: 'center',
   },
   name: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text, flex: 1 },
-  cls: { fontSize: 16 },
+  cls: { fontSize: 15 },
   level: {
     fontFamily: F.semi,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
     width: 52,
     textAlign: 'right',
   },
-  seasonRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  seasonRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   seasonTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
-  seasonSub: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  seasonSub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
   chevron: { fontFamily: F.black, fontSize: 20, color: C.textFaint, marginLeft: -2 },
-  dots: { color: C.textFaint, textAlign: 'center', fontSize: 18, paddingVertical: 6 },
+  dots: { color: C.textFaint, textAlign: 'center', fontSize: 17, paddingVertical: 8 },
 });

@@ -109,7 +109,7 @@ export default function QuestScreen() {
             style={styles.action}
             size="sm"
             variant="ember"
-            icon="🫗"
+            icon="⏫"
             label={t('quest.refill')}
             sub={`🌶️ 5 · +${MAX_MOTIVATION - motivation}`}
             onPress={refillMotivation}
@@ -140,7 +140,7 @@ export default function QuestScreen() {
             icon="📍"
             label={t(activeQuest.quest.placeKey)}
             color={C.lagoon}
-            style={{ alignSelf: 'flex-start', marginTop: 6 }}
+            style={{ alignSelf: 'flex-start', marginTop: 8 }}
           />
           <Text style={styles.flavor}>{t(activeQuest.quest.flavorKey)}</Text>
           {remaining > 0 ? (
@@ -180,7 +180,7 @@ export default function QuestScreen() {
                 collectQuest();
                 cancelQuestReminder();
               }}
-              style={{ marginTop: 6 }}
+              style={{ marginTop: 8 }}
             />
           )}
         </Card>
@@ -266,7 +266,7 @@ export default function QuestScreen() {
             icon="🔄"
             label={t('quest.reroll')}
             onPress={rerollQuests}
-            style={{ alignSelf: 'center', marginTop: 6 }}
+            style={{ alignSelf: 'center', marginTop: 8 }}
           />
         </>
       )}
@@ -283,7 +283,7 @@ function formatTime(sec: number): string {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
+  content: { padding: 12, paddingBottom: 32 },
   motivHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   motivValue: {
     fontFamily: F.black,
@@ -305,39 +305,39 @@ const styles = StyleSheet.create({
   emptyTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ember },
   emptyText: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
   },
   refillNote: {
     fontFamily: F.semi,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textFaint,
     textAlign: 'center',
     marginTop: 8,
   },
   // deux boutons de largeur égale : l'un ne doit pas écraser l'autre selon la
   // longueur de son libellé
-  actions: { flexDirection: 'row', gap: 8, marginTop: 10, marginBottom: 8 },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 8, marginBottom: 8 },
   action: { flex: 1, alignSelf: 'auto' },
   transportRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 14,
+    marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: C.hairlineSoft,
   },
   transportLabel: {
     fontFamily: F.black,
-    fontSize: 11.5,
+    fontSize: 11,
     letterSpacing: 0.9,
     textTransform: 'uppercase',
     color: C.textFaint,
   },
-  timerWell: { alignItems: 'center', gap: 10, paddingVertical: 18 },
+  timerWell: { alignItems: 'center', gap: 8, paddingVertical: 16 },
   timerCap: {
     fontFamily: F.black,
     fontSize: 11,
@@ -355,26 +355,26 @@ const styles = StyleSheet.create({
   },
   abandon: { alignSelf: 'center', marginTop: 12 },
   questHead: { gap: 8, alignItems: 'flex-start' },
-  questTitle: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
+  questTitle: { fontFamily: F.black, fontSize: 20, lineHeight: 26, color: C.text },
   flavor: {
     fontFamily: F.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: C.textDim,
-    marginVertical: 10,
+    marginVertical: 8,
     lineHeight: 21,
   },
   countdown: {
     fontFamily: F.black,
-    fontSize: 34,
-    lineHeight: 42,
+    fontSize: 31,
+    lineHeight: 41,
     color: C.gold,
     letterSpacing: 1,
   },
   levelUp: { ...T.body, fontFamily: F.black, color: C.gold, marginTop: 8 },
   yield: {
     fontFamily: F.bold,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.cane,
     textAlign: 'center',
     marginTop: 8,

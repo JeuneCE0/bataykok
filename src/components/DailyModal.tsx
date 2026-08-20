@@ -105,7 +105,7 @@ export default function DailyModal() {
                 const r = claimStreak();
                 if (r) setGot(r);
               }}
-              style={{ marginTop: 14 }}
+              style={{ marginTop: 12 }}
             />
           </LinearGradient>
         </Animated.View>
@@ -120,32 +120,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,2,8,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 22,
+    padding: 24,
   },
   card: {
     borderRadius: R.xl,
     borderWidth: 1,
     borderColor: C.hairline,
-    padding: 22,
+    padding: 24,
     alignItems: 'center',
     ...SHADOW.float,
   },
   kicker: {
     fontFamily: F.black,
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 1.6,
     color: C.ember,
   },
-  title: { fontFamily: F.black, fontSize: 26, color: C.gold, marginTop: 2 },
+  title: { fontFamily: F.black, fontSize: 24, color: C.gold, marginTop: 2 },
   sub: {
     fontFamily: F.regular,
-    fontSize: 12.5,
+    fontSize: 12,
     color: C.textDim,
     textAlign: 'center',
     marginTop: 2,
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, justifyContent: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
   day: {
     width: 62,
     borderRadius: R.md,
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
     borderColor: C.hairlineSoft,
     backgroundColor: 'rgba(6,3,12,0.45)',
     alignItems: 'center',
-    paddingVertical: 7,
-    gap: 1,
+    paddingVertical: 8,
+    gap: 2,
   },
   dayPassed: { opacity: 0.42, borderColor: C.cane },
   dayToday: {
@@ -165,5 +165,5 @@ const styles = StyleSheet.create({
   dayNum: { fontFamily: F.black, fontSize: 11, color: C.textDim },
   dayIcon: { fontSize: 15 },
   dayVal: { fontFamily: F.black, fontSize: 12, color: C.text },
-  got: { fontFamily: F.black, fontSize: 17, color: C.cane, marginTop: 14 },
+  got: { fontFamily: F.black, fontSize: 17, color: C.cane, marginTop: 12 },
 });

@@ -81,7 +81,7 @@ export default function DefenseReport() {
               </Text>
             </View>
 
-            <ScrollView style={{ marginTop: 6 }}>
+            <ScrollView style={{ marginTop: 8 }}>
               {defenses.map((d) => {
                 const cls = CLASSES[d.attackerClass];
                 return (
@@ -99,11 +99,11 @@ export default function DefenseReport() {
                     >
                       <Text style={{ fontSize: 17 }}>{d.defended ? '🛡️' : '💀'}</Text>
                     </View>
-                    <View style={{ flex: 1, gap: 3 }}>
+                    <View style={{ flex: 1, gap: 4 }}>
                       <Text style={styles.name} numberOfLines={1}>
                         {d.attackerName}
                       </Text>
-                      <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                      <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
                         <Chip icon={cls.emoji} label={`niv. ${d.attackerLevel}`} color={cls.color} />
                         <Chip
                           label={d.defended ? 'Repoussé' : 'Battu'}
@@ -128,7 +128,7 @@ export default function DefenseReport() {
               size="lg"
               label={t('defense.ack')}
               onPress={clearDefenses}
-              style={{ marginTop: 14 }}
+              style={{ marginTop: 12 }}
             />
           </LinearGradient>
         </Animated.View>
@@ -143,19 +143,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,2,8,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 16,
   },
   card: {
     borderRadius: R.xl,
     borderWidth: 1,
     borderColor: C.hairline,
-    padding: 20,
+    padding: 16,
     ...SHADOW.float,
   },
   kicker: {
     fontFamily: F.black,
-    fontSize: 10.5,
-    lineHeight: 14,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1.6,
     color: C.ember,
     textAlign: 'center',
@@ -163,14 +163,14 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: F.black,
     fontSize: 24,
-    lineHeight: 31,
+    lineHeight: 32,
     color: C.gold,
     textAlign: 'center',
   },
   sub: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
     textAlign: 'center',
     marginBottom: 12,
@@ -180,16 +180,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 16,
     flexWrap: 'wrap',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: C.hairlineSoft,
   },
-  total: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
+  total: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
@@ -203,6 +203,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   name: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
-  gain: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 18, color: C.gold },
-  honor: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  gain: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.gold },
+  honor: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
 });

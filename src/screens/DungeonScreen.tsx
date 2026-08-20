@@ -113,19 +113,19 @@ export default function DungeonScreen() {
       {/* Clés */}
       <Card compact>
         <View style={styles.keyRow}>
-          <View style={{ flexDirection: 'row', gap: 5 }}>
+          <View style={{ flexDirection: 'row', gap: 4 }}>
             {Array.from({ length: MAX_KEYS }, (_, i) => (
-              <Text key={i} style={{ fontSize: 19, opacity: i < keys ? 1 : 0.22 }}>
+              <Text key={i} style={{ fontSize: 20, opacity: i < keys ? 1 : 0.22 }}>
                 🗝️
               </Text>
             ))}
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.keyTitle}>
-              {keys > 0 ? `${keys} clés en poche` : 'Plus de clé'}
+              {keys > 0 ? t('dungeon.keys', { n: keys }) : t('dungeon.noKey')}
             </Text>
             <Text style={styles.keySub}>
-              1 offerte par jour · coffre des défis · 1 quête sur 12 · pub
+              {t('dungeon.keySources')}
             </Text>
           </View>
           <Button
@@ -149,7 +149,7 @@ export default function DungeonScreen() {
           max={BOSSES.length}
           variant="mystic"
           height={16}
-          label={`${dungeonFloor} / ${BOSSES.length} gardiens vaincus`}
+          label={t('dungeon.cleared_n', { n: dungeonFloor, total: BOSSES.length })}
         />
       </Card>
 
@@ -181,7 +181,7 @@ export default function DungeonScreen() {
                 <View style={styles.portrait}>
                   <View style={[styles.halo, { backgroundColor: cls.color }]} />
                   {locked ? (
-                    <Text style={{ fontSize: 32 }}>🔒</Text>
+                    <Text style={{ fontSize: 31 }}>🔒</Text>
                   ) : (
                     <Rooster
                       appearance={boss.appearance}
@@ -195,14 +195,14 @@ export default function DungeonScreen() {
                   </View>
                 </View>
 
-                <View style={{ flex: 1, gap: 5 }}>
+                <View style={{ flex: 1, gap: 4 }}>
                   <Text style={styles.bossName} numberOfLines={1}>
                     {locked ? '???' : boss.name}
                   </Text>
                   <Text style={styles.place} numberOfLines={1}>
                     📍 {boss.place}
                   </Text>
-                  <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                  <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
                     <Chip label={t('common.level', { n: boss.level })} color={C.textDim} />
                     {!locked && (
                       <Chip icon={cls.emoji} label={cls.name} color={cls.color} />
@@ -248,10 +248,10 @@ export default function DungeonScreen() {
                     size="lg"
                     variant="mystic"
                     icon="🗝️"
-                    label={keys > 0 ? 'Affronter le gardien' : 'Plus de clé'}
+                    label={keys > 0 ? t('dungeon.fight') : t('dungeon.noKey')}
                     onPress={() => launch(boss)}
                     disabled={keys <= 0}
-                    style={{ marginTop: 10, ...SHADOW.card }}
+                    style={{ marginTop: 8, ...SHADOW.card }}
                   />
                 </>
               )}
@@ -265,7 +265,7 @@ export default function DungeonScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
+  content: { padding: 12, paddingBottom: 32 },
   keyRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   keyTitle: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
   keySub: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   gainRow: { flexDirection: 'row', gap: 16, flexWrap: 'wrap', marginBottom: 4 },
-  gain: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.text },
-  lootLine: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.gold },
+  gain: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  lootLine: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.gold },
   damageLine: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
     marginBottom: 8,
   },
@@ -300,8 +300,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     minWidth: 22,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
     borderRadius: R.pill,
     backgroundColor: 'rgba(6,3,12,0.92)',
     borderWidth: 1,
@@ -310,35 +310,35 @@ const styles = StyleSheet.create({
   floorText: {
     fontFamily: F.black,
     fontSize: 11,
-    lineHeight: 14,
+    lineHeight: 15,
     color: C.mystic,
     includeFontPadding: false,
     textAlign: 'center',
   },
-  bossName: { fontFamily: F.black, fontSize: 17.5, lineHeight: 23, color: C.text },
-  place: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  bossName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
+  place: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: C.textDim },
   flavor: {
     fontFamily: F.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 17,
     color: C.textDim,
-    marginTop: 10,
+    marginTop: 8,
   },
   rewardBox: {
-    marginTop: 10,
-    padding: 10,
+    marginTop: 8,
+    padding: 8,
     borderRadius: R.md,
     borderWidth: 1,
     borderColor: C.hairlineSoft,
-    gap: 6,
+    gap: 8,
   },
   rewardLabel: {
     fontFamily: F.black,
-    fontSize: 9.5,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 15,
     letterSpacing: 1.2,
     color: C.textFaint,
   },
   rewardRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  rewardItem: { fontFamily: F.bold, fontSize: 13.5, lineHeight: 18, color: C.text },
+  rewardItem: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.text },
 });

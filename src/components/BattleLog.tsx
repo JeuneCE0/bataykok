@@ -73,7 +73,7 @@ export default function BattleLog() {
         <GhostButton
           label={all ? 'Voir moins' : `Voir tout (${log.length})`}
           onPress={() => setAll((v) => !v)}
-          style={{ alignSelf: 'center', marginTop: 10 }}
+          style={{ alignSelf: 'center', marginTop: 8 }}
         />
       )}
     </Card>
@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 7,
+    gap: 8,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  name: { fontFamily: F.bold, fontSize: 14.5, lineHeight: 19, color: C.text },
+  name: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
   meta: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim },
   gold: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.gold },
   honor: { fontFamily: F.semi, fontSize: 12, lineHeight: 16 },

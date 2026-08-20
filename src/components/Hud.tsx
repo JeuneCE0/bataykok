@@ -42,7 +42,7 @@ export default function Hud() {
           </View>
         </View>
 
-        <View style={{ flex: 1, marginLeft: 12, gap: 3 }}>
+        <View style={{ flex: 1, marginLeft: 12, gap: 4 }}>
           <Text style={styles.name} numberOfLines={1}>
             {player.name}
           </Text>
@@ -51,7 +51,7 @@ export default function Hud() {
           </Text>
         </View>
 
-        <View style={{ gap: 5, alignItems: 'flex-end' }}>
+        <View style={{ gap: 4, alignItems: 'flex-end' }}>
           <Purse icon="🌽" value={player.grains} colors={G.gold} />
           <Purse icon="🌶️" value={player.piments} colors={G.piment} />
         </View>
@@ -71,7 +71,7 @@ export default function Hud() {
               pressed && { opacity: 0.6 },
             ]}
           >
-            <Text style={{ fontSize: 14 }}>{muted ? '🔇' : '🔊'}</Text>
+            <Text style={{ fontSize: 13 }}>{muted ? '🔇' : '🔊'}</Text>
           </Pressable>
           <Pressable
             onPress={() => {
@@ -81,7 +81,7 @@ export default function Hud() {
             hitSlop={8}
             style={({ pressed }) => [styles.mute, pressed && { opacity: 0.6 }]}
           >
-            <Text style={{ fontSize: 14 }}>⚙️</Text>
+            <Text style={{ fontSize: 13 }}>⚙️</Text>
           </Pressable>
         </View>
         <SettingsModal visible={settings} onClose={() => setSettings(false)} />
@@ -132,15 +132,15 @@ function Purse({
 
 const styles = StyleSheet.create({
   hud: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingTop: 8,
-    paddingBottom: 10,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,246,232,0.10)',
     gap: 8,
   },
   row: { flexDirection: 'row', alignItems: 'center' },
-  tools: { gap: 5, marginLeft: 8 },
+  tools: { gap: 4, marginLeft: 8 },
   avatar: {
     width: 54,
     height: 54,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     right: -5,
     minWidth: 22,
     height: 22,
-    borderRadius: 11,
+    borderRadius: 10,
     paddingHorizontal: 4,
     backgroundColor: C.gold,
     borderWidth: 2,
@@ -176,24 +176,24 @@ const styles = StyleSheet.create({
   levelText: {
     fontFamily: F.black,
     fontSize: 13,
-    lineHeight: 16,
+    lineHeight: 17,
     color: C.ink,
     includeFontPadding: false,
     textAlign: 'center',
   },
-  name: { fontFamily: F.black, fontSize: 19, lineHeight: 25, color: C.text },
+  name: { fontFamily: F.black, fontSize: 20, lineHeight: 26, color: C.text },
   cls: { fontFamily: F.bold, fontSize: 13, lineHeight: 17 },
   purse: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     backgroundColor: 'rgba(6,3,12,0.55)',
     borderRadius: R.pill,
     borderWidth: 1,
     borderColor: C.hairlineSoft,
-    paddingRight: 10,
-    paddingLeft: 3,
-    paddingVertical: 3,
+    paddingRight: 8,
+    paddingLeft: 4,
+    paddingVertical: 4,
     minWidth: 84,
   },
   purseDot: {
@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
   muteOff: { borderColor: C.piment, backgroundColor: 'rgba(255,59,92,0.14)' },
   purseValue: {
     fontFamily: F.black,
-    fontSize: 14.5,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 20,
     color: C.text,
     includeFontPadding: false,
   },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 9,
+    paddingHorizontal: 8,
     minHeight: 24,
     borderRadius: R.pill,
     borderWidth: 1,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   evText: {
     fontFamily: F.black,
     fontSize: 11,
-    lineHeight: 14,
+    lineHeight: 15,
     includeFontPadding: false,
   },
 });

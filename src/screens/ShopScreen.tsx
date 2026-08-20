@@ -189,9 +189,9 @@ export default function ShopScreen() {
           <Card key={tr.name} compact glow={active ? C.cane : undefined}>
             <View style={styles.itemRow}>
               <View style={styles.transportIcon}>
-                <Text style={{ fontSize: 26 }}>{tr.emoji}</Text>
+                <Text style={{ fontSize: 24 }}>{tr.emoji}</Text>
               </View>
-              <View style={{ flex: 1, gap: 3 }}>
+              <View style={{ flex: 1, gap: 4 }}>
                 <Text style={styles.itemName}>{tr.name}</Text>
                 {tr.reduction > 0 && (
                   <Chip
@@ -234,7 +234,7 @@ export default function ShopScreen() {
         <Text style={T.dim}>
           {t('shop.exchangeRate', { n: fmt(grainsPerPiment(player.level)) })}
         </Text>
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
           {[1, 5, 10].map((n) => (
             <Button
               key={n}
@@ -254,7 +254,7 @@ export default function ShopScreen() {
           </Text>
           <Text style={styles.starterTitle}>{t('shop.pass')}</Text>
         </View>
-        <View style={{ gap: 5, marginBottom: 12 }}>
+        <View style={{ gap: 4, marginBottom: 12 }}>
           <Text style={styles.passLine}>🌶️ 20 piments chaque jour</Text>
           <Text style={styles.passLine}>✨ +10 % d'XP su tout</Text>
           <Text style={styles.passLine}>🧧 Coffre gratuit prioritèr</Text>
@@ -265,7 +265,7 @@ export default function ShopScreen() {
               label={t('shop.passActive', { d: new Date(passUntil).toLocaleDateString('fr-FR') })}
               color={C.cane}
               active
-              style={{ alignSelf: 'flex-start', marginBottom: 10 }}
+              style={{ alignSelf: 'flex-start', marginBottom: 8 }}
             />
             <Button
               full
@@ -303,17 +303,17 @@ export default function ShopScreen() {
       {!starterPackBought && (
         <Card glow={C.ember}>
           <View style={styles.starterHead}>
-            <Text style={styles.starterTag}>OFFRE DE BIENVENUE · UNE SEULE FOI</Text>
+            <Text style={styles.starterTag}>{t('shop.welcomeBadge')}</Text>
             <Text style={styles.starterTitle}>Pak Ti Batayeur</Text>
           </View>
           <View style={styles.starterGrid}>
             <View style={styles.starterItem}>
-              <Text style={{ fontSize: 26 }}>🌶️</Text>
+              <Text style={{ fontSize: 24 }}>🌶️</Text>
               <Text style={styles.starterVal}>300</Text>
             </View>
             <Text style={styles.plus}>+</Text>
             <View style={styles.starterItem}>
-              <Text style={{ fontSize: 26 }}>🌽</Text>
+              <Text style={{ fontSize: 24 }}>🌽</Text>
               <Text style={styles.starterVal}>1 500</Text>
             </View>
             <View style={{ flex: 1 }} />
@@ -350,7 +350,7 @@ export default function ShopScreen() {
             </LinearGradient>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.itemName}>×{p.piments} piments</Text>
-              <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+              <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
                 {p.tag && <Chip label={p.tag} color={C.gold} active />}
                 {p.bonus > 0 && <Chip label={t('shop.bonus', { n: p.bonus })} color={C.cane} />}
               </View>
@@ -371,8 +371,8 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { padding: 14, paddingBottom: 40 },
-  itemRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  content: { padding: 12, paddingBottom: 32 },
+  itemRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   itemIcon: {
     width: 46,
     height: 46,
@@ -398,33 +398,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemName: { fontFamily: F.black, fontSize: 16.5, lineHeight: 21, color: C.text },
+  itemName: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.text },
   itemStats: {
     fontFamily: F.regular,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
   },
-  chipLine: { flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center' },
-  more: { fontFamily: F.regular, fontSize: 11.5, lineHeight: 15, color: C.textFaint },
-  owned: { fontFamily: F.black, fontSize: 14, lineHeight: 19, color: C.cane },
-  starterHead: { marginBottom: 10 },
+  chipLine: { flexDirection: 'row', gap: 4, flexWrap: 'wrap', alignItems: 'center' },
+  more: { fontFamily: F.regular, fontSize: 11, lineHeight: 15, color: C.textFaint },
+  owned: { fontFamily: F.black, fontSize: 13, lineHeight: 17, color: C.cane },
+  starterHead: { marginBottom: 8 },
   starterTag: {
     fontFamily: F.black,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 1.3,
     color: C.ember,
   },
-  starterTitle: { fontFamily: F.black, fontSize: 23, lineHeight: 30, color: C.gold },
+  starterTitle: { fontFamily: F.black, fontSize: 24, lineHeight: 32, color: C.gold },
   starterGrid: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
+    gap: 8,
+    marginBottom: 12,
   },
   starterItem: { alignItems: 'center' },
-  starterVal: { fontFamily: F.black, fontSize: 14, color: C.text },
-  plus: { fontFamily: F.black, fontSize: 18, color: C.textFaint },
+  starterVal: { fontFamily: F.black, fontSize: 13, color: C.text },
+  plus: { fontFamily: F.black, fontSize: 17, color: C.textFaint },
   oldPrice: {
     fontFamily: F.semi,
     fontSize: 12,
@@ -432,5 +432,5 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   newPrice: { fontFamily: F.black, fontSize: 20, color: C.cane },
-  passLine: { fontFamily: F.semi, fontSize: 14, lineHeight: 19, color: C.text },
+  passLine: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.text },
 });

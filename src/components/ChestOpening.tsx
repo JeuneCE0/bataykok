@@ -272,7 +272,7 @@ export default function ChestOpening({
             size="lg"
             label={t('chest.pocket')}
             onPress={onClose}
-            style={{ marginTop: 18 }}
+            style={{ marginTop: 16 }}
           />
         </Animated.View>
       </View>
@@ -300,23 +300,23 @@ const styles = StyleSheet.create({
     height: 190,
     borderRadius: 2,
   },
-  chest: { fontSize: 96 },
+  chest: { fontSize: 64 },
   rewardWrap: { position: 'absolute', alignItems: 'center', width: '100%' },
   rewardCard: {
     alignItems: 'center',
-    paddingVertical: 22,
-    paddingHorizontal: 28,
+    paddingVertical: 24,
+    paddingHorizontal: 24,
     borderRadius: R.xl,
     borderWidth: 2,
     minWidth: 240,
     gap: 4,
   },
-  rewardIcon: { fontSize: 54 },
+  rewardIcon: { fontSize: 44 },
   rewardLabel: {
     fontFamily: F.black,
-    fontSize: 22,
-    lineHeight: 29,
+    fontSize: 20,
+    lineHeight: 26,
     textAlign: 'center',
   },
-  rarity: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.textDim },
+  rarity: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.textDim },
 });

@@ -111,8 +111,8 @@ export default function CharacterScreen() {
       value={view}
       onChange={setView}
       options={[
-        { id: 'kok', label: '🐓  Mon Kok' },
-        { id: 'kaz', label: '🏡  La Kaz' },
+        { id: 'kok', label: `🐓  ${t('kok.tab.me')}` },
+        { id: 'kaz', label: `🏡  ${t('kok.tab.kaz')}` },
       ]}
     />
   );
@@ -122,8 +122,8 @@ export default function CharacterScreen() {
       <View style={{ flex: 1 }}>
         {switcher}
         <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-          <ScreenTitle title="La Kaz" sub={t('kok.dailyMissions')} />
-          <View style={{ alignItems: 'center', marginBottom: 10 }}>
+          <ScreenTitle title={t('kok.tab.kaz')} sub={t('kok.dailyMissions')} />
+          <View style={{ alignItems: 'center', marginBottom: 8 }}>
             <Chip
               label={ONLINE_LABEL[onlineState]}
               color={
@@ -151,7 +151,7 @@ export default function CharacterScreen() {
               icon="⚙️"
               label={t('settings.title')}
               onPress={() => setSettings(true)}
-              style={{ marginTop: 10 }}
+              style={{ marginTop: 8 }}
             />
           </Card>
           <SettingsModal visible={settings} onClose={() => setSettings(false)} />
@@ -170,13 +170,13 @@ export default function CharacterScreen() {
         </Card>
       )}
       {/* ─── Fiche ─── */}
-      <Card glow={cls.color} style={{ paddingBottom: 10 }}>
+      <Card glow={cls.color} style={{ paddingBottom: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={styles.portrait}>
             <View style={[styles.halo, { backgroundColor: cls.color }]} />
             <Rooster appearance={player.appearance} size={128} alive aura={auraColor(player)} />
           </View>
-          <View style={{ flex: 1, gap: 7 }}>
+          <View style={{ flex: 1, gap: 8 }}>
             <Text style={[styles.className, { color: cls.color }]} numberOfLines={1}>
               {cls.emoji} {cls.name}
             </Text>
@@ -204,7 +204,7 @@ export default function CharacterScreen() {
       <Card>
         <View style={styles.sectionHead}>
           <SectionTitle icon="💪">{t('kok.attrs')}</SectionTitle>
-          <View style={{ flexDirection: 'row', gap: 6 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             {[1, 5, 10].map((n) => (
               <Chip
                 key={n}
@@ -222,7 +222,7 @@ export default function CharacterScreen() {
           const main = a === cls.mainAttr;
           return (
             <View key={a} style={styles.attrRow}>
-              <View style={{ flex: 1, gap: 5 }}>
+              <View style={{ flex: 1, gap: 4 }}>
                 <View style={styles.attrHead}>
                   <Text style={styles.attrName}>
                     {ATTR_ICONS[a]} {ATTR_LABELS[a]}
@@ -259,7 +259,7 @@ export default function CharacterScreen() {
             if (!tal) return null;
             return (
               <View key={id} style={styles.talentRow}>
-                <Text style={{ fontSize: 18 }}>{tal.icon}</Text>
+                <Text style={{ fontSize: 17 }}>{tal.icon}</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.talentName}>{t(tal.titleKey)}</Text>
                   <Text style={styles.talentDesc}>{t(tal.descKey)}</Text>
@@ -304,7 +304,7 @@ export default function CharacterScreen() {
                 ]}
                 onPress={() => it && setSelected(it)}
               >
-                <Text style={{ fontSize: 22, opacity: it ? 1 : 0.35 }}>{SLOT_ICONS[s]}</Text>
+                <Text style={{ fontSize: 20, opacity: it ? 1 : 0.35 }}>{SLOT_ICONS[s]}</Text>
                 <Text
                   style={[styles.slotLabel, col ? { color: col } : null]}
                   numberOfLines={2}
@@ -347,13 +347,13 @@ export default function CharacterScreen() {
                   { borderColor: RARITY_COLORS[it.rarity], backgroundColor: `${RARITY_COLORS[it.rarity]}1A` },
                 ]}
               >
-                <Text style={{ fontSize: 18 }}>{SLOT_ICONS[it.slot]}</Text>
+                <Text style={{ fontSize: 17 }}>{SLOT_ICONS[it.slot]}</Text>
               </Pressable>
-              <View style={{ flex: 1, gap: 3 }}>
+              <View style={{ flex: 1, gap: 4 }}>
                 <Text style={[styles.invName, { color: RARITY_COLORS[it.rarity] }]} numberOfLines={1}>
                   {itemLabel(it, t)} <Text style={styles.invLevel}>niv.{it.level}</Text>
                 </Text>
-                <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
                   <VerdictBadge cmp={cmp} />
                   {it.setId && SET_BY_ID[it.setId] && (
                     <Chip
@@ -366,7 +366,7 @@ export default function CharacterScreen() {
                   {itemStats(it)}
                 </Text>
               </View>
-              <View style={{ gap: 5, alignItems: 'flex-end' }}>
+              <View style={{ gap: 4, alignItems: 'flex-end' }}>
                 <Button
                   size="sm"
                   variant={cmp.diff > 0 ? 'cane' : 'slate'}
@@ -386,13 +386,13 @@ export default function CharacterScreen() {
 
       {selected && (
         <Card glow={RARITY_COLORS[selected.rarity]}>
-          <Text style={[styles.invName, { color: RARITY_COLORS[selected.rarity], fontSize: 16 }]}>
+          <Text style={[styles.invName, { color: RARITY_COLORS[selected.rarity], fontSize: 15 }]}>
             {selected.name}
           </Text>
           <Chip
             label={RARITY_LABELS[selected.rarity]}
             color={RARITY_COLORS[selected.rarity]}
-            style={{ alignSelf: 'flex-start', marginVertical: 6 }}
+            style={{ alignSelf: 'flex-start', marginVertical: 8 }}
           />
           <Text style={styles.invStats}>{itemStats(selected)}</Text>
           <CompareLines cmp={compareToEquipped(selected, player)} />
@@ -449,29 +449,29 @@ const styles = StyleSheet.create({
   settingsHint: {
     fontFamily: F.regular,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 17,
     color: C.textDim,
     marginTop: 2,
   },
-  content: { padding: 14, paddingBottom: 40 },
+  content: { padding: 12, paddingBottom: 32 },
   sectionHead: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 8,
     marginBottom: 4,
   },
-  flash: { fontFamily: F.bold, fontSize: 14, lineHeight: 19, color: C.cane },
+  flash: { fontFamily: F.bold, fontSize: 13, lineHeight: 17, color: C.cane },
   talentRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 7,
+    gap: 8,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
   },
-  talentName: { fontFamily: F.black, fontSize: 14.5, lineHeight: 19, color: C.text },
-  talentDesc: { fontFamily: F.regular, fontSize: 12.5, lineHeight: 17, color: C.textDim },
+  talentName: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  talentDesc: { fontFamily: F.regular, fontSize: 12, lineHeight: 16, color: C.textDim },
   portrait: { width: 132, alignItems: 'center', justifyContent: 'center' },
   halo: {
     position: 'absolute',
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     opacity: 0.14,
     top: 12,
   },
-  className: { fontFamily: F.black, fontSize: 21, lineHeight: 27 },
+  className: { fontFamily: F.black, fontSize: 20, lineHeight: 26 },
   tile: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -490,8 +490,8 @@ const styles = StyleSheet.create({
     borderRadius: R.md,
     borderWidth: 1,
     borderColor: C.hairlineSoft,
-    paddingVertical: 5,
-    paddingHorizontal: 7,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   tileIcon: {
     width: 24,
@@ -502,25 +502,25 @@ const styles = StyleSheet.create({
   },
   tileLabel: {
     fontFamily: F.bold,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
     flex: 1,
   },
-  tileValue: { fontFamily: F.black, fontSize: 15.5, lineHeight: 20, color: C.text },
-  recordRow: { flexDirection: 'row', gap: 6, marginTop: 12, flexWrap: 'wrap' },
+  tileValue: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.text },
+  recordRow: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' },
   classDesc: {
     fontFamily: F.regular,
-    fontSize: 13.5,
+    fontSize: 13,
     color: C.textDim,
     marginTop: 12,
     lineHeight: 20,
   },
-  attrRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 6 },
+  attrRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 8 },
   attrHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   attrName: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.text },
-  attrValue: { fontFamily: F.black, fontSize: 16.5, lineHeight: 21, color: C.gold },
-  attrBonus: { color: C.cane, fontSize: 14 },
+  attrValue: { fontFamily: F.black, fontSize: 17, lineHeight: 22, color: C.gold },
+  attrBonus: { color: C.cane, fontSize: 13 },
   slotGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   slot: {
     width: '22.7%',
@@ -533,22 +533,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 4,
-    gap: 3,
+    gap: 4,
     shadowOpacity: 0.5,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
   slotLabel: {
     fontFamily: F.bold,
-    fontSize: 10,
-    lineHeight: 12.5,
+    fontSize: 11,
+    lineHeight: 15.5,
     color: C.textDim,
     textAlign: 'center',
   },
   invRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: C.hairlineSoft,
@@ -562,11 +562,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   invName: { fontFamily: F.black, fontSize: 15, lineHeight: 20 },
-  invLevel: { fontFamily: F.regular, fontSize: 12.5, color: C.textFaint },
+  invLevel: { fontFamily: F.regular, fontSize: 12, color: C.textFaint },
   invStats: {
     fontFamily: F.regular,
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.textDim,
     marginTop: 2,
   },

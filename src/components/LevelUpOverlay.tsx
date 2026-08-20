@@ -149,8 +149,8 @@ const styles = StyleSheet.create({
   },
   confetti: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
   badge: {
-    paddingHorizontal: 44,
-    paddingVertical: 22,
+    paddingHorizontal: 32,
+    paddingVertical: 24,
     borderRadius: R.xl,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
@@ -163,5 +163,5 @@ const styles = StyleSheet.create({
     color: 'rgba(42,18,6,0.75)',
   },
   level: { fontFamily: F.black, fontSize: 64, color: C.ink, marginVertical: -6 },
-  sub: { fontFamily: F.bold, fontSize: 14, color: 'rgba(42,18,6,0.85)' },
+  sub: { fontFamily: F.bold, fontSize: 13, color: 'rgba(42,18,6,0.85)' },
 });
