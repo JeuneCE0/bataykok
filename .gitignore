@@ -43,3 +43,6 @@ yarn-error.*
 # tableau de bord
 web/.vercel
 App.tsx.peekbak
+
+# sorties de build locales
+dist/

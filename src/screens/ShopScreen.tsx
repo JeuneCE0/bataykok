@@ -237,15 +237,13 @@ export default function ShopScreen() {
 
       <Card glow={passUntil > Date.now() ? C.cane : C.mystic}>
         <View style={styles.starterHead}>
-          <Text style={[styles.starterTag, { color: C.mystic }]}>
-            ABONMAN · 30 JOUR
-          </Text>
+          <Text style={[styles.starterTag, { color: C.mystic }]}>{t('shop.passTag')}</Text>
           <Text style={styles.starterTitle}>{t('shop.pass')}</Text>
         </View>
         <View style={{ gap: 4, marginBottom: 12 }}>
-          <Text style={styles.passLine}>🌶️ 20 piments chaque jour</Text>
-          <Text style={styles.passLine}>✨ +10 % d'XP su tout</Text>
-          <Text style={styles.passLine}>🧧 Coffre gratuit prioritèr</Text>
+          <Text style={styles.passLine}>{t('shop.passPerk1')}</Text>
+          <Text style={styles.passLine}>{t('shop.passPerk2')}</Text>
+          <Text style={styles.passLine}>{t('shop.passPerk3')}</Text>
         </View>
         {passUntil > Date.now() ? (
           <>
@@ -260,8 +258,8 @@ export default function ShopScreen() {
               variant="cane"
               label={
                 passClaimedDay === localDay()
-                  ? 'Piments du jour déjà pris'
-                  : 'Récupérer 🌶️20 du jour'
+                  ? t('shop.passClaimed')
+                  : t('shop.passClaim')
               }
               disabled={passClaimedDay === localDay()}
               onPress={claimPassPiments}

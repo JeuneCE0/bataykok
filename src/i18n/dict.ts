@@ -1557,6 +1557,12 @@ export const DICT = {
   'iap.takePiments': { fr: 'Recevoir 🌶️{n}', rcf: 'Rosovoir 🌶️{n}' },
   'iap.takePass': { fr: 'Activer le pass', rcf: 'Aktivé le pass' },
   'iap.takePack': { fr: 'Recevoir le pack', rcf: 'Rosovoir le pak' },
+  'shop.passTag': { fr: 'ABONNEMENT · 30 JOURS', rcf: 'ABONMAN · 30 JOUR' },
+  'shop.passPerk1': { fr: '🌶️ 20 piments chaque jour', rcf: '🌶️ 20 pima tou lé zour' },
+  'shop.passPerk2': { fr: '✨ +10 % d’XP sur tout', rcf: '✨ +10 % XP su tout' },
+  'shop.passPerk3': { fr: '🧧 Coffre gratuit prioritaire', rcf: '🧧 Kofr gratui prioritèr' },
+  'shop.passClaimed': { fr: 'Piments du jour déjà pris', rcf: 'Pima du zour déza pri' },
+  'shop.passClaim': { fr: 'Récupérer 🌶️20 du jour', rcf: 'Ramas 🌶️20 du zour' },
   'shop.perMonth': { fr: '{price} / mois', rcf: '{price} / moi' },
   'market.offlineTitle': { fr: 'Hôtel fermé', rcf: 'Lotèl fermé' },
   'market.offlineBody': {
