@@ -29,7 +29,7 @@ import {
 } from '../lib/guild';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
-import { C, F, R } from '../theme';
+import { BW, C, F, OUTLINE, R } from '../theme';
 
 export default function GuildScreen() {
   const t = useT();
@@ -84,7 +84,11 @@ export default function GuildScreen() {
         <Card glow={C.gold}>
           <SectionTitle icon="⭐">{t('guild.level')}</SectionTitle>
           <View style={styles.levelRow}>
-            <Text style={styles.guildLevel}>{guildLevel}</Text>
+            {/* Le chiffre flottait sans boîte : à 44 px sans interligne, Baloo 2
+                le collait en haut et un niveau à deux chiffres décalait tout. */}
+            <View style={styles.levelPlate}>
+              <Text style={styles.guildLevel}>{guildLevel}</Text>
+            </View>
             <View style={{ flex: 1, gap: 8 }}>
               <BonusLine
                 icon="✨"
@@ -251,9 +255,22 @@ const styles = StyleSheet.create({
     textShadowRadius: 20,
   },
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  levelPlate: {
+    width: 64,
+    height: 64,
+    borderRadius: R.md,
+    borderWidth: BW.thick,
+    borderColor: OUTLINE,
+    backgroundColor: 'rgba(255,201,60,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   guildLevel: {
     fontFamily: F.black,
-    fontSize: 44,
+    fontSize: 40,
+    lineHeight: 53,
+    includeFontPadding: false,
+    textAlign: 'center',
     color: C.gold,
     textShadowColor: 'rgba(255,201,60,0.45)',
     textShadowRadius: 16,
