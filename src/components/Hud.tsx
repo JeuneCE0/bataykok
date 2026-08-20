@@ -14,7 +14,7 @@ import SettingsModal from './SettingsModal';
 import { Bar } from './ui';
 import { useT } from '../i18n/useT';
 
-export default function Hud() {
+export default function Hud({ onBuy }: { onBuy?: () => void }) {
   const t = useT();
   const player = useGame((s) => s.player);
   const sfxOn = useGame((s) => s.sfxOn);
@@ -52,8 +52,8 @@ export default function Hud() {
         </View>
 
         <View style={{ gap: 4, alignItems: 'flex-end' }}>
-          <Purse icon="🌽" value={player.grains} colors={G.gold} />
-          <Purse icon="🌶️" value={player.piments} colors={G.piment} />
+          <Purse icon="🌽" value={player.grains} colors={G.gold} onBuy={onBuy} />
+          <Purse icon="🌶️" value={player.piments} colors={G.piment} onBuy={onBuy} />
         </View>
 
         {/* couper vite d'un côté, tout régler de l'autre */}
@@ -110,10 +110,12 @@ function Purse({
   icon,
   value,
   colors,
+  onBuy,
 }: {
   icon: string;
   value: number;
   colors: readonly [string, string, string];
+  onBuy?: () => void;
 }) {
   return (
     <View style={styles.purse}>
@@ -126,6 +128,20 @@ function Purse({
         <Text style={{ fontSize: 11 }}>{icon}</Text>
       </LinearGradient>
       <Counter value={value} style={styles.purseValue} />
+      {/* Le « + » mène au Bazar : la bourse indiquait un manque sans jamais
+          dire où le combler. */}
+      {onBuy ? (
+        <Pressable
+          hitSlop={8}
+          onPress={() => {
+            play('tap', 0.6);
+            onBuy();
+          }}
+          style={({ pressed }) => [styles.plus, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.plusText}>+</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -187,14 +203,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(6,3,12,0.55)',
+    backgroundColor: 'rgba(6,3,12,0.7)',
     borderRadius: R.pill,
-    borderWidth: 1,
-    borderColor: C.hairlineSoft,
-    paddingRight: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(6,3,12,0.85)',
+    paddingRight: 4,
     paddingLeft: 4,
-    paddingVertical: 4,
-    minWidth: 84,
+    paddingVertical: 3,
+    minWidth: 96,
+  },
+  plus: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: 'rgba(6,3,12,0.8)',
+    backgroundColor: C.cane,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 'auto',
+  },
+  plusText: {
+    fontFamily: F.black,
+    fontSize: 15,
+    lineHeight: 19,
+    color: C.ink,
+    includeFontPadding: false,
+    marginTop: -1,
   },
   purseDot: {
     width: 20,
