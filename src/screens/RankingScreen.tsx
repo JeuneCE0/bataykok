@@ -127,7 +127,7 @@ export default function RankingScreen({
           <Text style={{ fontSize: 20 }}>{tier.icon}</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.seasonTitle}>
-              {t('season.current', { n: seasonNo, d: daysLeft })}
+              {t('season.current', { s: seasonNo, n: daysLeft })}
             </Text>
             <Text style={styles.seasonSub}>
               {t('season.atYourRank', { tier: t(tier.labelKey) })} → 🌽{fmt(tier.grains)} · 🌶️

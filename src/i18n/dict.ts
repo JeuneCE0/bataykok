@@ -264,7 +264,14 @@ export const DICT = {
     fr: '1 offerte par jour · coffre des défis · 1 quête sur 12 · pub',
     rcf: '1 ofèr shak zour · kof dé défi · 1 kést su 12 · pib',
   },
-  'dungeon.cleared_n': {
+  // Ne pas nommer ce compteur `dungeon.cleared_n` : `dungeon.cleared` est le
+  // badge « ✓ VAINCU », et la convention du pluriel aurait servi le compteur
+  // à sa place au premier appel avec n ≥ 2.
+  'dungeon.progressCount': {
+    fr: '{n} / {total} gardien vaincu',
+    rcf: '{n} / {total} gardien vinkri',
+  },
+  'dungeon.progressCount_n': {
     fr: '{n} / {total} gardiens vaincus',
     rcf: '{n} / {total} gardien vinkri',
   },
@@ -908,6 +915,10 @@ export const DICT = {
   'cosmetic.shopTitle': {
     fr: 'Plumage & parures',
     rcf: 'Plimaz & parir',
+  },
+  'cosmetic.tryHint': {
+    fr: 'Touche une couleur ou une parure pour l’essayer',
+    rcf: 'Tap in koulèr ou in parir pou éséy alï',
   },
   'cosmetic.shopSub': {
     fr: 'Change la tête de ton coq — aucun effet au combat, tout l’effet au rond.',
@@ -1632,8 +1643,8 @@ export const DICT = {
   'season.over': { fr: 'Saison {n} terminée !', rcf: 'Saizon {n} lé fini !' },
   'season.finished': { fr: 'Tu finis #{n} — {tier}', rcf: 'Ou la fini #{n} — {tier}' },
   'season.claim': { fr: 'Récupérer', rcf: 'Ramas' },
-  'season.current': { fr: 'Saison {n} · {d} jour restant', rcf: 'Saizon {n} · {d} zour restan' },
-  'season.current_n': { fr: 'Saison {n} · {d} jours restants', rcf: 'Saizon {n} · {d} zour restan' },
+  'season.current': { fr: 'Saison {s} · {n} jour restant', rcf: 'Saizon {s} · {n} zour restan' },
+  'season.current_n': { fr: 'Saison {s} · {n} jours restants', rcf: 'Saizon {s} · {n} zour restan' },
   'season.atYourRank': { fr: 'À ton rang : {tier}', rcf: 'A out ran : {tier}' },
 
   // ─── Profil d'un coq ───────────────────────────────────────────────────

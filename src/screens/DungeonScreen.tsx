@@ -149,7 +149,7 @@ export default function DungeonScreen() {
           max={BOSSES.length}
           variant="mystic"
           height={16}
-          label={t('dungeon.cleared_n', { n: dungeonFloor, total: BOSSES.length })}
+          label={t('dungeon.progressCount', { n: dungeonFloor, total: BOSSES.length })}
         />
       </Card>
 

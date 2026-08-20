@@ -110,7 +110,9 @@ export default function CosmeticsShop() {
             />
           </View>
         ) : (
-          <Text style={styles.hint}>{t('cosmetic.shopSub')}</Text>
+          // répéter le sous-titre de l'écran ne disait rien de plus : à
+          // l'essayage, la place sert à indiquer quoi faire
+          <Text style={styles.hint}>{t('cosmetic.tryHint')}</Text>
         )}
       </Card>
 

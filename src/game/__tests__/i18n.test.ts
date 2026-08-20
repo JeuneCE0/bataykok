@@ -44,3 +44,29 @@ describe('traductions', () => {
     assert.deepEqual(orphelines, [], `clés référencées mais absentes : ${orphelines.join(', ')}`);
   });
 });
+
+describe('pluriels', () => {
+  it('toute clé au pluriel compte bien sur {n}', () => {
+    // « Saison 1 · 13 jour restant » : la clé portait le numéro de saison dans
+    // {n} et le nombre de jours dans {d}. Le pluriel se décidait donc sur un
+    // nombre qui n'était pas celui qu'on compte.
+    for (const key of Object.keys(DICT)) {
+      if (!key.endsWith('_n')) continue;
+      const singulier = key.slice(0, -2);
+      for (const k of [key, singulier]) {
+        const fr = (DICT as Record<string, { fr: string }>)[k]?.fr ?? '';
+        assert.ok(fr.includes('{n}'), `${k} se décline sans porter {n}`);
+      }
+    }
+  });
+
+  it('la forme change bien entre un et plusieurs', () => {
+    for (const key of Object.keys(DICT)) {
+      if (!key.endsWith('_n')) continue;
+      const singulier = key.slice(0, -2) as Parameters<typeof translate>[1];
+      const un = translate('fr', singulier, { n: 1, s: 1, d: 1 });
+      const plusieurs = translate('fr', singulier, { n: 13, s: 1, d: 13 });
+      assert.notEqual(un.replace(/\d+/g, '#'), plusieurs.replace(/\d+/g, '#'), `${singulier} ne se décline pas`);
+    }
+  });
+});
