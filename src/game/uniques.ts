@@ -105,8 +105,14 @@ export const UNIQUE_BY_ID: Record<string, UniqueDef> = UNIQUES.reduce(
   {} as Record<string, UniqueDef>
 );
 
-/** Budget d'attributs d'un unique à ce niveau — nettement au-dessus du mitik. */
-const UNIQUE_BUDGET = (level: number) => Math.round((1 + level * 0.42) * 6.5 * 4);
+/**
+ * Budget d'attributs d'un unique à ce niveau.
+ *
+ * À quatre parts, l'écart avec un mitik moyen tombait à 1,3× — assez mince
+ * pour qu'un bon mitik dépasse parfois un unique. Pour un objet qui tombe une
+ * fois sur mille et qu'on garde des mois, l'écart doit être hors de doute.
+ */
+const UNIQUE_BUDGET = (level: number) => Math.round((1 + level * 0.42) * 6.5 * 5.5);
 
 /**
  * Forge un unique. Les statistiques sont dérivées du niveau et du profil, sans

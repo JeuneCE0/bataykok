@@ -229,10 +229,14 @@ describe('objets uniques', () => {
 
   it('un unique bat largement le mitik du même niveau', () => {
     // Sinon le palier n'apporte qu'une couleur de plus.
-    const mitik = Array.from({ length: 30 }, () => itemValue(generateItem(30, 'amulette', 'mitik')));
+    // 200 tirages : à 30, la moyenne du mitik bougeait assez pour faire
+    // basculer l'assertion une fois sur huit.
+    const mitik = Array.from({ length: 200 }, () => itemValue(generateItem(30, 'amulette', 'mitik')));
     const moyMitik = mitik.reduce((a, b) => a + b, 0) / mitik.length;
+    const pire = Math.max(...mitik);
     const uq = itemValue(forgeUnique(UNIQUE_BY_ID.kolie_grandbasin, 30, 0));
-    assert.ok(uq > moyMitik * 1.3, `unique ${uq} vs mitik moyen ${moyMitik.toFixed(0)}`);
+    assert.ok(uq > moyMitik * 1.5, `unique ${uq} vs mitik moyen ${moyMitik.toFixed(0)}`);
+    assert.ok(uq > pire, `le meilleur mitik (${pire.toFixed(0)}) dépasse l’unique (${uq})`);
   });
 
   it('deux exemplaires du même unique au même niveau sont identiques', () => {

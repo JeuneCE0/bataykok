@@ -242,8 +242,6 @@ export default function ArenaScreen() {
         <Chip label={t('rond.honor', { n: player.honor })} color={C.mystic} />
       </View>
 
-      <FriendDuel onDuel={launchOnline} />
-
       <Card compact>
         <View style={styles.ticketRow}>
           <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -342,6 +340,10 @@ export default function ArenaScreen() {
           );
         })
       )}
+      {/* En fin de liste : les adversaires du rond restent la voie normale,
+          le duel entre amis est un à-côté. */}
+      <FriendDuel onDuel={launchOnline} />
+
     </ScrollView>
   );
 }
