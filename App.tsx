@@ -30,6 +30,7 @@ import { useT } from './src/i18n/useT';
 import { useGame } from './src/store/gameStore';
 import { C, F, G, R } from './src/theme';
 import OfferModal from './src/components/OfferModal';
+import { initPubs } from './src/lib/ads';
 
 type Tab = 'kok' | 'quetes' | 'rond' | 'donjon' | 'ecurie' | 'bazar';
 
@@ -62,6 +63,8 @@ export default function App() {
   useEffect(() => {
     trackEvent('app_open', { hasPlayer: Boolean(player) });
     void initSound();
+    // consentement puis initialisation AdMob — sans effet sans le SDK natif
+    void initPubs();
     return () => {
       flushEvents();
       releaseSound();

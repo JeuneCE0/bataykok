@@ -1524,6 +1524,7 @@ export const DICT = {
   'market.title': { fr: 'Hôtel des Ventes', rcf: 'Lotèl dé Vant' },
   'market.sub': { fr: 'Acheter et vendre entre joueurs', rcf: 'Ashté ek vann ant zouèr' },
   'ad.outOfAds': { fr: 'Plus de pub aujourd’hui — reviens demain', rcf: 'Pu de pib zordi — rovien domin' },
+  'ad.loading': { fr: 'Chargement de la vidéo…', rcf: 'Vidéo i sarz…' },
   'ad.waiting': { fr: 'Disponible dans {n} s', rcf: 'Dispo dan {n} s' },
   'defense.count': { fr: '{n} combat sur ton kok', rcf: '{n} batay sï out kok' },
   'defense.count_n': { fr: '{n} combats sur ton kok', rcf: '{n} batay sï out kok' },

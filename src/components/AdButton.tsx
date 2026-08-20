@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AD_OFFERS, AdKind, MAX_ADS_PER_DAY } from '../game/progress';
+import { montrerPub, pubsReelles } from '../lib/ads';
 import { trackEvent } from '../lib/analytics';
 import { useGame } from '../store/gameStore';
 import { C, F, G, R, SHADOW } from '../theme';
@@ -11,8 +12,12 @@ import { useT } from '../i18n/useT';
 const AD_SECONDS = 4;
 
 /**
- * Pub récompensée. Le prototype simule le SDK (AdMob via RevenueCat en prod) :
- * même friction, même cadence, pour que l'équilibrage tienne dès maintenant.
+ * Pub récompensée.
+ *
+ * Sur un build natif, c'est une vraie vidéo AdMob et la récompense n'est
+ * versée que si Google confirme qu'elle est allée au bout. Sans le SDK (Expo
+ * Go), on retombe sur la simulation : même friction, même cadence, pour que
+ * l'équilibrage reste travaillable sans build.
  */
 export default function AdButton({
   kind,
@@ -32,6 +37,7 @@ export default function AdButton({
   const offer = AD_OFFERS[kind];
 
   const [playing, setPlaying] = useState(false);
+  const [chargement, setChargement] = useState(false);
   const [left, setLeft] = useState(AD_SECONDS);
   const [now, setNow] = useState(Date.now());
   const pulse = useRef(new Animated.Value(0)).current;
@@ -53,10 +59,7 @@ export default function AdButton({
 
   useEffect(() => {
     if (!playing || left > 0) return;
-    if (watchAd(kind)) {
-      trackEvent('ad_completed', { kind });
-      onRewarded?.();
-    }
+    encaisser();
     setPlaying(false);
   }, [left, playing, kind, watchAd, onRewarded]);
 
@@ -71,15 +74,32 @@ export default function AdButton({
 
   const waiting = Math.max(0, Math.ceil((adNextAt - now) / 1000));
   const outOfAds = adsToday >= MAX_ADS_PER_DAY;
-  const disabled = outOfAds || waiting > 0;
+  const disabled = outOfAds || waiting > 0 || chargement;
+
+  const encaisser = () => {
+    if (!watchAd(kind)) return;
+    trackEvent('ad_completed', { kind });
+    onRewarded?.();
+  };
+
+  const lancer = async () => {
+    trackEvent('ad_started', { kind });
+    if (!pubsReelles) {
+      setPlaying(true);
+      return;
+    }
+    setChargement(true);
+    // une pub refusée, coupée ou indisponible ne donne rien — et ne dit rien
+    // non plus : le bouton redevient simplement cliquable
+    const vue = await montrerPub(kind);
+    setChargement(false);
+    if (vue) encaisser();
+  };
 
   return (
     <>
       <Pressable
-        onPress={() => {
-          trackEvent('ad_started', { kind });
-          setPlaying(true);
-        }}
+        onPress={() => void lancer()}
         disabled={disabled}
         style={({ pressed }) => [
           styles.wrap,
@@ -115,9 +135,11 @@ export default function AdButton({
               <Text style={[styles.sub, disabled && { color: C.textDim }]}>
                 {outOfAds
                   ? t('ad.outOfAds')
-                  : waiting > 0
-                    ? t('ad.waiting', { n: waiting })
-                    : `${offer.icon} ${offer.reward} · gratuit`}
+                  : chargement
+                    ? t('ad.loading')
+                    : waiting > 0
+                      ? t('ad.waiting', { n: waiting })
+                      : `${offer.icon} ${offer.reward} · gratuit`}
               </Text>
             </View>
             <View style={[styles.counter, disabled && styles.counterOff]}>
