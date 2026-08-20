@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6,3,12,0.45)',
   },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  icon: { fontSize: 24, lineHeight: 32 },
   name: {
     fontFamily: F.black,
     fontSize: 15,

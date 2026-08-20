@@ -96,10 +96,9 @@ export default function QuestScreen() {
             style={styles.action}
             size="sm"
             icon="🍺"
-            label={
-              dodosToday >= MAX_DODOS_PER_DAY
-                ? t('quest.dodoNone')
-                : t('quest.dodo', { n: MAX_DODOS_PER_DAY - dodosToday })
+            label={dodosToday >= MAX_DODOS_PER_DAY ? t('quest.dodoNone') : t('quest.dodo')}
+            count={
+              dodosToday >= MAX_DODOS_PER_DAY ? undefined : MAX_DODOS_PER_DAY - dodosToday
             }
             sub={dodosToday >= MAX_DODOS_PER_DAY ? undefined : '🌶️ 1 · +20'}
             onPress={drinkDodo}

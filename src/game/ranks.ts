@@ -15,17 +15,16 @@ export interface RankTier {
   /** honneur à atteindre pour décrocher le palier — et plancher une fois acquis */
   floor: number;
   nameKey: TransKey;
-  icon: string;
   color: string;
 }
 
 export const RANK_TIERS: RankTier[] = [
-  { floor: 0, nameKey: 'rank.tikok', icon: '🐣', color: '#9AA6AD' },
-  { floor: 150, nameKey: 'rank.batayer', icon: '🐓', color: '#3BD97E' },
-  { floor: 300, nameKey: 'rank.konu', icon: '⚔️', color: '#3BA9F0' },
-  { floor: 500, nameKey: 'rank.respekte', icon: '🎖️', color: '#B06BFF' },
-  { floor: 750, nameKey: 'rank.lezand', icon: '🔥', color: '#FF8A3D' },
-  { floor: 1100, nameKey: 'rank.roi', icon: '👑', color: '#FFC93C' },
+  { floor: 0, nameKey: 'rank.tikok', color: '#9AA6AD' },
+  { floor: 150, nameKey: 'rank.batayer', color: '#3BD97E' },
+  { floor: 300, nameKey: 'rank.konu', color: '#3BA9F0' },
+  { floor: 500, nameKey: 'rank.respekte', color: '#B06BFF' },
+  { floor: 750, nameKey: 'rank.lezand', color: '#FF8A3D' },
+  { floor: 1100, nameKey: 'rank.roi', color: '#FFC93C' },
 ];
 
 /** Palier correspondant à un montant d'honneur. */

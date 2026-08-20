@@ -402,8 +402,10 @@ const styles = StyleSheet.create({
   },
   rankBadge: {
     position: 'absolute',
-    bottom: -2,
-    left: -2,
+    // aligné sur le donjon : en débord négatif, la pastille allait chercher
+    // l'angle arrondi de la carte
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(6,3,12,0.9)',
     borderRadius: R.pill,
     borderWidth: 1,

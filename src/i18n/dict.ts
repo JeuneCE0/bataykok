@@ -1477,7 +1477,7 @@ export const DICT = {
   'quest.motivation': { fr: 'Motivation', rcf: 'Motivasyon' },
   'quest.refillAt': { fr: 'Plein refait dans {t} (minuit)', rcf: 'Plin refé dan {t} (minui)' },
   'quest.full': { fr: 'Plein ! Le rond t’attend.', rcf: 'Plin ! Le rond i attend a ou.' },
-  'quest.dodo': { fr: 'Dodo · {n} restantes', rcf: 'Dodo · {n} restant' },
+  'quest.dodo': { fr: 'Dodo', rcf: 'Dodo' },
   'quest.dodoNone': { fr: 'Plus de Dodo aujourd’hui', rcf: 'Pu de Dodo zordi' },
   'quest.refill': { fr: 'Plein d’un coup', rcf: 'Plin dun kou' },
   'quest.transport': { fr: 'Transport', rcf: 'Transpor' },

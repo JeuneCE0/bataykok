@@ -75,6 +75,7 @@ type BtnSize = 'sm' | 'md' | 'lg';
 export function Button({
   label,
   sub,
+  count,
   onPress,
   disabled,
   variant = 'gold',
@@ -86,6 +87,8 @@ export function Button({
   label: string;
   /** seconde ligne : le coût, le gain — ce qui allongeait le libellé principal */
   sub?: string;
+  /** reste à consommer, en pastille d'angle : dans le libellé, il le tronquait */
+  count?: number;
   onPress: () => void;
   disabled?: boolean;
   variant?: GradientKey;
@@ -173,6 +176,18 @@ export function Button({
                 </Text>
               ) : null}
             </View>
+            {count !== undefined ? (
+              <View style={[styles.btnCount, !light && styles.btnCountDark]}>
+                <Text
+                  style={[
+                    styles.btnCountText,
+                    { color: disabled ? C.textDim : light ? C.ink : '#FFF8F0' },
+                  ]}
+                >
+                  {count}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </LinearGradient>
       )}
@@ -518,6 +533,23 @@ const styles = StyleSheet.create({
   },
   btnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   btnIcon: { includeFontPadding: false },
+  btnCount: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(42,18,6,0.18)',
+  },
+  btnCountDark: { backgroundColor: 'rgba(255,248,240,0.16)' },
+  btnCountText: {
+    fontFamily: F.black,
+    fontSize: 12,
+    lineHeight: 16,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
   btnLabels: { alignItems: 'center', flexShrink: 1 },
   btnSub: {
     fontFamily: F.semi,
