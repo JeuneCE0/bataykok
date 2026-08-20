@@ -580,6 +580,14 @@ export const DICT = {
     fr: 'Panoplies',
     rcf: 'Panopli',
   },
+  'collection.sets.hint': {
+    fr: '2 pièces = bonus · 4 pièces = bonus doublé',
+    rcf: '2 morso = bonus · 4 morso = bonus doub',
+  },
+  'collection.album.sub': {
+    fr: '{n}/{total} découvert · chaque case = +1 % d’XP pou touzour',
+    rcf: '{n}/{total} trouvé · shak kaz = +1 % XP pou touzour',
+  },
   'collection.album': {
     fr: 'Zalbum',
     rcf: 'Zalbum',

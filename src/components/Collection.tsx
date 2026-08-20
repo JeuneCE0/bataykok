@@ -8,13 +8,13 @@ import {
   albumKey,
   albumXpBonus,
 } from '../game/album';
-import { SLOT_ICONS } from '../game/formulas';
-import { RARITY_COLORS } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS } from '../game/items';
 import { countSets, SETS, setBonusLabel, SET_THRESHOLDS } from '../game/sets';
 import { useGame } from '../store/gameStore';
-import { C, F, R } from '../theme';
+import { BW, C, F, R } from '../theme';
 import { Bar, Card, Chip, SectionTitle } from './ui';
 import { useT } from '../i18n/useT';
+import ItemArt from './ItemArt';
 
 /** {t('collection.album')} + panoplies : ce qu'on collectionne, et ce que ça rapporte. */
 export default function Collection() {
@@ -61,9 +61,7 @@ export default function Collection() {
             </View>
           );
         })}
-        <Text style={styles.hint}>
-          2 pièces = bonus · 4 pièces = bonus doublé
-        </Text>
+        <Text style={styles.hint}>{t('collection.sets.hint')}</Text>
       </Card>
 
       <Card>
@@ -76,13 +74,26 @@ export default function Collection() {
           />
         </View>
         <Text style={styles.albumSub}>
-          {album.length}/{ALBUM_SIZE} découvert · chaque case = +1 % d'XP pou touzour
+          {t('collection.album.sub', { n: album.length, total: ALBUM_SIZE })}
         </Text>
+
+        {/* Les cases se distinguaient par la couleur seule : la gamme se
+            devinait, elle ne se lisait pas. */}
+        <View style={styles.legend}>
+          <View style={styles.gridIcon} />
+          {ALBUM_RARITIES.map((r) => (
+            <Text key={r} style={[styles.legendText, { color: RARITY_COLORS[r] }]}>
+              {RARITY_LABELS[r].slice(0, 3)}
+            </Text>
+          ))}
+        </View>
 
         <View style={styles.grid}>
           {ALBUM_SLOTS.map((slot) => (
             <View key={slot} style={styles.gridRow}>
-              <Text style={styles.gridIcon}>{SLOT_ICONS[slot]}</Text>
+              <View style={styles.gridIcon}>
+                <ItemArt slot={slot} rarity="commun" size={20} />
+              </View>
               {ALBUM_RARITIES.map((r) => {
                 const has = owned.has(albumKey(slot, r));
                 return (
@@ -95,9 +106,14 @@ export default function Collection() {
                         : null,
                     ]}
                   >
-                    <Text style={[styles.cellText, has && { color: RARITY_COLORS[r] }]}>
-                      {has ? '✓' : '·'}
-                    </Text>
+                    {/* Une case cochée montre la pièce dans le métal de sa
+                        gamme : un ✓ ne dit pas ce qu'on a trouvé, et le Zalbum
+                        est une collection — on doit voir ce qu'on collectionne. */}
+                    {has ? (
+                      <ItemArt slot={slot} rarity={r} size={22} />
+                    ) : (
+                      <Text style={styles.cellText}>·</Text>
+                    )}
                   </View>
                 );
               })}
@@ -142,13 +158,25 @@ const styles = StyleSheet.create({
   },
   grid: { gap: 4 },
   gridRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  gridIcon: { fontSize: 15, width: 24 },
+  gridIcon: { width: 24, alignItems: 'center', justifyContent: 'center', opacity: 0.55 },
+  legend: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
+  legendText: {
+    flex: 1,
+    fontFamily: F.black,
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 0.6,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    includeFontPadding: false,
+  },
   cell: {
     flex: 1,
-    height: 26,
+    // la case accueille désormais un dessin, pas une coche
+    height: 32,
     borderRadius: R.sm,
-    borderWidth: 1,
-    borderColor: C.hairlineSoft,
+    borderWidth: BW.thick,
+    borderColor: 'rgba(6,3,12,0.7)',
     backgroundColor: 'rgba(6,3,12,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
