@@ -16,7 +16,7 @@ export interface SeasonTier {
   icon: string;
 }
 
-export const SEASON_TIERS: SeasonTier[] = [
+const SEASON_TIERS: SeasonTier[] = [
   { maxRank: 1, labelKey: 'season.tier.roi', grains: 6000, piments: 50, icon: '👑' },
   { maxRank: 3, labelKey: 'season.tier.podium', grains: 3500, piments: 30, icon: '🥇' },
   { maxRank: 10, labelKey: 'season.tier.top10', grains: 1800, piments: 15, icon: '🏆' },

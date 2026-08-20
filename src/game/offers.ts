@@ -34,7 +34,7 @@ export interface Offer {
   hours: number;
 }
 
-export const OFFERS: Offer[] = [
+const OFFERS: Offer[] = [
   {
     id: 'ti_batayer',
     nameKey: 'offer.ti_batayer.name',

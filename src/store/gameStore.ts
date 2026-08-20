@@ -83,9 +83,9 @@ import { trackEvent } from '../lib/analytics';
 import { DefenseLog } from '../lib/online';
 
 export { ARENA_TICKET_MS, BASE_ARENA_TICKETS } from '../game/tickets';
-export const CHEST_MS = 4 * 60 * 60 * 1000;
-export const PASS_DAYS = 30;
-export const PASS_DAILY_PIMENTS = 20;
+const CHEST_MS = 4 * 60 * 60 * 1000;
+const PASS_DAYS = 30;
+const PASS_DAILY_PIMENTS = 20;
 
 /** plafond de jetons : base + talents + événement du jour */
 /** plafond de jetons : base + talents + événement du jour */

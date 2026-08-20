@@ -25,7 +25,7 @@ export interface UniqueDef {
   armorBias?: number;
 }
 
-export const UNIQUES: UniqueDef[] = [
+const UNIQUES: UniqueDef[] = [
   {
     id: 'zepron_sitarane',
     slot: 'arme',

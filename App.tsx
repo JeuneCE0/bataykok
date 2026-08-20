@@ -1,10 +1,4 @@
-import {
-  Baloo2_500Medium,
-  Baloo2_600SemiBold,
-  Baloo2_700Bold,
-  Baloo2_800ExtraBold,
-  useFonts,
-} from '@expo-google-fonts/baloo-2';
+import { useFonts } from 'expo-font';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
@@ -55,11 +49,14 @@ export default function App() {
   const regenTickets = useGame((s) => s.regenTickets);
   useOnlineSync();
   const [tab, setTab] = useState<Tab>('kok');
+  // Chemins directs, pas le barrel : `@expo-google-fonts/baloo-2/index.js`
+  // fait un `require` des cinq graisses, et embarquait donc la 400Regular
+  // (420 Ko) que le jeu n'utilise nulle part.
   const [fontsLoaded] = useFonts({
-    Baloo2_500Medium,
-    Baloo2_600SemiBold,
-    Baloo2_700Bold,
-    Baloo2_800ExtraBold,
+    Baloo2_500Medium: require('@expo-google-fonts/baloo-2/500Medium/Baloo2_500Medium.ttf'),
+    Baloo2_600SemiBold: require('@expo-google-fonts/baloo-2/600SemiBold/Baloo2_600SemiBold.ttf'),
+    Baloo2_700Bold: require('@expo-google-fonts/baloo-2/700Bold/Baloo2_700Bold.ttf'),
+    Baloo2_800ExtraBold: require('@expo-google-fonts/baloo-2/800ExtraBold/Baloo2_800ExtraBold.ttf'),
   });
 
   useEffect(() => {

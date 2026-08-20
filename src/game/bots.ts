@@ -8,7 +8,7 @@ import { REFERENCE_CURVE, curveAttr } from './reference';
 import { Appearance, Bot, ClassId, Fighter, Item, PlayerState, Rarity, SlotId } from './types';
 
 /** Un bot ne porte que du cosmétique gratuit : il n'a rien acheté au Bazar. */
-export function randomAppearance(rand: () => number = Math.random): Appearance {
+function randomAppearance(rand: () => number = Math.random): Appearance {
   return {
     bodyColor: BODY_COLORS[Math.floor(rand() * FREE_COUNTS.body)],
     combColor: COMB_COLORS[Math.floor(rand() * FREE_COUNTS.comb)],

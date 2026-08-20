@@ -182,9 +182,9 @@ export function itemValue(it: Item): number {
 const DMG_VALUE = 3;
 const ARMOR_VALUE = 1.3;
 /** Grains par point de valeur — le levier qui aligne boutique et Kaz. */
-export const GRAINS_PER_VALUE = 3.1;
+const GRAINS_PER_VALUE = 3.1;
 
-export function itemPrice(it: Item, rand: () => number = Math.random): number {
+function itemPrice(it: Item, rand: () => number = Math.random): number {
   const setPremium = it.setId ? 1.25 : 1;
   return Math.max(
     5,

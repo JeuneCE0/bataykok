@@ -92,7 +92,7 @@ export const OUTLINE = 'rgba(6,3,12,0.75)';
  * Neuf suffisent — et les trois dernières sont des tailles d'affichage, à
  * réserver aux moments qui doivent occuper l'écran.
  */
-export const FS = {
+const FS = {
   micro: 11,
   caption: 12,
   small: 13,
