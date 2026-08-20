@@ -27,7 +27,7 @@ import {
 } from '../lib/notifications';
 import { useT } from '../i18n/useT';
 import { useGame } from '../store/gameStore';
-import { C, F } from '../theme';
+import { C, F, TEXT_OUTLINE } from '../theme';
 
 export default function QuestScreen() {
   const t = useT();
@@ -365,6 +365,7 @@ const styles = StyleSheet.create({
   },
   countdown: {
     fontFamily: F.black,
+    ...TEXT_OUTLINE,
     fontSize: 31,
     lineHeight: 41,
     color: C.gold,

@@ -158,6 +158,7 @@ export const F = {
 export const TYPO = {
   display: {
     fontFamily: F.black,
+    ...TEXT_OUTLINE,
     fontSize: 31,
     lineHeight: 41,
     letterSpacing: 0.3,
@@ -165,6 +166,7 @@ export const TYPO = {
   } as TextStyle,
   h1: {
     fontFamily: F.black,
+    ...TEXT_OUTLINE,
     fontSize: 24,
     lineHeight: 32,
     color: C.text,
