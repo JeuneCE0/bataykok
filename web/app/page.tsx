@@ -42,7 +42,6 @@ export default async function Page() {
         <Tile label="Sessions 24 h" value={n(o?.sessions_24h)} hint={`${n(o?.events_24h)} événements`} />
         <Tile label="Batays" value={n(o?.battles)} hint={`${n(o?.battles_24h)} sur 24 h`} accent="ember" />
         <Tile label="Niveau moyen" value={n(o?.avg_level)} hint={`${n(o?.guilds)} écuries`} />
-        <Tile label="Ventes" value={n(o?.sales)} hint={`${n(o?.listings_open)} annonces ouvertes`} accent="lagoon" />
         <Tile label="Parrainages" value={n(o?.referrals)} accent="mystic" />
       </div>
 

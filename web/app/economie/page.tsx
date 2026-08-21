@@ -29,7 +29,6 @@ export default async function Page() {
         <Tile label="Piments en circulation" value={n(o?.piments_total)} accent="piment" />
         <Tile label="Grains / joueur" value={n(avgGrains)} hint="moyenne" />
         <Tile label="Piments / joueur" value={n(avgPiments)} hint="moyenne" />
-        <Tile label="Volume échangé" value={n(o?.sales_volume)} hint="hôtel des ventes" accent="lagoon" />
       </div>
 
       <Panel title="Répartition des niveaux">

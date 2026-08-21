@@ -24,7 +24,6 @@ const SECTIONS = [
     links: [
       { href: '/combats', icon: '⚔️', label: 'Combats' },
       { href: '/economie', icon: '🌽', label: 'Économie' },
-      { href: '/marche', icon: '⚖️', label: 'Hôtel des ventes' },
     ],
   },
   {

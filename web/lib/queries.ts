@@ -47,8 +47,7 @@ async function single<T>(name: string): Promise<T | null> {
 export interface Overview {
   members: number; online_now: number; active_24h: number; active_7d: number;
   new_24h: number; new_7d: number; events_24h: number; sessions_24h: number;
-  battles: number; battles_24h: number; sales: number; listings_open: number;
-  sales_volume: number; referrals: number; grains_total: number;
+  battles: number; battles_24h: number; referrals: number; grains_total: number;
   piments_total: number; avg_level: number; guilds: number;
 }
 export interface DailyRow { day: string; events: number; sessions: number; players: number }
@@ -64,7 +63,6 @@ export interface PlayerRow {
   created_at: string; updated_at: string; online: boolean;
 }
 export interface EconomyRow { level_bucket: number; players: number; avg_grains: number; avg_piments: number; avg_equipped: number; avg_floor: number }
-export interface MarketRow { rarity: string; en_vente: number; vendus: number; prix_moyen: number; prix_min: number; prix_max: number }
 export interface DungeonRow { floor: number; players: number }
 export interface TalentRow { talent: string; picks: number }
 export interface PlatformRow { platform: string; version: string; players: number }
@@ -88,8 +86,6 @@ export const getPlayers = () =>
   view<PlayerRow>('stats_players', { order: { column: 'honor' }, limit: 300 });
 export const getEconomy = () =>
   view<EconomyRow>('stats_economy', { order: { column: 'level_bucket', ascending: true }, limit: 12 });
-export const getMarket = () =>
-  view<MarketRow>('stats_market', { order: { column: 'vendus' }, limit: 12 });
 export const getDungeon = () =>
   view<DungeonRow>('stats_dungeon', { order: { column: 'floor', ascending: true }, limit: 20 });
 export const getTalents = () =>
@@ -103,28 +99,6 @@ export const getHourly = () =>
   view<HourRow>('stats_hourly', { order: { column: 'hour', ascending: true }, limit: 24 });
 export const getLevels = () =>
   view<LevelRow>('stats_levels', { order: { column: 'level', ascending: true }, limit: 60 });
-
-/** Annonces en cours, pour la page Marché. */
-export async function getListings() {
-  if (!admin) return [];
-  const { data, error } = await admin
-    .from('market_listings')
-    .select('id, item, price, status, rarity, slot, item_level, created_at, sold_at')
-    .order('created_at', { ascending: false })
-    .limit(60);
-  if (error) throw new QueryError('market_listings', error.message);
-  type Row = {
-    id: string; item: unknown; price: number; status: string;
-    rarity: string; slot: string; item_level: number;
-    created_at: string | null; sold_at: string | null;
-  };
-  // `item` est du jsonb : un nom qui serait un objet ferait tomber tout le
-  // rendu React (« Objects are not valid as a React child »)
-  return ((data ?? []) as Row[]).map((r) => {
-    const name = (r.item as { name?: unknown } | null)?.name;
-    return { ...r, itemName: typeof name === 'string' ? name : '—' };
-  });
-}
 
 /** Derniers combats, pour la page Combats. */
 export async function getRecentBattles() {

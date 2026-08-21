@@ -192,11 +192,6 @@ function itemPrice(it: Item, rand: () => number = Math.random): number {
   );
 }
 
-/** Ce que le marchand rachète — deux écrans en avaient chacun leur copie. */
-export function resaleValue(it: Item): number {
-  return Math.max(1, Math.round(it.price * 0.4));
-}
-
 export function generateItem(
   level: number,
   slot?: SlotId,

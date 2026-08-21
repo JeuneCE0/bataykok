@@ -24,7 +24,6 @@ export const DICT = {
   'common.wins': { fr: '{n} V', rcf: '{n} V' },
   'common.losses': { fr: '{n} D', rcf: '{n} D' },
   'common.equip': { fr: 'Équiper', rcf: 'Ékip' },
-  'common.sell': { fr: 'Vendre', rcf: 'Vann' },
   'common.buy': { fr: 'Acheter', rcf: 'Ashté' },
 
   // ─── Réglages ──────────────────────────────────────────────────────────
@@ -173,11 +172,6 @@ export const DICT = {
     rcf: 'Asha intégré pa branshé — pou le prototip, lofèr lé ofèr.',
   },
 
-  // ─── Fiche d'objet ─────────────────────────────────────────────────────
-  'item.resale': {
-    fr: 'Revente',
-    rcf: 'Revant',
-  },
   'item.stats': {
     fr: 'Ce que ça donne',
     rcf: 'Sak i donn',
@@ -199,18 +193,6 @@ export const DICT = {
   'referral.shareFail': {
     fr: 'Partage impossible sur cet appareil.',
     rcf: 'Partaz inposib su sèt aparèy.',
-  },
-  'market.withdrawn': {
-    fr: 'Annonce retirée, l’objet est revenu dans ton sac.',
-    rcf: 'Danons ôté, le zafèr la rovnu dan out sak.',
-  },
-  'market.noGrains': {
-    fr: 'Pas assez de grains.',
-    rcf: 'Pa asé de grin.',
-  },
-  'market.bagFull': {
-    fr: 'Ton sac est plein — achat annulé.',
-    rcf: 'Out sak lé plin — asha anilé.',
   },
 
   // ─── Donjon (suite) ────────────────────────────────────────────────────
@@ -260,35 +242,6 @@ export const DICT = {
     rcf: 'Anon batayé !',
   },
 
-  // ─── Hôtel des ventes (suite) ──────────────────────────────────────────
-  'market.pick': {
-    fr: 'Choisir',
-    rcf: 'Choizi',
-  },
-  'market.picked': {
-    fr: 'Choisi',
-    rcf: 'Choizi',
-  },
-  'market.quote': {
-    fr: 'Cote du marché : ~🌽{med} ({n} ventes · de 🌽{min} à 🌽{max})',
-    rcf: 'Kot du marshé : ~🌽{med} ({n} vant · de 🌽{min} a 🌽{max})',
-  },
-  'market.noQuote': {
-    fr: 'Pas encore de vente comparable. Le Bazar rachète à 🌽{n}.',
-    rcf: 'Pankor de vant konparab. Le Bazar i rashète a 🌽{n}.',
-  },
-  'market.max': {
-    fr: 'Prix maximal : 🌽{n}',
-    rcf: 'Pri maksimom : 🌽{n}',
-  },
-  'market.tooHigh': {
-    fr: 'Trop cher pour cet objet — 🌽{n} au maximum.',
-    rcf: 'Tro shèr pou sa — 🌽{n} o maksimom.',
-  },
-  'market.failed': {
-    fr: 'Mise en vente impossible.',
-    rcf: 'Mis an vant inposib.',
-  },
 
   // ─── Défis du jour ─────────────────────────────────────────────────────
   'mission.q2': {
@@ -1461,7 +1414,12 @@ export const DICT = {
   // ─── Mon coq (suite) ───────────────────────────────────────────────────
   'kok.talents': { fr: 'Talents', rcf: 'Talan' },
   'kok.dailyMissions': { fr: 'Tes rendez-vous du jour', rcf: 'Out randévou zordi' },
-  'kok.sellSurplus': { fr: 'Vendre le surplus', rcf: 'Vann le rès' },
+  'common.discard': { fr: 'Jeter', rcf: 'Zète' },
+  'kok.bagCount': { fr: 'Sac — {n}/{max}', rcf: 'Sak — {n}/{max}' },
+  'kok.discardSurplus': { fr: 'Jeter le surplus', rcf: 'Zète le surplis' },
+  'kok.discarded': { fr: '🗑️ {n} objet jeté', rcf: '🗑️ {n} objè zété' },
+  'kok.discarded_n': { fr: '🗑️ {n} objets jetés', rcf: '🗑️ {n} objè zété' },
+  'kok.nothingToDiscard': { fr: 'Rien à jeter : tout sert encore.', rcf: 'Nada pou zète : tout i sèrt ankor.' },
   'kok.bagEmpty': {
     fr: 'Ton sac est vide, petit coq. Passe au Bazar !',
     rcf: 'Sak lé vide, ti kok. Pass o Bazar !',
@@ -1520,9 +1478,6 @@ export const DICT = {
   'guild.leave': { fr: 'Quitter l’écurie', rcf: 'Kit lékiri' },
   'guild.join': { fr: 'Rejoindre', rcf: 'Rantré' },
 
-  // ─── Hôtel des ventes ──────────────────────────────────────────────────
-  'market.title': { fr: 'Hôtel des Ventes', rcf: 'Lotèl dé Vant' },
-  'market.sub': { fr: 'Acheter et vendre entre joueurs', rcf: 'Ashté ek vann ant zouèr' },
   'ad.outOfAds': { fr: 'Plus de pub aujourd’hui — reviens demain', rcf: 'Pu de pib zordi — rovien domin' },
   'ad.loading': { fr: 'Chargement de la vidéo…', rcf: 'Vidéo i sarz…' },
   'ad.unavailable': { fr: 'Aucune pub dispo — réessaie', rcf: 'Nana pwin pib — résèy ankor' },
@@ -1546,11 +1501,6 @@ export const DICT = {
     fr: 'Tu lui as retiré {p} % de sa vie. Renforce ton kok, puis reviens.',
     rcf: 'Ou la anlèv ali {p} % son vi. Ranforsé out kok, apré rovien.',
   },
-  'market.listed': { fr: '🏷️ {name} est en vente pour 🌽{price}.', rcf: '🏷️ {name} lé an vant pou 🌽{price}.' },
-  'market.salesClaimed': {
-    fr: '💰 {n} ventes conclues — +🌽{total} (commission {fee} %)',
-    rcf: '💰 {n} vant fini — +🌽{total} (komision {fee} %)',
-  },
   'iap.title': { fr: 'Achat simulé 💳', rcf: 'Ashté similé 💳' },
   'iap.body': {
     fr: 'Le paiement n’est pas encore branché : pour l’instant, c’est offert.',
@@ -1566,22 +1516,6 @@ export const DICT = {
   'shop.passClaimed': { fr: 'Piments du jour déjà pris', rcf: 'Pima du zour déza pri' },
   'shop.passClaim': { fr: 'Récupérer 🌶️20 du jour', rcf: 'Ramas 🌶️20 du zour' },
   'shop.perMonth': { fr: '{price} / mois', rcf: '{price} / moi' },
-  'market.offlineTitle': { fr: 'Hôtel fermé', rcf: 'Lotèl fermé' },
-  'market.offlineBody': {
-    fr: 'Les annonces ont besoin de la connexion. Dès qu’elle revient, elles s’affichent ici.',
-    rcf: 'Bann anons i bezoin la konèksion. Dès k’èl rovien, zot va parèt isi.',
-  },
-  'market.retry': { fr: 'Réessayer', rcf: 'Résèy ankor' },
-  'market.refresh': { fr: 'Rafraîchir', rcf: 'Rafréshi' },
-  'market.withdraw': { fr: 'Retirer', rcf: 'Retiré' },
-  'market.list': { fr: 'Mettre en vente', rcf: 'Mète an vant' },
-  'market.none': {
-    fr: 'Pas encore d’annonce. Sois le premier à vendre quelque chose !',
-    rcf: 'Pankor nana danons. Soi le premié pou vann inn zafèr !',
-  },
-  'market.pickItem': { fr: 'Sac — choisir un objet à vendre', rcf: 'Sak — shwazi in zafèr pou vann' },
-  'market.bagEmpty': { fr: 'Ton sac est vide.', rcf: 'Out sak lé vide.' },
-  'market.price': { fr: 'Prix de vente', rcf: 'Pri de vant' },
 
   // ─── Création ──────────────────────────────────────────────────────────
   'creation.tagline': {

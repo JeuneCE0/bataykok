@@ -28,7 +28,6 @@ import {
   SLOT_LIST,
   generateItem,
   isTopRarity,
-  resaleValue,
   rollRarity,
   shopRotation,
 } from '../game/items';
@@ -218,7 +217,9 @@ interface GameState {
   ensureDaily: () => void;
   buyAttr: (attr: AttrId, times?: number) => void;
   equipBest: () => number;
-  sellJunk: () => { count: number; grains: number };
+  /** vide le sac sans rien créer : l'économie ne se fabrique plus sur l'appareil */
+  discardJunk: () => { count: number };
+  discardItem: (item: Item) => void;
   regenTickets: () => void;
   rerollQuests: () => void;
   startQuest: (q: Quest) => void;
@@ -241,7 +242,6 @@ interface GameState {
   refreshShop: (payWithPiment: boolean) => void;
   buyItem: (item: Item) => void;
   equipItem: (item: Item) => void;
-  sellItem: (item: Item) => void;
   joinGuild: (guildId: string) => void;
   leaveGuild: () => void;
   /** verse à la caisse commune ; renvoie l'état de l'écurie, ou null si refusé */
@@ -626,27 +626,40 @@ export const useGame = create<GameState>()(
           return changed;
         },
 
-        /** vend tout ce qui est strictement moins bon que le porté */
-        sellJunk: () => {
+        /**
+         * Jette tout ce qui est strictement moins bon que le porté.
+         *
+         * Cette action rendait des grains : l'appareil fabriquait donc de la
+         * monnaie à partir d'objets qu'il avait lui-même tirés. Elle ne fait
+         * plus que libérer de la place — le sac est plafonné à 24, il faut
+         * bien un moyen de le vider.
+         */
+        discardJunk: () => {
           const s = get();
-          if (!s.player) return { count: 0, grains: 0 };
+          if (!s.player) return { count: 0 };
           const junk = s.player.inventory.filter(
             (it) => compareToEquipped(it, s.player!).verdict === 'worse'
           );
-          if (!junk.length) return { count: 0, grains: 0 };
-          const grains = junk.reduce(
-            (sum, it) => sum + resaleValue(it),
-            0
-          );
+          if (!junk.length) return { count: 0 };
           const ids = new Set(junk.map((i) => i.id));
           set({
             player: {
               ...s.player,
-              grains: s.player.grains + grains,
               inventory: s.player.inventory.filter((i) => !ids.has(i.id)),
             },
           });
-          return { count: junk.length, grains };
+          return { count: junk.length };
+        },
+
+        discardItem: (item) => {
+          const s = get();
+          if (!s.player) return;
+          set({
+            player: {
+              ...s.player,
+              inventory: s.player.inventory.filter((i) => i.id !== item.id),
+            },
+          });
         },
 
         /** rend les jetons de batay dus depuis la dernière visite */
@@ -942,18 +955,6 @@ export const useGame = create<GameState>()(
           p.equipment[item.slot] = item;
           set({ player: p });
           track('equip');
-        },
-
-        sellItem: (item) => {
-          const s = get();
-          if (!s.player) return;
-          set({
-            player: {
-              ...s.player,
-              grains: s.player.grains + resaleValue(item),
-              inventory: s.player.inventory.filter((i) => i.id !== item.id),
-            },
-          });
         },
 
         joinGuild: (guildId) => {

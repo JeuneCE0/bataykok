@@ -5,7 +5,7 @@ import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
 import { ATTR_ICONS, ATTR_LABELS } from '../game/classes';
 import { fmt, SLOT_LABELS } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS, itemLabel, resaleValue } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemLabel } from '../game/items';
 import { ItemComparison } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { UNIQUE_BY_ID } from '../game/uniques';
@@ -33,8 +33,8 @@ export default function ItemDetail({
   primaryLabel,
   onPrimary,
   primaryDisabled,
+  onDiscard,
   primaryVariant = 'gold',
-  onSell,
   price,
 }: {
   item: Item | null;
@@ -43,9 +43,10 @@ export default function ItemDetail({
   primaryLabel?: string;
   onPrimary?: () => void;
   primaryDisabled?: boolean;
+  /** jeter la pièce : elle disparaît, elle ne se convertit pas */
+  onDiscard?: () => void;
   primaryVariant?: 'gold' | 'cane' | 'piment' | 'slate';
   /** proposé seulement pour une pièce déjà dans le sak */
-  onSell?: () => void;
   /** prix d'achat ; absent pour une pièce possédée */
   price?: number;
 }) {
@@ -135,10 +136,6 @@ export default function ItemDetail({
                   <Text style={styles.pillValue}>🌽 {fmt(price)}</Text>
                 </View>
               ) : null}
-              <View style={styles.pill}>
-                <Text style={styles.pillLabel}>{t('item.resale')}</Text>
-                <Text style={styles.pillValue}>🌽 {fmt(resaleValue(item))}</Text>
-              </View>
             </View>
           </ScrollView>
 
@@ -153,16 +150,15 @@ export default function ItemDetail({
               style={{ marginTop: SP.md }}
             />
           ) : null}
-          {onSell ? (
+          {onDiscard ? (
             <Button
               full
               variant="slate"
-              label={`${t('common.sell')} · 🌽${fmt(resaleValue(item))}`}
-              onPress={onSell}
+              label={t('common.discard')}
+              onPress={onDiscard}
               style={{ marginTop: SP.sm }}
             />
           ) : null}
-
         </LinearGradient>
       </View>
     </Modal>

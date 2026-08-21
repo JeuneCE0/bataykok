@@ -34,7 +34,7 @@ import {
   SLOT_LABELS,
   totalAttrs,
 } from '../game/formulas';
-import { RARITY_COLORS, RARITY_LABELS, itemStats, resaleValue } from '../game/items';
+import { RARITY_COLORS, RARITY_LABELS, itemStats } from '../game/items';
 import { compareToEquipped, kokPower } from '../game/power';
 import { SET_BY_ID } from '../game/sets';
 import { TALENT_BY_ID } from '../game/talents';
@@ -72,7 +72,6 @@ export default function CharacterScreen() {
   const player = useGame((s) => s.player);
   const buyAttr = useGame((s) => s.buyAttr);
   const equipItem = useGame((s) => s.equipItem);
-  const sellItem = useGame((s) => s.sellItem);
   const [selected, setSelected] = useState<Item | null>(null);
   const [settings, setSettings] = useState(false);
   const [bulk, setBulk] = useState(1);
@@ -80,7 +79,8 @@ export default function CharacterScreen() {
   const onlineState = useGame((s) => s.onlineState);
   const [flash, setFlash] = useState<string | null>(null);
   const equipBest = useGame((s) => s.equipBest);
-  const sellJunk = useGame((s) => s.sellJunk);
+  const discardJunk = useGame((s) => s.discardJunk);
+  const discardItem = useGame((s) => s.discardItem);
 
   const say = (msg: string) => {
     setFlash(msg);
@@ -331,16 +331,14 @@ export default function CharacterScreen() {
       {/* ─── Inventaire ─── */}
       <Card>
         <View style={styles.sectionHead}>
-          <SectionTitle icon="🎒">Sak — {player.inventory.length}/24</SectionTitle>
+          <SectionTitle icon="🎒">
+            {t('kok.bagCount', { n: player.inventory.length, max: 24 })}
+          </SectionTitle>
           <GhostButton
-            label={t('kok.sellSurplus')}
+            label={t('kok.discardSurplus')}
             onPress={() => {
-              const r = sellJunk();
-              say(
-                r.count > 0
-                  ? `💰 ${r.count} objè vandi · +🌽${fmt(r.grains)}`
-                  : 'Rien à vendre : tout i sert encore.'
-              );
+              const r = discardJunk();
+              say(r.count > 0 ? t('kok.discarded', { n: r.count }) : t('kok.nothingToDiscard'));
             }}
           />
         </View>
@@ -385,10 +383,6 @@ export default function CharacterScreen() {
                   label={t('common.equip')}
                   onPress={() => equipItem(it)}
                 />
-                <GhostButton
-                  label={`🌽${fmt(resaleValue(it))}`}
-                  onPress={() => sellItem(it)}
-                />
               </View>
             </View>
             );
@@ -414,10 +408,10 @@ export default function CharacterScreen() {
           if (selected) equipItem(selected);
           setSelected(null);
         }}
-        onSell={
+        onDiscard={
           selected && player.equipment[selected.slot]?.id !== selected.id
             ? () => {
-                if (selected) sellItem(selected);
+                if (selected) discardItem(selected);
                 setSelected(null);
               }
             : undefined
